@@ -32,7 +32,7 @@ const sponsorAds = [
 export default function SponsorAdsCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
-  const scrollPositionRef = useRef(0); 
+  const scrollPositionRef = useRef(0);
 
   useEffect(() => {
     const container = scrollRef.current;
@@ -62,7 +62,7 @@ export default function SponsorAdsCarousel() {
   }, [isPaused]);
 
   return (
-    <div className="w-full py-5 bg-muted/20 rounded-md">
+    <div className="w-full py-5 bg-muted/20 rounded-lg border mb-5">
       <div className="container mx-auto px-3 md:px-4">
         <h2 className="text-xl md:text-2xl font-semibold text-center mb-3 text-foreground">
           Sponsor AD
@@ -77,7 +77,7 @@ export default function SponsorAdsCarousel() {
         >
           <div
             ref={scrollRef}
-            className="flex gap-2 sm:gap-3 md:gap-4 overflow-x-hidden whitespace-nowrap"
+            className="flex gap-2 sm:gap-3 md:gap-4 overflow-x-hidden rounded-md whitespace-nowrap"
           >
             {/* Duplicate for infinite seamless scroll */}
             {[...sponsorAds, ...sponsorAds].map((ad, index) => (

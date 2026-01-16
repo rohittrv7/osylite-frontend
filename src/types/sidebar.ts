@@ -193,56 +193,13 @@ import {
   MapPin,
 } from "lucide-react";
 
-// export const sidebarConfig: SidebarItem[] = [
-//   {
-//     id: "dashboard",
-//     label: "Dashboard",
-//     icon: LayoutDashboard,
-//     type: "link",
-//     path: "/dashboard",
-//   },
-//   {
-//     id: "settings",
-//     label: "Settings",
-//     icon: Settings,
-//     type: "parent",
-//     children: [
-//       {
-//         id: "profile",
-//         label: "Profile",
-//         path: "/settings/profile",
-//         icon: User,
-//       },
-//       {
-//         id: "security",
-//         label: "Security",
-//         path: "/settings/security",
-//         icon: Shield,
-//       },
-//     ],
-//   },
-//   {
-//     id: "logout",
-//     label: "Logout",
-//     icon: LogOut,
-//     type: "action",
-//     action: "logout",
-//   },
-// ];
 export const sidebarConfig: SidebarItem[] = [
   {
     id: "home",
     label: "Home",
     icon: Home,
     type: "link",
-    path: "/",
-  },
-  {
-    id: "dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    type: "link",
-    path: "/dashboard",
+    path: "/home",
   },
   {
     id: "mchat",
@@ -257,6 +214,13 @@ export const sidebarConfig: SidebarItem[] = [
     icon: Sparkles,
     type: "link",
     path: "/mlife",
+  },
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    type: "link",
+    path: "/dashboard",
   },
   {
     id: "ang-mart",
