@@ -154,7 +154,7 @@ export default function ModernWhatsApp() {
   const [showSettings, setShowSettings] = useState(false);
   const [showSidebarMenu, setShowSidebarMenu] = useState(false);
   const [showChatMenu, setShowChatMenu] = useState(false);
-  const [viewArchived, setViewArchived] = useState(false);
+  // const [viewArchived, setViewArchived] = useState(false);
 
   const currentChat = chats.find((c) => c.id === selectedChatId);
   const currentMessages = messagesByChat[selectedChatId] || [];
@@ -167,9 +167,9 @@ export default function ModernWhatsApp() {
     setShowEmoji(false);
   };
 
-  const visibleChats = viewArchived
-    ? chats.filter((c) => c.isArchived)
-    : chats.filter((c) => !c.isArchived);
+  const visibleChats = chats
+  //   ? chats.filter((c) => c.isArchived)
+  //   : chats.filter((c) => !c.isArchived);
 
   return (
     <div className="flex h-screen bg-background text-foreground">

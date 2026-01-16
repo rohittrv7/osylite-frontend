@@ -1,22 +1,29 @@
-import { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { isActionItem, isLinkItem, isParentItem, sidebarConfig } from "@/types/sidebar";
+import {
+  isActionItem,
+  isLinkItem,
+  isParentItem,
+  sidebarConfig,
+} from "@/types/sidebar";
+import { useMemo, useState } from "react";
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [openMenu, setOpenMenu] = useState<string>("");
+  const [manualOpen, setManualOpen] = useState<string>("");
 
-  useEffect(() => {
-    const activeParent = sidebarConfig.find(
+  const autoOpenMenu = useMemo(() => {
+    const parent = sidebarConfig.find(
       (item) =>
         isParentItem(item) &&
-        item.children.some((child) => child.path === location.pathname)
+        item.children.some((c) => c.path === location.pathname)
     );
 
-    setOpenMenu(activeParent ? activeParent.id : "");
+    return parent?.id ?? "";
   }, [location.pathname]);
+
+  const openMenu = manualOpen || autoOpenMenu;
 
   return (
     <aside
@@ -56,9 +63,7 @@ export default function Sidebar() {
             return (
               <div
                 key={item.id}
-                onClick={() =>
-                  item.action === "logout" && console.log("Logout")
-                }
+                onClick={() => console.log("Logout")}
                 className="flex items-center gap-4 px-4 py-3 rounded-lg cursor-pointer
                 text-destructive hover:bg-muted/50"
               >
@@ -74,7 +79,7 @@ export default function Sidebar() {
             return (
               <div key={item.id}>
                 <div
-                  onClick={() => setOpenMenu(isOpen ? "" : item.id)}
+                  onClick={() => setManualOpen(isOpen ? "" : item.id)}
                   className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer
                     ${
                       isOpen
@@ -97,7 +102,7 @@ export default function Sidebar() {
                   <div className="ml-6 mt-3 space-y-2">
                     {item.children.map((child) => {
                       const ChildIcon = child.icon;
-                      const isChildActive = location.pathname === child.path;
+                      const isActive = location.pathname === child.path;
 
                       return (
                         <div
@@ -105,7 +110,7 @@ export default function Sidebar() {
                           onClick={() => navigate(child.path)}
                           className={`flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer
                             ${
-                              isChildActive
+                              isActive
                                 ? "bg-muted border border-border"
                                 : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                             }`}

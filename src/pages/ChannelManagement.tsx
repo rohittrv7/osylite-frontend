@@ -1,16 +1,7 @@
 import type { Column } from "@/components/CustomTable";
 import CustomTable from "@/components/CustomTable";
-import { channels } from "@/types/channel";
-
-interface Channel {
-  id: number;
-  name: string;
-  subtitle?: string;
-  owner: string;
-  createdAt: string;
-  status: "Pending" | "Approved";
-  logo: string;
-}
+// import { channels } from "@/types/channel";
+import { channels, type Channel } from "@/types/channel";
 
 export default function ChannelManagement() {
   const channelColumns: Column<Channel>[] = [

@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { Toaster } from "sonner";
 import LoginPage from "@/pages/LoginPage";
 import { ThemeProvider } from "./components/theme-provider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -11,11 +12,13 @@ import HomeSections from "./pages/HomeSections";
 import WallPage from "./pages/WallPage";
 import Chat from "./pages/Chat";
 import InfiniteScrollPage from "./pages/Feed";
+import HomePage from "./pages/home/MainPage";
 
 function App() {
   return (
     <ThemeProvider>
       <Routes>
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
 
         <Route
@@ -41,6 +44,7 @@ function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Toaster richColors position="top-right" />
     </ThemeProvider>
   );
 }

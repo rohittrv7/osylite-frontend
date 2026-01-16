@@ -2,9 +2,11 @@ export type Channel = {
   id: string;
   name: string;
   owner: string;
+  logo?: string;
   createdAt: string;
   status: "Pending" | "Approved";
 };
+
 
 export const channels: Channel[] = [
   {
