@@ -7,15 +7,23 @@ import {
   Coins,
   UserCircle,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useGetProfileQuery } from "@/store/api/authApi";
 
 export default function Dashboard() {
+  const navigator = useNavigate();
+
+  const { data: userData, isLoading } = useGetProfileQuery();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (!userData) return <div>No data found</div>;
   return (
     <div className="min-h-screen bg-background text-foreground p-4 md:p-6">
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-              Welcome, Rahul 👋
+              Welcome, {userData.firstName} 👋
             </h1>
             <p className="text-muted-foreground mt-1">
               Here's an overview of your account activity
@@ -24,7 +32,7 @@ export default function Dashboard() {
 
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-950/40 text-green-400 border border-green-800/60 rounded-full text-sm font-medium">
             <CircleCheck className="h-4 w-4" />
-            User
+            {userData.role}
           </div>
         </div>
 
@@ -34,7 +42,7 @@ export default function Dashboard() {
             <CardContent className="p-5 flex flex-col items-center text-center gap-1">
               <Wallet className="h-8 w-8 text-primary mb-1" />
               <p className="text-sm text-muted-foreground">Wallet Balance</p>
-              <p className="text-2xl font-bold">₹0</p>
+              <p className="text-2xl font-bold">₹{userData?.walletBalance}</p>
             </CardContent>
           </Card>
 
@@ -42,7 +50,7 @@ export default function Dashboard() {
             <CardContent className="p-5 flex flex-col items-center text-center gap-1">
               <Coins className="h-8 w-8 text-blue-500 mb-1" />
               <p className="text-sm text-muted-foreground">ANG Tokens</p>
-              <p className="text-2xl font-bold">0</p>
+              <p className="text-2xl font-bold">{userData?.angCoins}</p>
             </CardContent>
           </Card>
 
@@ -50,7 +58,7 @@ export default function Dashboard() {
             <CardContent className="p-5 flex flex-col items-center text-center gap-1">
               <ShieldCheck className="h-8 w-8 text-emerald-500 mb-1" />
               <p className="text-sm text-muted-foreground">Membership</p>
-              <p className="text-xl font-semibold text-emerald-400">Free</p>
+              <p className="text-xl font-semibold text-emerald-400">{userData.membershipType}</p>
             </CardContent>
           </Card>
 
@@ -58,7 +66,7 @@ export default function Dashboard() {
             <CardContent className="p-5 flex flex-col items-center text-center gap-1">
               <CircleCheck className="h-8 w-8 text-green-500 mb-1" />
               <p className="text-sm text-muted-foreground">Account Status</p>
-              <p className="text-xl font-semibold text-green-400">Verified</p>
+              <p className="text-xl font-semibold text-green-400">{userData.isVerified ? "Active" : "Inactive"}</p>
             </CardContent>
           </Card>
         </div>
@@ -83,6 +91,7 @@ export default function Dashboard() {
               <Button
                 variant="outline"
                 className="w-full justify-start gap-3 h-11"
+                onClick={() => navigator("/profile")}
               >
                 <UserCircle className="h-5 w-5" />
                 View Profile

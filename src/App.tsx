@@ -8,11 +8,16 @@ import DashboardPage from "./pages/DashboardPage";
 import Account from "./pages/Account";
 import ChannelManagement from "./pages/ChannelManagement";
 import ContentManagement from "./pages/ContentManagement";
-import HomeSections from "./pages/HomeSections";
 import WallPage from "./pages/WallPage";
 import Chat from "./pages/Chat";
 import InfiniteScrollPage from "./pages/Feed";
+import RegisterPage from "./pages/Register";
+import OTPVerificationPage from "./pages/OtpVerification";
+import ProfilePage from "./pages/Profile";
+import HomeSections from "./pages/HomeSections";
 import HomePage from "./pages/home/MainPage";
+import ForgotPassword from "./pages/ForgotPage";
+import ResetPasswordPage from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -20,6 +25,10 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/verify-otp" element={<OTPVerificationPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         <Route
           element={
@@ -28,21 +37,22 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/" element={<HomeSections />} />
-
+          <Route path="/home" element={<HomeSections />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/mlife" element={<InfiniteScrollPage />} />
           <Route path="/account" element={<Account />} />
           <Route path="/mlife/channel" element={<ChannelManagement />} />
           <Route path="/mlife/content" element={<ContentManagement />} />
           <Route path="/mlife" element={<WallPage />} />
-
-          {/* <Route path="/" element={<DashboardPage />} />  ← commented out to avoid conflict */}
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route
+            path="/mchat"
+            element={<Chat />}
+            handle={{ fullScreen: true }}
+          />
         </Route>
 
-        <Route path="/mchat" element={<Chat />} handle={{ fullScreen: true }} />
-
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/mlife" replace />} />
       </Routes>
       <Toaster richColors position="top-right" />
     </ThemeProvider>

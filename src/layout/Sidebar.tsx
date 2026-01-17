@@ -1,4 +1,4 @@
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   isActionItem,
@@ -6,24 +6,46 @@ import {
   isParentItem,
   sidebarConfig,
 } from "@/types/sidebar";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { useLogoutMutation } from "@/store/api/authApi";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
+import { logout } from "@/store/slices/authSlice";
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [manualOpen, setManualOpen] = useState<string>("");
 
-  const autoOpenMenu = useMemo(() => {
+  // 🔥 NO useMemo — simple calculation
+  const autoOpenMenu = (() => {
     const parent = sidebarConfig.find(
       (item) =>
         isParentItem(item) &&
         item.children.some((c) => c.path === location.pathname)
     );
-
     return parent?.id ?? "";
-  }, [location.pathname]);
+  })();
 
   const openMenu = manualOpen || autoOpenMenu;
+
+  const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+
+    try {
+      await logoutApi().unwrap();
+      toast.success("Logged out successfully");
+    } catch {
+      console.warn("Logout API failed");
+    } finally {
+      dispatch(logout());
+      sessionStorage.clear();
+      navigate("/login", { replace: true });
+    }
+  };
 
   return (
     <aside
@@ -38,6 +60,7 @@ export default function Sidebar() {
         {sidebarConfig.map((item) => {
           const Icon = item.icon;
 
+          /* ───────── LINK ITEM ───────── */
           if (isLinkItem(item)) {
             const isActive = location.pathname === item.path;
 
@@ -59,20 +82,31 @@ export default function Sidebar() {
             );
           }
 
+          /* ───────── LOGOUT ───────── */
           if (isActionItem(item)) {
             return (
               <div
                 key={item.id}
-                onClick={() => console.log("Logout")}
-                className="flex items-center gap-4 px-4 py-3 rounded-lg cursor-pointer
-                text-destructive hover:bg-muted/50"
+                onClick={handleLogout}
+                className={`flex items-center gap-4 px-4 py-3 rounded-lg
+                text-destructive transition
+                ${
+                  isLoggingOut
+                    ? "opacity-60 cursor-not-allowed"
+                    : "cursor-pointer hover:bg-muted/50"
+                }`}
               >
-                <Icon size={20} />
-                {item.label}
+                {isLoggingOut ? (
+                  <Loader2 size={20} className="animate-spin" />
+                ) : (
+                  <Icon size={20} />
+                )}
+                {isLoggingOut ? "Logging out..." : item.label}
               </div>
             );
           }
 
+          /* ───────── PARENT ───────── */
           if (isParentItem(item)) {
             const isOpen = openMenu === item.id;
 
