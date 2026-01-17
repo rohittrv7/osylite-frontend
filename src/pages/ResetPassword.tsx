@@ -26,10 +26,6 @@ import { toast } from "sonner";
 import { useResetPasswordMutation } from "@/store/api/authApi";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
-// ──────────────────────────────────────────────
-// Validation Schema
-// ──────────────────────────────────────────────
-
 const formSchema = z
   .object({
     otp: z.string().length(6, "OTP must be 6 digits"),
@@ -51,7 +47,6 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Email passed from forgot-password page
   const email = location.state?.email;
 
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
@@ -155,7 +150,7 @@ export default function ResetPasswordPage() {
         </CardContent>
 
         <CardFooter className="text-xs text-muted-foreground text-center">
-          OTP 10–15 minutes ke liye valid hota hai
+          OTP valid till 10–15 minutes.
         </CardFooter>
       </Card>
     </div>

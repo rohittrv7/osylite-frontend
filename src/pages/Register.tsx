@@ -28,13 +28,13 @@ import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
 const formSchema = z
   .object({
-    firstName: z.string().min(2, { message: "First name required" }),
-    lastName: z.string().min(2, { message: "Last name required" }),
-    mobile: z.string().min(10, { message: "Valid mobile number required" }),
-    pincode: z.string().length(6, { message: "Pincode must be 6 digits" }),
-    email: z.string().email({ message: "Invalid email" }),
-    username: z.string().min(3, { message: "Username min 3 characters" }),
-    password: z.string().min(6, { message: "Password min 6 characters" }),
+    firstName: z.string().min(2, "First name required"),
+    lastName: z.string().min(2, "Last name required"),
+    mobile: z.string().min(10, "Valid mobile number required"),
+    pincode: z.string().length(6, "Pincode must be 6 digits"),
+    email: z.string().email("Invalid email"),
+    username: z.string().min(3, "Username min 3 characters"),
+    password: z.string().min(6, "Password min 6 characters"),
     confirmPassword: z.string(),
     terms: z.boolean().refine((val) => val === true, {
       message: "You must agree to terms",
@@ -50,7 +50,6 @@ type FormValues = z.infer<typeof formSchema>;
 export default function RegisterPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const [register, { isLoading }] = useRegisterMutation();
 
   const form = useForm<FormValues>({
@@ -78,11 +77,9 @@ export default function RegisterPage() {
       username: values.username,
       password: values.password,
     };
-
     try {
       const res = await register(payload).unwrap();
       dispatch(setCredentials({ token: res.verificationToken, user: null }));
-
       toast.success(res.message);
       navigate("/verify-otp");
     } catch (err) {
@@ -90,15 +87,15 @@ export default function RegisterPage() {
         data?: { message?: string };
       };
       toast.error(
-        error?.data?.message || "Registration failed. Please try again."
+        error?.data?.message || "Registration failed. Please try again.",
       );
     }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md space-y-8 border border-zinc-500 p-8 rounded-lg shadow-lg">
-        <div className="text-center">
+      <div className="w-full max-w-md border border-zinc-500 p-6 sm:p-8 rounded-lg shadow-lg">
+        <div className="text-center mb-6">
           <h1 className="text-3xl font-bold">Create Account</h1>
           <p className="text-muted-foreground mt-2">
             Enter your details to get started
@@ -106,8 +103,9 @@ export default function RegisterPage() {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            {/* Name */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="firstName"
@@ -115,13 +113,12 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>First Name *</FormLabel>
                     <FormControl>
-                      <Input placeholder="First Name" {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="lastName"
@@ -129,7 +126,7 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Last Name *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Last Name" {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -137,7 +134,8 @@ export default function RegisterPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* Mobile + Pincode */}
+            <div className="">
               <FormField
                 control={form.control}
                 name="mobile"
@@ -145,19 +143,22 @@ export default function RegisterPage() {
                   <FormItem>
                     <FormLabel>Mobile *</FormLabel>
                     <FormControl>
-                      <div className="flex">
+                      <div className="flex items-center gap-2">
+                        {/* Country Code */}
                         <Select defaultValue="+91">
-                          <SelectTrigger className="w-24">
+                          <SelectTrigger className="w-[72px] flex-shrink-0">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="+91">+91 🇮🇳</SelectItem>
                           </SelectContent>
                         </Select>
+
+                        {/* Mobile Number */}
                         <Input
                           type="tel"
                           placeholder="9964525434"
-                          className="flex-1 ml-2"
+                          className="flex-1"
                           {...field}
                         />
                       </div>
@@ -166,22 +167,22 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="pincode"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Pincode *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="110059" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
+            <FormField
+              control={form.control}
+              name="pincode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Pincode *</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
+            {/* Email */}
             <FormField
               control={form.control}
               name="email"
@@ -189,13 +190,14 @@ export default function RegisterPage() {
                 <FormItem>
                   <FormLabel>Email *</FormLabel>
                   <FormControl>
-                    <Input placeholder="rahul@example.com" {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
+            {/* Username */}
             <FormField
               control={form.control}
               name="username"
@@ -203,14 +205,15 @@ export default function RegisterPage() {
                 <FormItem>
                   <FormLabel>Username *</FormLabel>
                   <FormControl>
-                    <Input placeholder="username" {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* Password */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="password"
@@ -224,7 +227,6 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="confirmPassword"
@@ -240,29 +242,23 @@ export default function RegisterPage() {
               />
             </div>
 
+            {/* Terms */}
             <FormField
               control={form.control}
               name="terms"
               render={({ field }) => (
-                <FormItem className="flex items-center space-x-3 space-y-0">
+                <FormItem className="flex items-start space-x-3">
                   <FormControl>
                     <Checkbox
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel className="text-sm">
-                      I agree to the{" "}
-                      <a href="#" className="text-primary hover:underline">
-                        Terms & Conditions
-                      </a>{" "}
-                      and{" "}
-                      <a href="#" className="text-primary hover:underline">
-                        Privacy Policy
-                      </a>
-                    </FormLabel>
-                  </div>
+                  <FormLabel className="text-sm leading-snug">
+                    I agree to the{" "}
+                    <span className="text-primary">Terms & Conditions</span> and{" "}
+                    <span className="text-primary">Privacy Policy</span>
+                  </FormLabel>
                   <FormMessage />
                 </FormItem>
               )}
@@ -272,6 +268,17 @@ export default function RegisterPage() {
               {isLoading ? "Registering..." : "Register"}
             </Button>
           </form>
+          <p className="text-center text-sm text-muted-foreground">
+            Don't have an account?{" "}
+            <Button
+              variant="link"
+              className="px-1"
+              type="button"
+              onClick={() => navigate("/login")}
+            >
+              Sign up
+            </Button>
+          </p>
         </Form>
       </div>
     </div>
