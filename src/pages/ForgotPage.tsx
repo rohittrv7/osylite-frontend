@@ -30,7 +30,7 @@ export default function ForgotPassword() {
 
     try {
       const res = await forgotPassword({ email }).unwrap();
-      toast.success("Reset link email par bhej diya gaya hai");
+      toast.success(res.message || "Reset link sent on your email");
       dispatch(setCredentials({ token: res.verificationToken, user: null }));
 
       navigate("/reset-password", {
@@ -40,9 +40,7 @@ export default function ForgotPassword() {
       const error = err as FetchBaseQueryError & {
         data?: { message?: string };
       };
-      toast.error(
-        error?.data?.message || "Kuch galat ho gaya, dobara try karo"
-      );
+      toast.error(error?.data?.message);
     }
   };
 
@@ -57,12 +55,10 @@ export default function ForgotPassword() {
               </Button>
             </Link>
             <CardTitle className="text-2xl font-bold">
-              Password bhool gaye?
+              Forgot Password ?
             </CardTitle>
           </div>
-          <CardDescription>
-            Apna email daal do, reset link bhej dete hain
-          </CardDescription>
+          <CardDescription>Enter Email for reset password</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -85,21 +81,21 @@ export default function ForgotPassword() {
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Reset Password Link Bhejo
+              Reset Password
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            Yaad aa gaya password?{" "}
+            login with password?{" "}
             <Link to="/login" className="text-primary hover:underline">
-              Login kar lo
+              Login
             </Link>
           </div>
         </CardContent>
 
         <CardFooter className="flex flex-col items-center justify-center text-xs text-muted-foreground pt-2 border-t">
-          <p>Link 15 minute tak valid rahega</p>
-          <p>Spam folder bhi check kar lena</p>
+          <p>Link valid till 15 minute</p>
+          <p>Check your spam folder</p>
         </CardFooter>
       </Card>
     </div>
