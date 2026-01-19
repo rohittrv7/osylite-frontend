@@ -26,7 +26,7 @@ export interface User {
 
   isVerified: boolean;
   otpExpiresAt: string | null;
-
+  channelStatus: string;
   additionalProfiles?: string | null;
 
   privacySettings: PrivacySettings;

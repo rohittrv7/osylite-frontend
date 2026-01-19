@@ -52,33 +52,6 @@ export const postsApi = createApi({
   }),
   tagTypes: ["Post"],
   endpoints: (builder) => ({
-    // createPost: builder.mutation<any, CreatePostPayload>({
-    //   query: ({ caption, type, file, isEnquiryPost, ctaLabel }) => {
-    //     const formData = new FormData();
-
-    //     formData.append("type", type);
-    //     formData.append("file", file);
-
-    //     if (caption) {
-    //       formData.append("caption", caption);
-    //     }
-
-    //     if (typeof isEnquiryPost === "boolean") {
-    //       formData.append("isEnquiryPost", String(isEnquiryPost));
-    //     }
-
-    //     if (ctaLabel) {
-    //       formData.append("ctaLabel", ctaLabel);
-    //     }
-
-    //     return {
-    //       url: "/posts",
-    //       method: "POST",
-    //       body: formData,
-    //     };
-    //   },
-    //   // invalidatesTags: ["Post"],
-    // }),
     createPost: builder.mutation<any, CreatePostPayload>({
       query: ({ caption, type, file, isEnquiryPost, ctaLabel }) => {
         const formData = new FormData();
