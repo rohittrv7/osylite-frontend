@@ -52,12 +52,13 @@ const Header = () => {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end" className="w-48">
-            {!user?.isChannelCreated && user?.channelStatus === "pending" && (
-              <DropdownMenuItem onClick={() => setOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Create Channel
-              </DropdownMenuItem>
-            )}
+            {user?.isChannelCreated === false &&
+              user?.channelStatus === "pending" && (
+                <DropdownMenuItem onClick={() => setOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Channel
+                </DropdownMenuItem>
+              )}
 
             <DropdownMenuItem>
               <Lock className="mr-2 h-4 w-4" />
