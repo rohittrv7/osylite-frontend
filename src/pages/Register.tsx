@@ -22,7 +22,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useRegisterMutation } from "@/store/api/authApi";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { setCredentials } from "@/store/slices/authSlice";
+import { setUser } from "@/store/slices/authSlice";
 import { useDispatch } from "react-redux";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
@@ -79,9 +79,11 @@ export default function RegisterPage() {
     };
     try {
       const res = await register(payload).unwrap();
-      dispatch(setCredentials({ token: res.verificationToken, user: null }));
+      dispatch(setUser(res.user));
       toast.success(res.message);
-      navigate("/verify-otp");
+      navigate("/verify-otp", {
+        state: { email: values.email },
+      });
     } catch (err) {
       const error = err as FetchBaseQueryError & {
         data?: { message?: string };

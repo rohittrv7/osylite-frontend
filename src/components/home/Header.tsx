@@ -58,9 +58,7 @@ const Header = () => {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          {/* <div className="flex h-8 w-8 items-center justify-center rounded-lg border-2 border-primary bg-background"> */}
           <ShoppingBag />
-          {/* </div> */}
           <span className="text-lg font-semibold text-foreground">
             ANG Growth
           </span>
@@ -147,7 +145,6 @@ const Header = () => {
           </DropdownMenu>
         </div>
 
-        {/* Mobile Actions */}
         <div className="flex md:hidden items-center gap-2">
           <Button
             variant="outline"

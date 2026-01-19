@@ -1,9 +1,10 @@
+import type { UserRole } from "./userRole";
+
 export interface User {
   id: string;
   phoneNumber: string;
   email: string;
   memberId: string;
-
   firstName: string;
   lastName: string;
   username: string;
@@ -14,8 +15,8 @@ export interface User {
   backgroundUrl: string | null;
   bio: string | null;
 
-  role: "user" | "admin";
-  membershipType: "primary_free" | "premium";
+  role: UserRole;
+  membershipType: "primary_free" | string;
 
   angCoins: number;
   walletBalance: string;
@@ -30,8 +31,13 @@ export interface User {
 
   privacySettings: PrivacySettings;
 
+  // channel?: Channel | null;
+
   createdAt: string;
   updatedAt: string;
+
+  isChannelCreated: boolean;
+  // channelStatus: ChannelStatus;
 }
 
 export interface PrivacySettings {

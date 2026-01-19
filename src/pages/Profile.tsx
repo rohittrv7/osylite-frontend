@@ -3,9 +3,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useGetProfileQuery } from "@/store/api/authApi";
+import CreateMenu from "@/components/CreateMenu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Bookmark, Contact, Grid3X3 } from "lucide-react";
+import MediaGrid from "@/components/MediaGrid";
+import { useGetMyPostsQuery } from "@/store/api/postsApi";
+import { useState } from "react";
 
 export default function ProfilePage() {
+  const [activeTab, setActiveTab] = useState<"post" | "video" | "reel">("post");
   const { data: userData, isLoading } = useGetProfileQuery();
+
+  const { data: Content } = useGetMyPostsQuery({
+    type: activeTab,
+  });
 
   if (isLoading) return <div>Loading...</div>;
   if (!userData) return <div>No data found</div>;
@@ -13,39 +24,63 @@ export default function ProfilePage() {
   return (
     <div className="bg-background p-6">
       <div className="max-w-4xl mx-auto space-y-8">
-        {/* Top Header Card */}
-        <Card className="bg-gradient-to-r from-gray-950 to-black border-none">
-          <CardContent className="p-8 flex flex-col md:flex-row items-center gap-6">
-            <Avatar className="h-24 w-24 border-4 border-background">
-              <AvatarImage
-                src={userData.avatarUrl ?? ""}
-                alt={userData.firstName}
-              />
-              <AvatarFallback className="text-4xl bg-primary text-primary-foreground">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-8">
+          {/* Avatar */}
+          <div className="flex justify-center sm:justify-start">
+            <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
+              <AvatarImage src={userData.avatarUrl ?? ""} />
+              <AvatarFallback>
                 {userData.username.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
+          </div>
 
-            <div className="text-center md:text-left">
-              <h1 className="text-3xl font-bold text-white">
-                {userData.firstName} {userData.lastName}
-              </h1>
-              <p className="text-gray-400 mt-1">@{userData.username}</p>
-              <div className="mt-4 flex flex-wrap gap-3 justify-center md:justify-start">
-                <Badge
-                  variant="outline"
-                  className="bg-green-950 text-green-400 border-green-700"
-                >
-                  {userData.isVerified ? "Verified" : "Unverified"}
+          {/* Right Content */}
+          <div className="flex-1 space-y-4 text-center sm:text-left">
+            {/* Name + Actions */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <h2 className="text-lg sm:text-xl font-semibold">
+                {userData.username}
+              </h2>
+
+              {userData.isVerified && (
+                <Badge className="w-fit mx-auto sm:mx-0 bg-blue-600">
+                  ✔ Verified
                 </Badge>
-                <Badge variant="outline">{userData.role}</Badge>
+              )}
+
+              <div className="flex justify-center sm:justify-start gap-2">
+                <Button variant="outline" size="sm">
+                  Edit Profile
+                </Button>
+                <CreateMenu />
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Stats */}
+            <div className="flex justify-center sm:justify-start gap-6 text-sm flex-wrap">
+              <span>
+                <b>24</b> posts
+              </span>
+              <span>
+                <b>177</b> followers
+              </span>
+              <span>
+                <b>81</b> following
+              </span>
+            </div>
+
+            {/* Bio */}
+            <div className="text-sm text-muted-foreground space-y-1">
+              <p className="font-medium text-foreground">
+                {userData.firstName} {userData.lastName}
+              </p>
+              <p>🚀 Building cool stuff with code</p>
+            </div>
+          </div>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Personal Information */}
           <Card>
             <CardHeader>
               <CardTitle>Personal Information</CardTitle>
@@ -82,10 +117,46 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
         </div>
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) =>
+            setActiveTab(value as "post" | "video" | "reel")
+          }
+          className="w-full"
+        >
+          <TabsList className="w-full bg-transparent border-t border-gray-800 rounded-none h-auto p-0 flex justify-center gap-12">
+            <TabsTrigger
+              value="post"
+              className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+            >
+              <Grid3X3 size={12} /> Posts
+            </TabsTrigger>
+            <TabsTrigger
+              value="video"
+              className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+            >
+              <Bookmark size={12} /> Video
+            </TabsTrigger>
+            <TabsTrigger
+              value="reel"
+              className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+            >
+              <Contact size={12} /> Reel
+            </TabsTrigger>
+          </TabsList>
 
-        <div className="flex justify-center">
-          <Button variant="outline">Edit Profile</Button>
-        </div>
+          <TabsContent value="post">
+            <MediaGrid items={Content} />
+          </TabsContent>
+
+          <TabsContent value="video">
+            <MediaGrid items={Content} />
+          </TabsContent>
+
+          <TabsContent value="reel">
+            <MediaGrid items={Content} isReel />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

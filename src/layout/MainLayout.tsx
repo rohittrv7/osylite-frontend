@@ -5,8 +5,8 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
-const HEADER_HEIGHT = "pt-16"; 
-const SIDEBAR_DESKTOP = "lg:ml-64"; 
+const HEADER_HEIGHT = "pt-16";
+const SIDEBAR_DESKTOP = "lg:ml-64";
 const SIDEBAR_TABLET = "md:ml-20";
 
 const MainLayout = () => {
@@ -27,12 +27,9 @@ const MainLayout = () => {
           min-h-screen
         `}
       >
-        {/* <div className="p-4 md:p-6"> */}
-          <Outlet />
-        {/* </div> */}
+        <Outlet />
       </main>
 
-      {/* Mobile Bottom Nav */}
       {isMobile && <BottomNavbar />}
     </div>
   );

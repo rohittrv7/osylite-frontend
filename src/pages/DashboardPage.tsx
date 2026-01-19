@@ -18,7 +18,7 @@ export default function Dashboard() {
   if (isLoading) return <div>Loading...</div>;
   if (!userData) return <div>No data found</div>;
   return (
-    <div className="min-h-screen bg-background text-foreground p-4 md:p-6">
+    <div className="bg-background text-foreground p-4 md:p-6">
       <div className="mx-auto max-w-7xl space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
