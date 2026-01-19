@@ -61,7 +61,6 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
 
-        {/* PROTECTED ROUTES (ONLY USER) */}
         <Route
           element={
             <ProtectedRoute>
