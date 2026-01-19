@@ -53,7 +53,8 @@ export default function ProfilePage() {
                 {/* <Button variant="outline" size="sm">
                   Edit Profile
                 </Button> */}
-                {!userData?.isChannelCreated &&
+
+                {userData?.isChannelCreated === false &&
                   userData?.channelStatus === "pending" && <CreateMenu />}
               </div>
             </div>
@@ -120,7 +121,7 @@ export default function ProfilePage() {
           </Card>
         </div>
 
-        {!userData?.isChannelCreated &&
+        {userData?.isChannelCreated === false &&
           userData?.channelStatus === "pending" && (
             <Tabs
               value={activeTab}
