@@ -1,14 +1,27 @@
+import { CreateChannelDialog } from "@/components/CreateChannelDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { IndianRupee, Lock, LogOut, Moon, Sun, Wallet } from "lucide-react";
+import { useGetProfileQuery } from "@/store/api/authApi";
+import {
+  IndianRupee,
+  Lock,
+  LogOut,
+  Moon,
+  Plus,
+  Sun,
+  Wallet,
+} from "lucide-react";
 import { useTheme } from "next-themes";
+import { useState } from "react";
 
 const Header = () => {
   const { theme, setTheme } = useTheme();
+  const [open, setOpen] = useState(false);
+  const { data: user } = useGetProfileQuery();
 
   return (
     <header
@@ -33,12 +46,24 @@ const Header = () => {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white cursor-pointer">
+            <p className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-black cursor-pointer">
               A
-            </div>
+            </p>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end" className="w-48">
+            {!user?.isChannelCreated && (
+              <DropdownMenuItem onClick={() => setOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Channel
+              </DropdownMenuItem>
+            )}
+            {!user?.isChannelCreated && (
+              <DropdownMenuItem onClick={() => setOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Channel
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem>
               <Lock className="mr-2 h-4 w-4" />
               Change Password
@@ -48,6 +73,7 @@ const Header = () => {
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
+          <CreateChannelDialog open={open} onClose={() => setOpen(false)} />
         </DropdownMenu>
       </div>
     </header>

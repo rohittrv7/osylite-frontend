@@ -14,7 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useForgotPasswordMutation } from "@/store/api/authApi";
-import { setCredentials } from "@/store/slices/authSlice";
+import { setUser } from "@/store/slices/authSlice";
 import { useDispatch } from "react-redux";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
@@ -31,7 +31,7 @@ export default function ForgotPassword() {
     try {
       const res = await forgotPassword({ email }).unwrap();
       toast.success(res.message || "Reset link sent on your email");
-      dispatch(setCredentials({ token: res.verificationToken, user: null }));
+      dispatch(setUser(res.user));
 
       navigate("/reset-password", {
         state: { email },

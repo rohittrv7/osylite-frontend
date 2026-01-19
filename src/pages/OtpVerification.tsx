@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { setCredentials } from "@/store/slices/authSlice";
+import { setUser } from "@/store/slices/authSlice";
 import { useDispatch } from "react-redux";
 import {
   useOtpVerifyMutation,
@@ -23,11 +23,14 @@ export default function OTPVerificationPage() {
   const dispatch = useDispatch();
   const [verifyOtp] = useOtpVerifyMutation();
   const [resendOtp] = useResendOtpMutation();
+  const location = useLocation();
 
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
   const [isVerifying, setIsVerifying] = useState(false);
   const [resendTimer, setResendTimer] = useState(60);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const { email } = location.state || { email: "Your Email" };
 
   useEffect(() => {
     if (resendTimer > 0) {
@@ -52,7 +55,7 @@ export default function OTPVerificationPage() {
 
   const handleKeyDown = (
     index: number,
-    e: React.KeyboardEvent<HTMLInputElement>
+    e: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
@@ -61,7 +64,7 @@ export default function OTPVerificationPage() {
 
   const handlePaste = (
     e: React.ClipboardEvent<HTMLInputElement>,
-    index: number
+    index: number,
   ) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text").trim();
@@ -91,7 +94,7 @@ export default function OTPVerificationPage() {
     try {
       const res = await verifyOtp({ otp: otpValue }).unwrap();
 
-      dispatch(setCredentials({ token: res.accessToken, user: res.user }));
+      dispatch(setUser(res.user));
 
       toast.success("OTP Verified Successfully!");
       navigate("/mlife");
@@ -122,9 +125,7 @@ export default function OTPVerificationPage() {
           <CardDescription>
             We sent a 6-digit code to your email
             <br />
-            <span className="font-medium text-foreground">
-              rahul@example.com
-            </span>
+            <span className="font-medium text-foreground">{email}</span>
           </CardDescription>
         </CardHeader>
 

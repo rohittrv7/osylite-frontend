@@ -1,11 +1,10 @@
 import { useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useGetProfileQuery } from "@/store/api/authApi";
-import type { ReactNode } from "react";
-import { DOMAINS } from "@/config/config";
 import { UserRole } from "@/types/userRole";
+import { DOMAINS } from "@/config/config";
 
-export function ProtectedRoute({ children }: { children: ReactNode }) {
+export default function PublicRoute() {
   const { data: user, isLoading } = useGetProfileQuery();
 
   useEffect(() => {
@@ -31,26 +30,26 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   if (isLoading) return null;
 
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
+  if (user) {
+    const currentHost = window.location.hostname;
 
-  const currentHost = window.location.hostname;
+    if (user.role === UserRole.ADMIN) {
+      if (
+        currentHost === "admin.osylite.com" ||
+        currentHost.includes("localhost")
+      ) {
+        return <Navigate to="/dashboard" replace />;
+      }
+      return null;
+    }
 
-  if (user.role === UserRole.ADMIN) {
-    if (
-      currentHost !== "admin.osylite.com" &&
-      !currentHost.includes("localhost")
-    ) {
+    if (user.role === UserRole.USER) {
+      if (currentHost !== "admin.osylite.com") {
+        return <Navigate to="/home" replace />;
+      }
       return null;
     }
   }
 
-  if (user.role === UserRole.USER) {
-    if (currentHost === "admin.osylite.com") {
-      return null;
-    }
-  }
-
-  return <>{children}</>;
+  return <Outlet />;
 }

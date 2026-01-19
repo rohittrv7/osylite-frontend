@@ -10,7 +10,7 @@ import { useState } from "react";
 import { useLogoutMutation } from "@/store/api/authApi";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-import { logout } from "@/store/slices/authSlice";
+import { clearAuth } from "@/store/slices/authSlice";
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function Sidebar() {
     const parent = sidebarConfig.find(
       (item) =>
         isParentItem(item) &&
-        item.children.some((c) => c.path === location.pathname)
+        item.children.some((c) => c.path === location.pathname),
     );
     return parent?.id ?? "";
   })();
@@ -41,7 +41,7 @@ export default function Sidebar() {
     } catch {
       console.warn("Logout API failed");
     } finally {
-      dispatch(logout());
+      dispatch(clearAuth());
       sessionStorage.clear();
       navigate("/login", { replace: true });
     }

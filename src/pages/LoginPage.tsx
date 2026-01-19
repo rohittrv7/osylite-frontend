@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { toast } from "sonner";
-import { setCredentials } from "@/store/slices/authSlice";
+import { setUser } from "@/store/slices/authSlice";
 import { useLoginMutation } from "@/store/api/authApi";
 import { useDispatch } from "react-redux";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
@@ -32,7 +32,7 @@ type FormValues = z.infer<typeof formSchema>;
 export default function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [login] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -46,7 +46,7 @@ export default function LoginPage() {
     try {
       const res = await login(values).unwrap();
 
-      dispatch(setCredentials({ token: res.access_token, user: res.user }));
+      dispatch(setUser(res.user));
       toast.success("Login Successful");
 
       navigate("/mlife");
@@ -112,7 +112,7 @@ export default function LoginPage() {
             </div>
 
             <Button type="submit" className="w-full">
-              Login
+              {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
         </Form>
