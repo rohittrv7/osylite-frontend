@@ -121,6 +121,20 @@ export const authApi = createApi({
         };
       },
     }),
+
+    getUserStats: builder.query<
+      { totalPosts: number; followersCount: number; followingCount: number },
+      void
+    >({
+      query: () => "users/stats/me",
+    }),
+
+    getConnections: builder.query<any[], { type: "followers" | "following" }>({
+      query: ({ type }) => ({
+        url: "users/connections/list",
+        params: { type },
+      }),
+    }),
   }),
 });
 
@@ -133,4 +147,6 @@ export const {
   useResendOtpMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
+  useGetConnectionsQuery,
+  useGetUserStatsQuery,
 } = authApi;

@@ -1,8 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { useGetProfileQuery } from "@/store/api/authApi";
+import { useGetProfileQuery, useGetUserStatsQuery } from "@/store/api/authApi";
 import CreateMenu from "@/components/CreateMenu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bookmark, Contact, Grid3X3 } from "lucide-react";
@@ -17,6 +16,7 @@ export default function ProfilePage() {
   const { data: Content } = useGetMyPostsQuery({
     type: activeTab,
   });
+  const { data: stats } = useGetUserStatsQuery();
 
   if (isLoading) return <div>Loading...</div>;
   if (!userData) return <div>No data found</div>;
@@ -50,23 +50,25 @@ export default function ProfilePage() {
               )}
 
               <div className="flex justify-center sm:justify-start gap-2">
-                <Button variant="outline" size="sm">
+                {/* <Button variant="outline" size="sm">
                   Edit Profile
-                </Button>
-                <CreateMenu />
+                </Button> */}
+                {!userData?.isChannelCreated &&
+                  userData?.channelStatus === "pending" && <CreateMenu />}
               </div>
             </div>
 
             {/* Stats */}
             <div className="flex justify-center sm:justify-start gap-6 text-sm flex-wrap">
               <span>
-                <b>24</b> posts
+                <b>{stats?.totalPosts}</b> posts
               </span>
               <span>
-                <b>177</b> followers
+                <b>{stats?.followersCount}</b> followers
               </span>
+
               <span>
-                <b>81</b> following
+                <b>{stats?.followingCount}</b> following
               </span>
             </div>
 
@@ -117,46 +119,50 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
         </div>
-        <Tabs
-          value={activeTab}
-          onValueChange={(value) =>
-            setActiveTab(value as "post" | "video" | "reel")
-          }
-          className="w-full"
-        >
-          <TabsList className="w-full bg-transparent border-t border-gray-800 rounded-none h-auto p-0 flex justify-center gap-12">
-            <TabsTrigger
-              value="post"
-              className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
-            >
-              <Grid3X3 size={12} /> Posts
-            </TabsTrigger>
-            <TabsTrigger
-              value="video"
-              className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
-            >
-              <Bookmark size={12} /> Video
-            </TabsTrigger>
-            <TabsTrigger
-              value="reel"
-              className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
-            >
-              <Contact size={12} /> Reel
-            </TabsTrigger>
-          </TabsList>
 
-          <TabsContent value="post">
-            <MediaGrid items={Content} />
-          </TabsContent>
+        {!userData?.isChannelCreated &&
+          userData?.channelStatus === "pending" && (
+            <Tabs
+              value={activeTab}
+              onValueChange={(value) =>
+                setActiveTab(value as "post" | "video" | "reel")
+              }
+              className="w-full"
+            >
+              <TabsList className="w-full bg-transparent border border-gray-800 rounded-none h-auto p-0 flex justify-center gap-12">
+                <TabsTrigger
+                  value="post"
+                  className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+                >
+                  <Grid3X3 size={12} /> Posts
+                </TabsTrigger>
+                <TabsTrigger
+                  value="video"
+                  className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+                >
+                  <Bookmark size={12} /> Video
+                </TabsTrigger>
+                <TabsTrigger
+                  value="reel"
+                  className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+                >
+                  <Contact size={12} /> Reel
+                </TabsTrigger>
+              </TabsList>
 
-          <TabsContent value="video">
-            <MediaGrid items={Content} />
-          </TabsContent>
+              <TabsContent value="post">
+                <MediaGrid items={Content} />
+              </TabsContent>
 
-          <TabsContent value="reel">
-            <MediaGrid items={Content} isReel />
-          </TabsContent>
-        </Tabs>
+              <TabsContent value="video">
+                <MediaGrid items={Content} />
+              </TabsContent>
+
+              <TabsContent value="reel">
+                <MediaGrid items={Content} isReel />
+              </TabsContent>
+            </Tabs>
+          )}
       </div>
     </div>
   );
