@@ -44,9 +44,7 @@ function App() {
     }
   }, [user, isLoading, error, dispatch]);
 
-  // if (isLoading) {
-  //   return <div>Loading Application...</div>;
-  // }
+ 
 
   if (isLoading) return <Loader />;
 

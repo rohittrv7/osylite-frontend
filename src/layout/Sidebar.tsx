@@ -7,7 +7,7 @@ import {
   sidebarConfig,
 } from "@/types/sidebar";
 import { useState } from "react";
-import { useLogoutMutation } from "@/store/api/authApi";
+import { useLazyLogoutQuery } from "@/store/api/authApi";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { clearAuth } from "@/store/slices/authSlice";
@@ -29,7 +29,7 @@ export default function Sidebar() {
 
   const openMenu = manualOpen || autoOpenMenu;
 
-  const [logoutApi, { isLoading: isLoggingOut }] = useLogoutMutation();
+  const [logoutApi, { isLoading: isLoggingOut }] = useLazyLogoutQuery();
   const dispatch = useDispatch();
 
   const handleLogout = async () => {
