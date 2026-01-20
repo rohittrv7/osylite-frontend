@@ -34,14 +34,10 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
-
     try {
       // await logoutApi().unwrap();
-      await logoutApi()
-        .unwrap()
-        .catch(() => {
-          // ignore error
-        });
+      const res = await logoutApi().unwrap();
+      console.log(res, "--------------");
       dispatch(clearAuth());
       toast.success("Logged out successfully");
       navigate("/", { replace: true });
@@ -97,13 +93,15 @@ export default function Sidebar() {
                   isLoggingOut
                     ? "opacity-60 cursor-not-allowed"
                     : "cursor-pointer hover:bg-muted/50"
-                }`}
+                }
+                  `}
               >
                 {isLoggingOut ? (
                   <Loader2 size={20} className="animate-spin" />
                 ) : (
                   <Icon size={20} />
                 )}
+                {isLoggingOut ? "Logging out..." : item.label}
                 {isLoggingOut ? "Logging out..." : item.label}
               </div>
             );

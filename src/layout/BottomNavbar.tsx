@@ -10,11 +10,16 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
+import { toast } from "sonner";
+import { useLazyLogoutQuery } from "@/store/api/authApi";
+import { clearAuth } from "@/store/slices/authSlice";
+import { useDispatch } from "react-redux";
 
 const BOTTOM_NAV_LIMIT = 5;
 
 const bottomNavItems = sidebarConfig.filter(
-  (item) => isLinkItem(item) || isActionItem(item)
+  (item) => isLinkItem(item) || isActionItem(item),
 );
 
 const mainNavItems = bottomNavItems.slice(0, BOTTOM_NAV_LIMIT - 1);
@@ -26,10 +31,24 @@ export default function MobileBottomNav() {
   const [open, setOpen] = useState(false);
 
   const isActive = (path?: string) => location.pathname === path;
+  const [logoutApi, { isLoading: isLoggingOut }] = useLazyLogoutQuery();
+  const dispatch = useDispatch();
 
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    try {
+      const res = await logoutApi().unwrap();
+      console.log(res, "--------------");
+      dispatch(clearAuth());
+      toast.success("Logged out successfully");
+      navigate("/", { replace: true });
+    } catch (error) {
+      apiErrorToastHandler(error);
+    }
+  };
   const handleNavigate = (path?: string, action?: string) => {
     if (action === "logout") {
-      console.log("Logging out...");
+      handleLogout();
       return;
     }
 
@@ -52,7 +71,7 @@ export default function MobileBottomNav() {
               onClick={() => handleNavigate(item.path)}
               className={cn(
                 "flex flex-col items-center flex-1 py-2.5",
-                active ? "text-primary" : "text-muted-foreground"
+                active ? "text-primary" : "text-muted-foreground",
               )}
             >
               <Icon className={active ? "h-7 w-7" : "h-6 w-6"} />
@@ -85,7 +104,7 @@ export default function MobileBottomNav() {
                     onClick={() =>
                       handleNavigate(
                         isLinkItem(item) ? item.path : undefined,
-                        isActionItem(item) ? item.action : undefined
+                        isActionItem(item) ? item.action : undefined,
                       )
                     }
                     className="flex flex-col items-center gap-1"
