@@ -7,9 +7,7 @@ import {
   selectAuthLoading,
   selectAuthUser,
 } from "@/store/selectors/authSelectors";
-// import { useGetProfileQuery } from "@/store/api/authApi"; // Agar slice me data nahi hai to yahan bhi call kar sakte hain
 
-// Config
 const DOMAIN_CONFIG: Record<string, string> = {
   [UserRole.ADMIN]: import.meta.env.VITE_ADMIN_URL,
   [UserRole.ASSOCIATE]: import.meta.env.VITE_ASSOCIATE_URL,
@@ -21,7 +19,6 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const user = useSelector(selectAuthUser);
   const isLoading = useSelector(selectAuthLoading);
 
-  // --- Logic ---
   const currentOrigin = window.location.origin;
   const normalizedCurrent = currentOrigin.replace(/\/$/, "");
   const normalizedMain = MAIN_DOMAIN.replace(/\/$/, "");
@@ -37,16 +34,13 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     user && normalizedTarget && normalizedCurrent !== normalizedTarget;
 
   useEffect(() => {
-    // 🛑 Agar load ho raha hai to kuch mat karo (Wait for Cookie check)
     if (isLoading) return;
 
-    // 1. Login nahi hai -> Go to Main
     if (!user && !isOnMainDomain) {
       window.location.href = `${normalizedMain}/`;
       return;
     }
 
-    // 2. Login hai, par galat domain -> Go to Target (Cookie browser ke pass hai, wahan bhi chalegi)
     if (user && isWrongDomainForUser) {
       window.location.href = `${normalizedTarget}/home`;
     }
@@ -59,9 +53,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     normalizedTarget,
   ]);
 
-  // --- Render ---
-
-  if (isLoading) return null; // Spinner dikhao jab tak user check na ho jaye
+  if (isLoading) return null;
 
   if (!user) {
     if (isOnMainDomain) return <Navigate to="/" replace />;

@@ -77,19 +77,11 @@ export const authApi = rootApiSlice.injectEndpoints({
       }),
     }),
 
-    logout: builder.mutation<void, void>({
+    logout: builder.query<void, void>({
       query: () => ({
         url: "/auth/logout",
-        method: "POST",
+        method: "GET",
       }),
-      invalidatesTags: [
-        "Auth",
-        "Profile",
-        "UserStats",
-        "Connections",
-        "Post",
-        "Channel",
-      ],
     }),
 
     forgotPassword: builder.mutation<ForgotPasswordResponse, { email: string }>(
@@ -133,7 +125,7 @@ export const authApi = rootApiSlice.injectEndpoints({
 
 export const {
   useLoginMutation,
-  useLogoutMutation,
+  useLazyLogoutQuery,
   useRegisterMutation,
   useOtpVerifyMutation,
   useGetProfileQuery,
