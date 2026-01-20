@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useGetProfileQuery } from "@/store/api/authApi";
+import { selectAuthUser } from "@/store/selectors/authSelectors";
 import {
   IndianRupee,
   Lock,
@@ -17,11 +17,13 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 const Header = () => {
   const { theme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
-  const { data: user } = useGetProfileQuery();
+  // const { data: user } = useGetProfileQuery();
+  const user = useSelector(selectAuthUser);
 
   return (
     <header
@@ -52,13 +54,18 @@ const Header = () => {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent align="end" className="w-48">
-            {user?.isChannelCreated === false &&
-              user?.channelStatus === "pending" && (
-                <DropdownMenuItem onClick={() => setOpen(true)}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Channel
-                </DropdownMenuItem>
-              )}
+            {user?.isChannelCreated === false && (
+              // <DropdownMenuItem onClick={() => setOpen(true)}>
+              <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setOpen(true);
+                }}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Create Channel
+              </DropdownMenuItem>
+            )}
 
             <DropdownMenuItem>
               <Lock className="mr-2 h-4 w-4" />
@@ -69,8 +76,8 @@ const Header = () => {
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
-          <CreateChannelDialog open={open} onClose={() => setOpen(false)} />
         </DropdownMenu>
+        <CreateChannelDialog open={open} onClose={() => setOpen(false)} />
       </div>
     </header>
   );

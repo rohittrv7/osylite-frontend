@@ -54,8 +54,7 @@ export default function ProfilePage() {
                   Edit Profile
                 </Button> */}
 
-                {userData?.isChannelCreated === false &&
-                  userData?.channelStatus === "pending" && <CreateMenu />}
+                {userData?.channelStatus === "approved" && <CreateMenu />}
               </div>
             </div>
 
@@ -121,49 +120,48 @@ export default function ProfilePage() {
           </Card>
         </div>
 
-        {userData?.isChannelCreated === false &&
-          userData?.channelStatus === "pending" && (
-            <Tabs
-              value={activeTab}
-              onValueChange={(value) =>
-                setActiveTab(value as "post" | "video" | "reel")
-              }
-              className="w-full"
-            >
-              <TabsList className="w-full bg-transparent border border-gray-800 rounded-none h-auto p-0 flex justify-center gap-12">
-                <TabsTrigger
-                  value="post"
-                  className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
-                >
-                  <Grid3X3 size={12} /> Posts
-                </TabsTrigger>
-                <TabsTrigger
-                  value="video"
-                  className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
-                >
-                  <Bookmark size={12} /> Video
-                </TabsTrigger>
-                <TabsTrigger
-                  value="reel"
-                  className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
-                >
-                  <Contact size={12} /> Reel
-                </TabsTrigger>
-              </TabsList>
+        {userData?.channelStatus === "approved" && (
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) =>
+              setActiveTab(value as "post" | "video" | "reel")
+            }
+            className="w-full"
+          >
+            <TabsList className="w-full bg-transparent border border-gray-800 rounded-none h-auto p-0 flex justify-center gap-12">
+              <TabsTrigger
+                value="post"
+                className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+              >
+                <Grid3X3 size={12} /> Posts
+              </TabsTrigger>
+              <TabsTrigger
+                value="video"
+                className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+              >
+                <Bookmark size={12} /> Video
+              </TabsTrigger>
+              <TabsTrigger
+                value="reel"
+                className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+              >
+                <Contact size={12} /> Reel
+              </TabsTrigger>
+            </TabsList>
 
-              <TabsContent value="post">
-                <MediaGrid items={Content} />
-              </TabsContent>
+            <TabsContent value="post">
+              <MediaGrid items={Content} />
+            </TabsContent>
 
-              <TabsContent value="video">
-                <MediaGrid items={Content} />
-              </TabsContent>
+            <TabsContent value="video">
+              <MediaGrid items={Content} />
+            </TabsContent>
 
-              <TabsContent value="reel">
-                <MediaGrid items={Content} isReel />
-              </TabsContent>
-            </Tabs>
-          )}
+            <TabsContent value="reel">
+              <MediaGrid items={Content} isReel />
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
     </div>
   );

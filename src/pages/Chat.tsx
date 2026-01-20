@@ -145,7 +145,7 @@ const emojis = ["😀", "😂", "😍", "🥳", "🔥", "👍", "❤️", "🎉"
 // Main Component
 // ──────────────────────────────────────────────
 
-export default function ModernWhatsApp() {
+export default function Chat() {
   const [selectedChatId, setSelectedChatId] = useState("1");
   const [message, setMessage] = useState("");
   const [darkMode, setDarkMode] = useState(true);
