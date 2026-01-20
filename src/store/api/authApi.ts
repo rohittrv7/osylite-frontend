@@ -1,5 +1,5 @@
 import type { User } from "@/types/user";
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { rootApiSlice } from "./rootApiSlice";
 
 interface LoginRequest {
   email: string;
@@ -36,13 +36,7 @@ interface OtpVerifyResponse {
   user: User;
 }
 
-export const authApi = createApi({
-  reducerPath: "authApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_API_URL,
-    credentials: "include",
-  }),
-
+export const authApi = rootApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({
@@ -50,6 +44,7 @@ export const authApi = createApi({
         method: "POST",
         body: credentials,
       }),
+      invalidatesTags: ["Auth", "Profile"],
     }),
 
     register: builder.mutation<RegisterResponse, RegisterRequest>({
@@ -58,35 +53,28 @@ export const authApi = createApi({
         method: "POST",
         body: credentials,
       }),
+      invalidatesTags: ["Auth"],
     }),
 
     otpVerify: builder.mutation<OtpVerifyResponse, OtpVerifyRequest>({
-      query: (credentials) => {
-        return {
-          url: "/auth/verify",
-          method: "POST",
-          body: credentials,
-        };
-      },
+      query: (credentials) => ({
+        url: "/auth/verify",
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["Auth", "Profile"],
     }),
 
     getProfile: builder.query<User, void>({
-      query: () => {
-        return {
-          url: "/users/me",
-          method: "GET",
-        };
-      },
+      query: () => "/users/me",
+      providesTags: ["Profile"],
     }),
 
     resendOtp: builder.mutation<LoginResponse, void>({
-      query: (credentials) => {
-        return {
-          url: "/auth/resend-otp",
-          method: "POST",
-          body: credentials,
-        };
-      },
+      query: () => ({
+        url: "/auth/resend-otp",
+        method: "POST",
+      }),
     }),
 
     logout: builder.mutation<void, void>({
@@ -94,6 +82,14 @@ export const authApi = createApi({
         url: "/auth/logout",
         method: "POST",
       }),
+      invalidatesTags: [
+        "Auth",
+        "Profile",
+        "UserStats",
+        "Connections",
+        "Post",
+        "Channel",
+      ],
     }),
 
     forgotPassword: builder.mutation<ForgotPasswordResponse, { email: string }>(
@@ -108,18 +104,13 @@ export const authApi = createApi({
 
     resetPassword: builder.mutation<
       { message: string },
-      {
-        otp: string;
-        newPassword: string;
-      }
+      { otp: string; newPassword: string }
     >({
-      query: (body) => {
-        return {
-          url: "/auth/reset-password",
-          method: "POST",
-          body,
-        };
-      },
+      query: (body) => ({
+        url: "/auth/reset-password",
+        method: "POST",
+        body,
+      }),
     }),
 
     getUserStats: builder.query<
@@ -127,6 +118,7 @@ export const authApi = createApi({
       void
     >({
       query: () => "users/stats/me",
+      providesTags: ["UserStats"],
     }),
 
     getConnections: builder.query<any[], { type: "followers" | "following" }>({
@@ -134,6 +126,7 @@ export const authApi = createApi({
         url: "users/connections/list",
         params: { type },
       }),
+      providesTags: ["Connections"],
     }),
   }),
 });

@@ -5,62 +5,69 @@ import { ThemeProvider } from "./components/theme-provider";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import MainLayout from "./layout/MainLayout";
-
-// --- ONLY USER PAGES IMPORTS ---
-import LoginPage from "@/pages/LoginPage";
-import RegisterPage from "@/pages/Register";
-import OTPVerificationPage from "@/pages/OtpVerification";
-import ForgotPassword from "@/pages/ForgotPage";
-import ResetPasswordPage from "@/pages/ResetPassword";
-import HomePage from "@/pages/home/MainPage";
-
-import HomeSections from "@/pages/HomeSections";
-import InfiniteScrollPage from "@/pages/Feed";
-import ChannelManagement from "@/pages/ChannelManagement";
-import ContentManagement from "@/pages/ContentManagement";
-import WallPage from "@/pages/WallPage";
-import Chat from "@/pages/Chat";
-import Account from "@/pages/Account";
-import ProfilePage from "@/pages/Profile";
-
 import { useGetProfileQuery } from "@/store/api/authApi";
-import { UserRole } from "@/types/userRole";
-import { DOMAINS } from "./config/config";
+import { useDispatch } from "react-redux";
+import { clearAuth, setUser, startLoading } from "@/store/slices/authSlice";
+import { Loader } from "lucide-react";
+import HomePage from "./pages/home/MainPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/Register";
+import AssociateRegisterPage from "./pages/AssociateRegisterPage";
+import OTPVerificationPage from "./pages/OtpVerification";
+import ForgotPassword from "./pages/ForgotPage";
+import ResetPasswordPage from "./pages/ResetPassword";
 import Dashboard from "./pages/DashboardPage";
-
-const Loader = () => (
-  <div className="flex h-screen items-center justify-center bg-background text-foreground">
-    <div className="text-xl font-medium animate-pulse">Loading Osylite...</div>
-  </div>
-);
+import HomeSections from "./pages/HomeSections";
+import WallPage from "./pages/WallPage";
+import Account from "./pages/Account";
+import ProfilePage from "./pages/Profile";
+import Chat from "./pages/Chat";
+import ExploreFeed from "./pages/Feed";
 
 function App() {
-  const { data: user, isLoading } = useGetProfileQuery();
+  const dispatch = useDispatch();
+  const {
+    data: user,
+    isLoading,
+    error,
+  } = useGetProfileQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
 
   useEffect(() => {
-    if (user?.role === UserRole.ADMIN) {
-      window.location.href = DOMAINS.ADMIN_URL;
+    if (isLoading) {
+      dispatch(startLoading());
+    } else if (user) {
+      dispatch(setUser(user));
+    } else if (error) {
+      dispatch(clearAuth());
     }
-  }, [user]);
+  }, [user, isLoading, error, dispatch]);
+
+  // if (isLoading) {
+  //   return <div>Loading Application...</div>;
+  // }
 
   if (isLoading) return <Loader />;
-
-  if (user?.role === UserRole.ADMIN) return null;
 
   return (
     <ThemeProvider>
       <Routes>
-        {/* PUBLIC ROUTES */}
+        {/* PUBLIC */}
         <Route element={<PublicRoute />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route
+            path="/associate-register"
+            element={<AssociateRegisterPage />}
+          />
           <Route path="/verify-otp" element={<OTPVerificationPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
 
+        {/* PROTECTED */}
         <Route
           element={
             <ProtectedRoute>
@@ -68,25 +75,18 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* Sirf User ke Routes rakho */}
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/home" element={<HomeSections />} />
-          <Route path="/mlife" element={<InfiniteScrollPage />} />
-          <Route path="/mlife/channel" element={<ChannelManagement />} />
-          <Route path="/mlife/content" element={<ContentManagement />} />
+          <Route path="/mlife" element={<ExploreFeed />} />
           <Route path="/mlife/wall" element={<WallPage />} />
           <Route path="/account" element={<Account />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route
-            path="/mchat"
-            element={<Chat />}
-            handle={{ fullScreen: true }}
-          />
-
-          {/* Catch All -> Home */}
-          <Route path="*" element={<Navigate to="/mlife" replace />} />
+          <Route path="/mchat" element={<Chat />} />
         </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
       <Toaster richColors position="top-right" />
     </ThemeProvider>
   );

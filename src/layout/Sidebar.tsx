@@ -11,13 +11,13 @@ import { useLogoutMutation } from "@/store/api/authApi";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { clearAuth } from "@/store/slices/authSlice";
+import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [manualOpen, setManualOpen] = useState<string>("");
 
-  // 🔥 NO useMemo — simple calculation
   const autoOpenMenu = (() => {
     const parent = sidebarConfig.find(
       (item) =>
@@ -36,14 +36,17 @@ export default function Sidebar() {
     if (isLoggingOut) return;
 
     try {
-      await logoutApi().unwrap();
-      toast.success("Logged out successfully");
-    } catch {
-      console.warn("Logout API failed");
-    } finally {
+      // await logoutApi().unwrap();
+      await logoutApi()
+        .unwrap()
+        .catch(() => {
+          // ignore error
+        });
       dispatch(clearAuth());
-      sessionStorage.clear();
-      navigate("/login", { replace: true });
+      toast.success("Logged out successfully");
+      navigate("/", { replace: true });
+    } catch (error) {
+      apiErrorToastHandler(error);
     }
   };
 
@@ -87,7 +90,7 @@ export default function Sidebar() {
             return (
               <div
                 key={item.id}
-                onClick={handleLogout}
+                onClick={() => handleLogout()}
                 className={`flex items-center gap-4 px-4 py-3 rounded-lg
                 text-destructive transition
                 ${

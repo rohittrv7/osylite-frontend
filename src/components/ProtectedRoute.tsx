@@ -1,56 +1,74 @@
 import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import { useGetProfileQuery } from "@/store/api/authApi";
 import type { ReactNode } from "react";
-import { DOMAINS } from "@/config/config";
+import { useSelector } from "react-redux";
 import { UserRole } from "@/types/userRole";
+import {
+  selectAuthLoading,
+  selectAuthUser,
+} from "@/store/selectors/authSelectors";
+// import { useGetProfileQuery } from "@/store/api/authApi"; // Agar slice me data nahi hai to yahan bhi call kar sakte hain
+
+// Config
+const DOMAIN_CONFIG: Record<string, string> = {
+  [UserRole.ADMIN]: import.meta.env.VITE_ADMIN_URL,
+  [UserRole.ASSOCIATE]: import.meta.env.VITE_ASSOCIATE_URL,
+  [UserRole.USER]: import.meta.env.VITE_MAIN_URL,
+};
+const MAIN_DOMAIN = import.meta.env.VITE_MAIN_URL;
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { data: user, isLoading } = useGetProfileQuery();
+  const user = useSelector(selectAuthUser);
+  const isLoading = useSelector(selectAuthLoading);
+
+  // --- Logic ---
+  const currentOrigin = window.location.origin;
+  const normalizedCurrent = currentOrigin.replace(/\/$/, "");
+  const normalizedMain = MAIN_DOMAIN.replace(/\/$/, "");
+
+  const isOnMainDomain = normalizedCurrent === normalizedMain;
+
+  const targetBaseUrl = user ? DOMAIN_CONFIG[user.role as UserRole] : null;
+  const normalizedTarget = targetBaseUrl
+    ? targetBaseUrl.replace(/\/$/, "")
+    : "";
+
+  const isWrongDomainForUser =
+    user && normalizedTarget && normalizedCurrent !== normalizedTarget;
 
   useEffect(() => {
-    if (user) {
-      const currentHost = window.location.hostname;
+    // 🛑 Agar load ho raha hai to kuch mat karo (Wait for Cookie check)
+    if (isLoading) return;
 
-      if (user.role === UserRole.ADMIN) {
-        if (
-          currentHost !== "admin.osylite.com" &&
-          !currentHost.includes("localhost")
-        ) {
-          window.location.href = DOMAINS.ADMIN_URL;
-        }
-      }
-
-      if (user.role === UserRole.USER) {
-        if (currentHost === "admin.osylite.com") {
-          window.location.href = DOMAINS.MAIN_URL + "/home";
-        }
-      }
+    // 1. Login nahi hai -> Go to Main
+    if (!user && !isOnMainDomain) {
+      window.location.href = `${normalizedMain}/`;
+      return;
     }
-  }, [user]);
 
-  if (isLoading) return null;
+    // 2. Login hai, par galat domain -> Go to Target (Cookie browser ke pass hai, wahan bhi chalegi)
+    if (user && isWrongDomainForUser) {
+      window.location.href = `${normalizedTarget}/home`;
+    }
+  }, [
+    user,
+    isLoading,
+    isOnMainDomain,
+    isWrongDomainForUser,
+    normalizedMain,
+    normalizedTarget,
+  ]);
+
+  // --- Render ---
+
+  if (isLoading) return null; // Spinner dikhao jab tak user check na ho jaye
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    if (isOnMainDomain) return <Navigate to="/" replace />;
+    return null;
   }
 
-  const currentHost = window.location.hostname;
-
-  if (user.role === UserRole.ADMIN) {
-    if (
-      currentHost !== "admin.osylite.com" &&
-      !currentHost.includes("localhost")
-    ) {
-      return null;
-    }
-  }
-
-  if (user.role === UserRole.USER) {
-    if (currentHost === "admin.osylite.com") {
-      return null;
-    }
-  }
+  if (isWrongDomainForUser) return null;
 
   return <>{children}</>;
 }

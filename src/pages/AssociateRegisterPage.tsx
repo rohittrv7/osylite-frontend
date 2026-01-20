@@ -1,8 +1,4 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -11,6 +7,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -19,11 +16,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRegisterMutation } from "@/store/api/authApi";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
 import { setUser } from "@/store/slices/authSlice";
-import { useDispatch } from "react-redux";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import z from "zod";
 
 const formSchema = z
   .object({
@@ -46,7 +46,7 @@ const formSchema = z
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function RegisterPage() {
+export default function AssociateRegisterPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [register, { isLoading }] = useRegisterMutation();
@@ -62,7 +62,7 @@ export default function RegisterPage() {
       username: "",
       password: "",
       confirmPassword: "",
-      terms: false,
+      terms: true,
     },
   });
 
@@ -75,11 +75,14 @@ export default function RegisterPage() {
       email: values.email,
       username: values.username,
       password: values.password,
+      role: "associate",
     };
+
     try {
       const res = await register(payload).unwrap();
       dispatch(setUser(res.user));
       toast.success(res.message);
+
       navigate("/verify-otp", {
         state: { email: values.email },
       });
@@ -87,19 +90,17 @@ export default function RegisterPage() {
       const error = err as FetchBaseQueryError & {
         data?: { message?: string };
       };
-      toast.error(
-        error?.data?.message || "Registration failed. Please try again.",
-      );
+      toast.error(error?.data?.message || "Associate registration failed");
     }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md border border-zinc-500 p-6 sm:p-8 rounded-lg shadow-lg">
+      <div className="w-full max-w-md border p-6 rounded-lg shadow-lg">
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold">Create Account</h1>
+          <h1 className="text-3xl font-bold">Associate Registration</h1>
           <p className="text-muted-foreground mt-2">
-            Enter your details to get started
+            Join as an Associate & earn via referrals
           </p>
         </div>
 
@@ -243,52 +244,19 @@ export default function RegisterPage() {
               />
             </div>
 
-            {/* Terms */}
-            {/* <FormField
-              control={form.control}
-              name="terms"
-              render={({ field }) => (
-                <FormItem className="flex items-start space-x-3">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormLabel className="text-sm leading-snug">
-                    I agree to the{" "}
-                    <span className="text-primary">Terms & Conditions</span> and{" "}
-                    <span className="text-primary">Privacy Policy</span>
-                  </FormLabel>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Registering..." : "Register"}
+              {isLoading ? "Registering..." : "Register as Associate"}
             </Button>
           </form>
-          <p className="text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
+
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            Already have an account?{" "}
             <Button
               variant="link"
-              className="px-1"
               type="button"
               onClick={() => navigate("/login")}
             >
               Sign in
-            </Button>
-          </p>
-          <p className="text-center text-sm text-muted-foreground">
-            Create Associate account?{" "}
-            <Button
-              variant="link"
-              className="px-1"
-              type="button"
-              onClick={() => navigate("/associate-register")}
-            >
-              sign up
             </Button>
           </p>
         </Form>

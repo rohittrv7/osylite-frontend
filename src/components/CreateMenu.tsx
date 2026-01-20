@@ -22,8 +22,7 @@ export default function CreateMenu() {
           type="post"
           trigger={
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              <Image className="mr-2 h-4 w-4" />
-              Post
+              <Image className="mr-2 h-4 w-4" /> Post
             </DropdownMenuItem>
           }
         />
@@ -32,8 +31,7 @@ export default function CreateMenu() {
           type="reel"
           trigger={
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              <Film className="mr-2 h-4 w-4" />
-              Reel
+              <Film className="mr-2 h-4 w-4" /> Reel
             </DropdownMenuItem>
           }
         />
@@ -42,8 +40,7 @@ export default function CreateMenu() {
           type="video"
           trigger={
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-              <Video className="mr-2 h-4 w-4" />
-              Video
+              <Video className="mr-2 h-4 w-4" /> Video
             </DropdownMenuItem>
           }
         />
