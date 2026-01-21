@@ -4,30 +4,25 @@ export type Channel = {
   owner: string;
   logo?: string;
   createdAt: string;
-  status: "Pending" | "Approved";
+  status: "pending" | "approved" | "rejected";
 };
 
+export interface ChannelData {
+  name: string;
+  handle: string;
+  logoUrl?: string;
+}
 
-export const channels: Channel[] = [
-  {
-    id: "1",
-    name: "Channel",
-    owner: "Rahul Kumar",
-    createdAt: "12 Jan 2026",
-    status: "Pending",
-  },
-  {
-    id: "2",
-    name: "AnG Growth",
-    owner: "Narayan Pandit",
-    createdAt: "06 Jan 2026",
-    status: "Approved",
-  },
-  {
-    id: "3",
-    name: "Myrk",
-    owner: "M Pandit",
-    createdAt: "05 Jan 2026",
-    status: "Approved",
-  },
-];
+export interface FeedPost {
+  id: string;
+  channel: ChannelData;
+  fileUrl: string;
+  title?: string;
+  caption?: string;
+  description?: string;
+  viewsCount: number;
+  likesCount: number;
+  commentsCount?: number;
+  isEnquiryPost?: boolean;
+  ctaLabel?: string;
+}

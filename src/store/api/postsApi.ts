@@ -1,84 +1,16 @@
 import type { MediaItem } from "@/components/MediaGrid";
 import { rootApiSlice } from "./rootApiSlice";
-
-export type PostType = "post" | "reel" | "video";
-
-export interface CreatePostPayload {
-  caption?: string;
-  type: "post" | "reel" | "video";
-  file: File;
-  isEnquiryPost?: boolean;
-  ctaLabel?: string;
-}
-
-export interface PostStats {
-  likes: number;
-  comments: number;
-  views: number;
-}
-
-export interface MyPost {
-  id: string;
-  url: string;
-  type: PostType;
-  stats: PostStats;
-}
-
-export interface ExplorePost {
-  id: string;
-  caption: string;
-  fileUrl: string;
-  thumbnailUrl: string | null;
-  type: PostType;
-  isEnquiryPost: boolean;
-  ctaLabel: string;
-  likesCount: number;
-  commentsCount: number;
-  sharesCount: number;
-  viewsCount: number;
-  channel: {
-    id: string;
-    name: string;
-    handle: string;
-    logoUrl: string | null;
-  };
-  createdAt: string;
-}
-
-export type CategoryDetails =
-  | {
-      gameName?: string;
-      organizer?: string;
-    }
-  | {
-      businessType?: string;
-    }
-  | {
-      genres?: string[];
-    };
-
-// export type PostCategory = {
-//   ENTERTAINMENT: "entertainment";
-//   EDUCATION: "education";
-//   BUSINESS: "business";
-//   SPORTS: "sports";
-//   OTHER: "other";
-// };
-
-export interface CreateAssociatePostPayload {
-  title: string;
-  description?: string;
-  file: File;
-
-  category: string;
-  earningMod: string;
-  price?: number;
-
-  categoryDetails?: CategoryDetails;
-
-  isEnquiryPost?: boolean;
-  ctaLabel?: string;
-}
+import type { PublicUserProfile } from "@/types/user";
+import type {
+  CreatePostPayload,
+  ExploreFilters,
+  ExplorePost,
+  FollowResponse,
+  PostMedia,
+  PostType,
+  Reel,
+} from "@/types/post";
+import type { FollowUser } from "@/components/FollowList";
 
 export const postsApi = rootApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -103,32 +35,79 @@ export const postsApi = rootApiSlice.injectEndpoints({
       invalidatesTags: ["Post", "MyPosts", "Explore", "UserStats"],
     }),
 
-    createAssociatePost: builder.mutation<any, CreateAssociatePostPayload>({
-      query: ({ file, categoryDetails, ...rest }) => {
-        const formData = new FormData();
-
-        Object.entries(rest).forEach(([key, value]) => {
-          if (value !== undefined) {
-            formData.append(key, String(value));
-          }
-        });
-
-        formData.append("file", file);
-
-        if (categoryDetails) {
-          formData.append("categoryDetails", JSON.stringify(categoryDetails));
-        }
-
-        return {
-          url: "/posts/associate/upload",
-          method: "POST",
-          body: formData,
-        };
-      },
+    createAssociatePost: builder.mutation<any, FormData>({
+      query: (formData) => ({
+        url: "/posts/associate/upload",
+        method: "POST",
+        body: formData,
+      }),
     }),
 
-    getExplore: builder.query<ExplorePost[], void>({
-      query: () => "/posts/explore",
+    getUserPosts: builder.query<
+      PostMedia[],
+      { userId: string; type?: PostType }
+    >({
+      query: ({ userId, type }) => ({
+        url: `/posts/user/${userId}`,
+        params: type ? { type } : undefined,
+      }),
+      providesTags: ["UserPosts"],
+    }),
+
+    getMyFollowers: builder.query<FollowUser[], void>({
+      query: () => "/connections/followers",
+      providesTags: ["Followers"],
+    }),
+
+    getMyFollowing: builder.query<FollowUser[], void>({
+      query: () => "/connections/following",
+      providesTags: ["Following"],
+    }),
+
+    getUserFollowers: builder.query<FollowUser[], string>({
+      query: (userId) => `/connections/${userId}/followers`,
+      providesTags: ["UserFollowers"],
+    }),
+
+    getUserFollowing: builder.query<FollowUser[], string>({
+      query: (userId) => `/connections/${userId}/following`,
+      providesTags: ["UserFollowing"],
+    }),
+
+    getPublicProfile: builder.query<
+      PublicUserProfile,
+      { targetUserId: string }
+    >({
+      query: ({ targetUserId }) => `/users/profile/${targetUserId}`,
+      providesTags: ["UserProfile"],
+    }),
+
+    getExplore: builder.query<ExplorePost[], ExploreFilters | void>({
+      query: (filters) => ({
+        url: "/posts/explore/social",
+        params: filters,
+      }),
+      providesTags: ["Explore"],
+    }),
+
+    getEntertainmentReels: builder.query<Reel[], void>({
+      query: () => ({
+        url: "/posts/reels/entertainment",
+        method: "GET",
+      }),
+      providesTags: ["Reels"],
+    }),
+
+    // getAngMart: builder.query<ExplorePost[], void>({
+    //   query: () => "/posts/explore/business",
+    //   providesTags: ["Explore"],
+    // }),
+
+    getAngMart: builder.query<ExplorePost[], ExploreFilters | void>({
+      query: (filters) => ({
+        url: "/posts/explore/business",
+        params: filters,
+      }),
       providesTags: ["Explore"],
     }),
 
@@ -138,6 +117,22 @@ export const postsApi = rootApiSlice.injectEndpoints({
         params: type ? { type } : undefined,
       }),
       providesTags: ["MyPosts"],
+    }),
+
+    followUser: builder.mutation<FollowResponse, { userId: string }>({
+      query: ({ userId }) => ({
+        url: `/connections/follow/${userId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Following", "UserProfile", "Followers"],
+    }),
+
+    unfollowUser: builder.mutation<FollowResponse, { userId: string }>({
+      query: ({ userId }) => ({
+        url: `/connections/unfollow/${userId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Following", "UserProfile", "Followers"],
     }),
 
     toggleLike: builder.mutation<void, string>({
@@ -185,8 +180,18 @@ export const {
   useCreateAssociatePostMutation,
   useGetMyPostsQuery,
   useGetExploreQuery,
+  useGetAngMartQuery,
   useToggleLikeMutation,
   useAddCommentMutation,
   useIncrementViewMutation,
   useIncrementShareMutation,
+  useGetPublicProfileQuery,
+  useFollowUserMutation,
+  useUnfollowUserMutation,
+  useGetUserPostsQuery,
+  useGetMyFollowersQuery,
+  useGetMyFollowingQuery,
+  useGetUserFollowersQuery,
+  useGetUserFollowingQuery,
+  useGetEntertainmentReelsQuery
 } = postsApi;

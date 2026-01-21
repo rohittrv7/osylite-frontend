@@ -34,7 +34,6 @@ const UploadTab = ({ type, onSuccess }: UploadTabProps) => {
       ctaLabel: isEnquiryPost ? ctaLabel : undefined,
     }).unwrap();
 
-    // reset
     setFile(null);
     setCaption("");
     setIsEnquiryPost(false);
@@ -99,12 +98,10 @@ export default function UploadContent({
   defaultType?: ContentType;
   onSuccess?: () => void;
 }) {
-  // 👉 Dialog Mode
   if (defaultType) {
     return <UploadTab type={defaultType} onSuccess={onSuccess} />;
   }
 
-  // 👉 Tabs Mode
   return (
     <Tabs defaultValue="post" className="w-full">
       <TabsList className="grid grid-cols-3 mb-4">

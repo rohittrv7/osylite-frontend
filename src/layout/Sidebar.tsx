@@ -35,9 +35,7 @@ export default function Sidebar() {
   const handleLogout = async () => {
     if (isLoggingOut) return;
     try {
-      // await logoutApi().unwrap();
-      const res = await logoutApi().unwrap();
-      console.log(res, "--------------");
+      await logoutApi().unwrap();
       dispatch(clearAuth());
       toast.success("Logged out successfully");
       navigate("/", { replace: true });
@@ -101,7 +99,6 @@ export default function Sidebar() {
                 ) : (
                   <Icon size={20} />
                 )}
-                {isLoggingOut ? "Logging out..." : item.label}
                 {isLoggingOut ? "Logging out..." : item.label}
               </div>
             );

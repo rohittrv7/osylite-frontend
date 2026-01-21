@@ -17,7 +17,6 @@ const baseQuery = fetchBaseQuery({
   credentials: "include",
 
   prepareHeaders: (headers) => {
-    // Agar koi common headers chahiye
     // const defaultHeaders = getDefaultHeaders();
     // Object.entries(defaultHeaders).forEach(([key, value]) => {
     //   headers.set(key, value);
@@ -81,5 +80,12 @@ export const rootApiSlice = createApi({
     "Post",
     "Explore",
     "MyPosts",
+    "UserPosts",
+    "Followers",
+    "Following",
+    "UserFollowers",
+    "UserFollowing",
+    "UserProfile",
+    "Reels",
   ],
 });

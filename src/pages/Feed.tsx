@@ -1,19 +1,14 @@
 import { useGetExploreQuery } from "@/store/api/postsApi";
-import { ExploreCard } from "@/components/ExploreCard";
-import SponsorAdsCarousel from "@/components/SponsorAdsCarousel"; // Assuming you have this
 import { Loader2 } from "lucide-react";
+import MasonryFeed from "@/components/MasonryFeed";
 
 export default function ExploreFeed() {
-  const { data: posts = [], isLoading, isError } = useGetExploreQuery(); // No argument needed
+  const { data: posts = [], isLoading, isError } = useGetExploreQuery();
 
   return (
     <div className="min-h-screen bg-background pb-16">
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-6">Explore</h1>
-
-        <div className="mb-8">
-          <SponsorAdsCarousel />
-        </div>
 
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-2">
@@ -35,10 +30,8 @@ export default function ExploreFeed() {
         )}
 
         {!isLoading && !isError && posts.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 justify-center">
-            {posts.map((post) => (
-              <ExploreCard key={post.id} post={post} />
-            ))}
+          <div className="">
+            <MasonryFeed posts={posts} />
           </div>
         )}
       </div>

@@ -1,4 +1,3 @@
-// import Header from "@/layout/Headers";
 import { useIsMobile } from "@/hooks/use-mobile";
 import BottomNavbar from "./BottomNavbar";
 import { Outlet } from "react-router-dom";
