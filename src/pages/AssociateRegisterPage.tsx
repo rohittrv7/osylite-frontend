@@ -1,13 +1,6 @@
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -15,252 +8,344 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRegisterMutation } from "@/store/api/authApi";
-import { setUser } from "@/store/slices/authSlice";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  AssociateCategory,
+  type AssociateCategory as AssociateCategoryType,
+  type BusinessDetails,
+} from "@/config/associate";
+import { BUSINESS_FIELDS_BY_CATEGORY } from "@/config/associateFieldConfig";
+import {
+  useApplyAssociateMutation,
+  useGetMyAssociateProfileQuery,
+} from "@/store/api/associateApi";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import z from "zod";
 
-const formSchema = z
-  .object({
-    firstName: z.string().min(2, "First name required"),
-    lastName: z.string().min(2, "Last name required"),
-    mobile: z.string().min(10, "Valid mobile number required"),
-    pincode: z.string().length(6, "Pincode must be 6 digits"),
-    email: z.string().email("Invalid email"),
-    username: z.string().min(3, "Username min 3 characters"),
-    password: z.string().min(6, "Password min 6 characters"),
-    confirmPassword: z.string(),
-    terms: z.boolean().refine((val) => val === true, {
-      message: "You must agree to terms",
-    }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
+// type KycDocuments = {
+//   aadharNumber?: string;
+//   panNumber?: string;
+//   gstNumber?: string;
+// };
 
-type FormValues = z.infer<typeof formSchema>;
+// type KycFiles = {
+//   aadharCardFront?: File;
+//   aadharCardBack?: File;
+//   panCard?: File;
+//   professionalDegree?: File;
+//   shopPhoto?: File;
+//   gstCertificate?: File;
+// };
 
-export default function AssociateRegisterPage() {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [register, { isLoading }] = useRegisterMutation();
+type FormErrors = Partial<
+  Record<
+    keyof AssociateFormState | `businessDetails.${keyof BusinessDetails}`,
+    string
+  >
+>;
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      mobile: "",
-      pincode: "",
-      email: "",
-      username: "",
-      password: "",
-      confirmPassword: "",
-      terms: true,
+const getErrorMessage = (error: unknown): string | null => {
+  if (typeof error === "object" && error !== null && "data" in error) {
+    const data = (error as FetchBaseQueryError).data;
+
+    if (
+      typeof data === "object" &&
+      data !== null &&
+      "message" in data &&
+      typeof (data as { message: unknown }).message === "string"
+    ) {
+      return (data as { message: string }).message;
+    }
+  }
+  return null;
+};
+
+type AssociateFormState = {
+  category: AssociateCategoryType;
+  subCategory?: string;
+  businessName: string;
+  address: string;
+  city: string;
+  state: string;
+  latitude?: number;
+  longitude?: number;
+  businessDetails: BusinessDetails;
+
+  /* 
+  kycDocuments?: KycDocuments;
+  files?: KycFiles;
+  */
+};
+
+export default function AssociateApplyForm() {
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const [applyAssociate, { isLoading, error }] = useApplyAssociateMutation();
+  const {
+    data: profile,
+    isLoading: profileIsLoading,
+    isSuccess,
+  } = useGetMyAssociateProfileQuery();
+
+  const [form, setForm] = useState<AssociateFormState>({
+    category: AssociateCategory.CONTENT_CREATOR,
+    subCategory: "",
+    businessName: "",
+    address: "",
+    city: "",
+    state: "",
+    businessDetails: {},
+
+    /* 
+    kycDocuments: {
+      aadharNumber: "",
+      panNumber: "",
+      gstNumber: "",
     },
+    files: {},
+    */
   });
 
-  async function onSubmit(values: FormValues) {
-    const payload = {
-      firstName: values.firstName,
-      lastName: values.lastName,
-      phoneNumber: values.mobile,
-      pincode: values.pincode,
-      email: values.email,
-      username: values.username,
-      password: values.password,
-      role: "associate",
-    };
+  const validateForm = (): FormErrors => {
+    const errors: FormErrors = {};
+
+    // Base required fields
+    if (!form.category) errors.category = "Category is required";
+    if (!form.businessName.trim())
+      errors.businessName = "Business name is required";
+    if (!form.address.trim()) errors.address = "Address is required";
+    if (!form.city.trim()) errors.city = "City is required";
+    if (!form.state.trim()) errors.state = "State is required";
+
+    // Business details required (category-wise)
+    if (form.category) {
+      const requiredBusiness = BUSINESS_FIELDS_BY_CATEGORY[form.category] ?? [];
+
+      requiredBusiness.forEach((field) => {
+        if (!form.businessDetails[field]) {
+          errors[`businessDetails.${field}`] = "This field is required";
+        }
+      });
+    }
+
+    return errors;
+  };
+
+  const allowedBusinessFields =
+    (form.category && BUSINESS_FIELDS_BY_CATEGORY[form.category]) ?? [];
+
+  const showField = (field: keyof BusinessDetails) =>
+    allowedBusinessFields.includes(field);
+
+  const handleCategoryChange = (value: AssociateCategoryType) => {
+    setForm((prev) => ({
+      ...prev,
+      category: value,
+      businessDetails: {},
+    }));
+  };
+
+  const updateBusinessDetail = <K extends keyof BusinessDetails>(
+    key: K,
+    value: BusinessDetails[K],
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      businessDetails: {
+        ...prev.businessDetails,
+        [key]: value,
+      },
+    }));
+  };
+
+  const handleSubmit = async () => {
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setErrors({});
 
     try {
-      const res = await register(payload).unwrap();
-      dispatch(setUser(res.user));
-      toast.success(res.message);
+      await applyAssociate(form).unwrap();
+    } catch (error: unknown) {
+      const message = getErrorMessage(error);
 
-      navigate("/verify-otp", {
-        state: { email: values.email },
-      });
-    } catch (err) {
-      const error = err as FetchBaseQueryError & {
-        data?: { message?: string };
-      };
-      toast.error(error?.data?.message || "Associate registration failed");
+      if (message) {
+        setErrors({
+          category: message,
+        });
+      }
     }
+  };
+
+  if (profileIsLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isSuccess && profile?.status === "pending") {
+    return <div>You have already applied for associate.</div>;
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md border p-6 rounded-lg shadow-lg">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold">Associate Registration</h1>
-          <p className="text-muted-foreground mt-2">
-            Join as an Associate & earn via referrals
-          </p>
-        </div>
+    <div className="max-w-3xl mx-auto space-y-6">
+      <h2 className="text-xl font-semibold">Apply as Associate</h2>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            {/* Name */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="firstName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First Name *</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="lastName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name *</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Mobile + Pincode */}
-            <div className="">
-              <FormField
-                control={form.control}
-                name="mobile"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mobile *</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center gap-2">
-                        {/* Country Code */}
-                        <Select defaultValue="+91">
-                          <SelectTrigger className="w-[72px] flex-shrink-0">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="+91">+91 🇮🇳</SelectItem>
-                          </SelectContent>
-                        </Select>
-
-                        {/* Mobile Number */}
-                        <Input
-                          type="tel"
-                          placeholder="9964525434"
-                          className="flex-1"
-                          {...field}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <FormField
-              control={form.control}
-              name="pincode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Pincode *</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Email */}
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email *</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Username */}
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username *</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Password */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password *</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password *</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Registering..." : "Register as Associate"}
-            </Button>
-          </form>
-
-          <p className="text-center text-sm text-muted-foreground mt-4">
-            Already have an account?{" "}
-            <Button
-              variant="link"
-              type="button"
-              onClick={() => navigate("/login")}
-            >
-              Sign in
-            </Button>
-          </p>
-        </Form>
+      {/* CATEGORY */}
+      <div>
+        <Label className="mb-3">Category</Label>
+        <Select onValueChange={handleCategoryChange}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={AssociateCategory.CONTENT_CREATOR}>
+              Creator
+            </SelectItem>
+            <SelectItem value={AssociateCategory.RETAILER}>Shop</SelectItem>
+            <SelectItem value={AssociateCategory.DOCTOR}>Doctor</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
+
+      <Input
+        placeholder="Sub Category (optional)"
+        value={form.subCategory ?? ""}
+        onChange={(e) =>
+          setForm((p) => ({ ...p, subCategory: e.target.value }))
+        }
+      />
+
+      <Input
+        placeholder="Business Name"
+        value={form.businessName}
+        onChange={(e) =>
+          setForm((p) => ({ ...p, businessName: e.target.value }))
+        }
+      />
+      {errors.businessName && (
+        <p className="text-sm text-red-500">{errors.businessName}</p>
+      )}
+
+      <Textarea
+        placeholder="Address"
+        value={form.address}
+        onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
+      />
+
+      <div className="grid grid-cols-2 gap-4">
+        <Input
+          placeholder="City"
+          value={form.city}
+          onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))}
+        />
+        <Input
+          placeholder="State"
+          value={form.state}
+          onChange={(e) => setForm((p) => ({ ...p, state: e.target.value }))}
+        />
+      </div>
+
+      {/* BUSINESS DETAILS (DYNAMIC) */}
+      {allowedBusinessFields.length > 0 && (
+        <>
+          <h3 className="font-medium">Business Details</h3>
+
+          {showField("consultationFee") && (
+            <>
+              <Input
+                type="number"
+                placeholder="Consultation Fee"
+                onChange={(e) =>
+                  updateBusinessDetail(
+                    "consultationFee",
+                    Number(e.target.value),
+                  )
+                }
+              />
+              {errors["businessDetails.consultationFee"] && (
+                <p className="text-sm text-red-500">
+                  {errors["businessDetails.consultationFee"]}
+                </p>
+              )}
+            </>
+          )}
+
+          {showField("specialization") && (
+            <Input
+              placeholder="Specialization"
+              onChange={(e) =>
+                updateBusinessDetail("specialization", e.target.value)
+              }
+            />
+          )}
+
+          {showField("registrationNumber") && (
+            <Input
+              placeholder="Registration Number"
+              onChange={(e) =>
+                updateBusinessDetail("registrationNumber", e.target.value)
+              }
+            />
+          )}
+
+          {showField("gstNumber") && (
+            <Input
+              placeholder="GST Number"
+              onChange={(e) =>
+                updateBusinessDetail("gstNumber", e.target.value)
+              }
+            />
+          )}
+
+          {showField("openingTime") && (
+            <Input
+              type="time"
+              onChange={(e) =>
+                updateBusinessDetail("openingTime", e.target.value)
+              }
+            />
+          )}
+
+          {showField("closingTime") && (
+            <Input
+              type="time"
+              onChange={(e) =>
+                updateBusinessDetail("closingTime", e.target.value)
+              }
+            />
+          )}
+
+          {showField("website") && (
+            <Input
+              placeholder="Website"
+              onChange={(e) => updateBusinessDetail("website", e.target.value)}
+            />
+          )}
+        </>
+      )}
+
+      {/*
+      <h3 className="font-medium">KYC Details</h3>
+
+      <Input placeholder="Aadhar Number" />
+      <Input placeholder="PAN Number" />
+      <Input placeholder="GST Number" />
+
+      <Input type="file" />
+      <Input type="file" />
+      */}
+      {error && (
+        <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+          Failed to submit form. Please check details and try again.
+        </div>
+      )}
+
+      <Button onClick={handleSubmit} disabled={isLoading}>
+        {isLoading ? "Submitting..." : "Apply"}
+      </Button>
     </div>
   );
 }

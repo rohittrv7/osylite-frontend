@@ -35,9 +35,9 @@ const formSchema = z
     username: z.string().min(3, "Username min 3 characters"),
     password: z.string().min(6, "Password min 6 characters"),
     confirmPassword: z.string(),
-    terms: z.boolean().refine((val) => val === true, {
-      message: "You must agree to terms",
-    }),
+    // terms: z.boolean().refine((val) => val === true, {
+    //   message: "You must agree to terms",
+    // }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -62,7 +62,7 @@ export default function RegisterPage() {
       username: "",
       password: "",
       confirmPassword: "",
-      terms: false,
+      // terms: false,
     },
   });
 
@@ -278,17 +278,6 @@ export default function RegisterPage() {
               onClick={() => navigate("/login")}
             >
               Sign in
-            </Button>
-          </p>
-          <p className="text-center text-sm text-muted-foreground">
-            Create Associate account?{" "}
-            <Button
-              variant="link"
-              className="px-1"
-              type="button"
-              onClick={() => navigate("/associate-register")}
-            >
-              sign up
             </Button>
           </p>
         </Form>

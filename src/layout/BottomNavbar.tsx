@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { sidebarConfig, isLinkItem, isActionItem } from "@/types/sidebar";
+import { baseSidebarConfig, isLinkItem, isActionItem } from "@/types/sidebar";
 import { Grid } from "lucide-react";
 import { useState } from "react";
 import {
@@ -18,7 +18,7 @@ import { useDispatch } from "react-redux";
 
 const BOTTOM_NAV_LIMIT = 5;
 
-const bottomNavItems = sidebarConfig.filter(
+const bottomNavItems = baseSidebarConfig.filter(
   (item) => isLinkItem(item) || isActionItem(item),
 );
 
@@ -37,8 +37,7 @@ export default function MobileBottomNav() {
   const handleLogout = async () => {
     if (isLoggingOut) return;
     try {
-      const res = await logoutApi().unwrap();
-      console.log(res, "--------------");
+      await logoutApi().unwrap();
       dispatch(clearAuth());
       toast.success("Logged out successfully");
       navigate("/", { replace: true });

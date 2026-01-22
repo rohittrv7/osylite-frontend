@@ -14,7 +14,7 @@ interface PostActionsProps {
     commentsCount: number;
     sharesCount: number;
   };
-  onCommentClick?: () => void; // Focus input when clicked
+  onCommentClick?: () => void;
 }
 
 export function PostActions({ post, onCommentClick }: PostActionsProps) {
@@ -24,7 +24,6 @@ export function PostActions({ post, onCommentClick }: PostActionsProps) {
 
   const viewedRef = useRef(false);
 
-  // 👁 Count view only once per component mount
   useEffect(() => {
     if (!viewedRef.current) {
       incrementView({ postId: post.id });
@@ -41,7 +40,7 @@ export function PostActions({ post, onCommentClick }: PostActionsProps) {
 
       <div className="flex items-center gap-4">
         <button
-          onClick={() => toggleLike(post.id)} // Pass ID string directly
+          onClick={() => toggleLike(post.id)}
           className="flex items-center gap-1.5 text-sm hover:text-red-500 transition-colors"
         >
           <Heart className="h-4 w-4" />

@@ -1,10 +1,10 @@
-import { ChevronDown, Loader2 } from "lucide-react";
+import { ChevronDown, Loader2, UserSquare2Icon } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   isActionItem,
   isLinkItem,
   isParentItem,
-  sidebarConfig,
+  baseSidebarConfig,
 } from "@/types/sidebar";
 import { useState } from "react";
 import { useLazyLogoutQuery } from "@/store/api/authApi";
@@ -12,11 +12,16 @@ import { useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { clearAuth } from "@/store/slices/authSlice";
 import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
+import { useGetMyAssociateProfileQuery } from "@/store/api/associateApi";
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [manualOpen, setManualOpen] = useState<string>("");
+
+  const { data: profile, isLoading } = useGetMyAssociateProfileQuery();
+
+  const sidebarConfig = [...baseSidebarConfig];
 
   const autoOpenMenu = (() => {
     const parent = sidebarConfig.find(
@@ -35,9 +40,7 @@ export default function Sidebar() {
   const handleLogout = async () => {
     if (isLoggingOut) return;
     try {
-      // await logoutApi().unwrap();
-      const res = await logoutApi().unwrap();
-      console.log(res, "--------------");
+      await logoutApi().unwrap();
       dispatch(clearAuth());
       toast.success("Logged out successfully");
       navigate("/", { replace: true });
@@ -45,6 +48,16 @@ export default function Sidebar() {
       apiErrorToastHandler(error);
     }
   };
+
+  if (!isLoading && (!profile || profile.status === "rejected")) {
+    sidebarConfig.splice(sidebarConfig.length - 1, 0, {
+      id: "associate",
+      label: "Become Associate",
+      icon: UserSquare2Icon,
+      type: "link",
+      path: "/associate-register",
+    });
+  }
 
   return (
     <aside
@@ -101,7 +114,6 @@ export default function Sidebar() {
                 ) : (
                   <Icon size={20} />
                 )}
-                {isLoggingOut ? "Logging out..." : item.label}
                 {isLoggingOut ? "Logging out..." : item.label}
               </div>
             );

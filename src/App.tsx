@@ -18,11 +18,13 @@ import ForgotPassword from "./pages/ForgotPage";
 import ResetPasswordPage from "./pages/ResetPassword";
 import Dashboard from "./pages/DashboardPage";
 import HomeSections from "./pages/HomeSections";
-import WallPage from "./pages/WallPage";
 import Account from "./pages/Account";
 import ProfilePage from "./pages/Profile";
 import Chat from "./pages/Chat";
 import ExploreFeed from "./pages/Feed";
+import AngMart from "./pages/AngMart";
+import PublicProfile from "./pages/UserProfile";
+import Entertainment from "./pages/Entertainment";
 
 function App() {
   const dispatch = useDispatch();
@@ -44,8 +46,6 @@ function App() {
     }
   }, [user, isLoading, error, dispatch]);
 
- 
-
   if (isLoading) return <Loader />;
 
   return (
@@ -56,10 +56,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route
-            path="/associate-register"
-            element={<AssociateRegisterPage />}
-          />
+
           <Route path="/verify-otp" element={<OTPVerificationPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -73,19 +70,25 @@ function App() {
             </ProtectedRoute>
           }
         >
+          <Route
+            path="/associate-register"
+            element={<AssociateRegisterPage />}
+          />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/home" element={<HomeSections />} />
           <Route path="/mlife" element={<ExploreFeed />} />
-          <Route path="/mlife/wall" element={<WallPage />} />
+          <Route path="/ang-mart" element={<AngMart />} />
+          {/* <Route path="/mlife/wall" element={<WallPage />} /> */}
           <Route path="/account" element={<Account />} />
+          <Route path="/entertainment" element={<Entertainment />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/:id" element={<PublicProfile />} />
           <Route path="/mchat" element={<Chat />} />
         </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/mlife" replace />} />
       </Routes>
-
-      <Toaster richColors position="top-right" />
+      <Toaster richColors theme="system" position="top-right" />
     </ThemeProvider>
   );
 }

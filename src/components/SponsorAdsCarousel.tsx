@@ -79,7 +79,6 @@ export default function SponsorAdsCarousel() {
             ref={scrollRef}
             className="flex gap-2 sm:gap-3 md:gap-4 overflow-x-hidden rounded-md whitespace-nowrap"
           >
-            {/* Duplicate for infinite seamless scroll */}
             {[...sponsorAds, ...sponsorAds].map((ad, index) => (
               <Card
                 key={index}

@@ -37,7 +37,7 @@ export default function UserUploadContent({ type = "post", onSuccess }: Props) {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-2">
       <Textarea
         placeholder="Write a caption..."
         value={caption}

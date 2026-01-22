@@ -1,0 +1,183 @@
+import {
+  useFollowUserMutation,
+  useGetPublicProfileQuery,
+  useGetUserFollowersQuery,
+  useGetUserFollowingQuery,
+  useGetUserPostsQuery,
+  useUnfollowUserMutation,
+} from "@/store/api/postsApi";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { Navigate, useParams } from "react-router-dom";
+import { Badge, Bookmark, Contact, Grid3X3 } from "lucide-react";
+import { Button } from "../components/ui/button";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
+import { useState } from "react";
+import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
+import { toast } from "sonner";
+import PostMediaGrid from "../components/PostMediaGrid";
+import { FollowStatsDialog } from "../components/FollowListDialog";
+
+export default function PublicProfile() {
+  const { id: userId = "" } = useParams();
+  const [activeTab, setActiveTab] = useState<"post" | "video" | "reel">("post");
+
+  const { data: userData, isLoading } = useGetPublicProfileQuery({
+    targetUserId: userId,
+  });
+  const { data: Content } = useGetUserPostsQuery({ userId, type: activeTab });
+
+  const { data: followers } = useGetUserFollowersQuery(userId);
+  const { data: following } = useGetUserFollowingQuery(userId);
+
+  const [follow] = useFollowUserMutation();
+  const [unFollow] = useUnfollowUserMutation();
+
+  if (!userData || isLoading) return <div>Loading...</div>;
+  if (!userData) {
+    return <Navigate to="/mlife" replace />;
+  }
+
+  const followUser = async (userId: string) => {
+    try {
+      const res = await follow({ userId }).unwrap();
+      toast.success(res.message);
+    } catch (error) {
+      apiErrorToastHandler(error);
+    }
+  };
+
+  const unfollowUser = async (userId: string) => {
+    try {
+      const res = await unFollow({ userId }).unwrap();
+      toast.success(res.message);
+    } catch (error) {
+      apiErrorToastHandler(error);
+    }
+  };
+
+  const message = () => {
+    console.log();
+  };
+
+  return (
+    <div className="bg-background p-6 max-w-4xl mx-auto space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-8">
+        {/* Avatar */}
+        <div className="flex justify-center sm:justify-start">
+          <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
+            <AvatarImage src={userData?.avatarUrl ?? ""} />
+            <AvatarFallback>
+              {userData.firstName.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        </div>
+
+        <div className="flex-1 space-y-4 text-center sm:text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+            <h2 className="text-lg sm:text-xl font-semibold">
+              {userData.username}
+            </h2>
+            {userData.isVerified && <Badge />}
+          </div>
+
+          {/* Stats */}
+          <div className="flex justify-center sm:justify-start gap-6 text-sm flex-wrap">
+            <span>
+              <b>{userData.stats?.totalPosts}</b> posts
+            </span>
+            <div className="flex gap-6 text-sm">
+              <FollowStatsDialog
+                label="followers"
+                count={userData.stats?.followersCount}
+                users={followers ?? []}
+              />
+
+              <FollowStatsDialog
+                label="following"
+                count={userData.stats?.followingCount}
+                users={following ?? []}
+              />
+            </div>
+          </div>
+
+          {/* Bio */}
+          <div className="text-sm text-muted-foreground space-y-1">
+            <p className="font-medium text-foreground">
+              {userData.firstName} {userData.lastName}
+            </p>
+            <p>🚀 Building cool stuff with code</p>
+          </div>
+          <div className="flex gap-2 w-full max-w-md">
+            <Button
+              onClick={() => {
+                if (userData.isFollowing) {
+                  unfollowUser(userData.id);
+                } else {
+                  followUser(userData.id);
+                }
+              }}
+              className={`flex-1 ${userData.isFollowing ? "bg-secondary hover:bg-secondary/80 text-secondary-foreground" : "bg-primary hover:bg-primary/90 text-primary-foreground"} font-semibold rounded-lg`}
+            >
+              {userData.isFollowing ? "Following" : "Follow"}
+            </Button>
+            <Button
+              variant="secondary"
+              disabled={!userData.isFollowing}
+              onClick={message}
+              className="flex-1 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold rounded-lg"
+            >
+              Message
+            </Button>
+          </div>
+        </div>
+      </div>
+      {userData.channel && userData?.channel.status === "approved" && (
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) =>
+            setActiveTab(value as "post" | "video" | "reel")
+          }
+          className="w-full"
+        >
+          <TabsList className="w-full bg-transparent border border-gray-800 rounded-none h-auto p-0 flex justify-center gap-12">
+            <TabsTrigger
+              value="post"
+              className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+            >
+              <Grid3X3 size={12} /> Posts
+            </TabsTrigger>
+            <TabsTrigger
+              value="video"
+              className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+            >
+              <Bookmark size={12} /> Video
+            </TabsTrigger>
+            <TabsTrigger
+              value="reel"
+              className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-white text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+            >
+              <Contact size={12} /> Reel
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="post">
+            <PostMediaGrid items={Content} />
+          </TabsContent>
+
+          <TabsContent value="video">
+            <PostMediaGrid items={Content} />
+          </TabsContent>
+
+          <TabsContent value="reel">
+            <PostMediaGrid items={Content} isReel />
+          </TabsContent>
+        </Tabs>
+      )}
+    </div>
+  );
+}

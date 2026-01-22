@@ -22,7 +22,6 @@ import { useSelector } from "react-redux";
 const Header = () => {
   const { theme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
-  // const { data: user } = useGetProfileQuery();
   const user = useSelector(selectAuthUser);
 
   return (
@@ -55,7 +54,6 @@ const Header = () => {
 
           <DropdownMenuContent align="end" className="w-48">
             {user?.isChannelCreated === false && (
-              // <DropdownMenuItem onClick={() => setOpen(true)}>
               <DropdownMenuItem
                 onSelect={(e) => {
                   e.preventDefault();
