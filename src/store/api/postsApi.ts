@@ -32,7 +32,13 @@ export const postsApi = rootApiSlice.injectEndpoints({
           body: formData,
         };
       },
-      invalidatesTags: ["Post", "MyPosts", "Explore", "UserStats"],
+      invalidatesTags: [
+        "Post",
+        "MyPosts",
+        "ExploreSocial",
+        "ExploreBusiness",
+        "UserStats",
+      ],
     }),
 
     createAssociatePost: builder.mutation<any, FormData>({
@@ -85,9 +91,17 @@ export const postsApi = rootApiSlice.injectEndpoints({
     getExplore: builder.query<ExplorePost[], ExploreFilters | void>({
       query: (filters) => ({
         url: "/posts/explore/social",
+        params: filters ?? undefined,
+      }),
+      providesTags: ["ExploreSocial"],
+    }),
+
+    getAngMart: builder.query<ExplorePost[], ExploreFilters | undefined>({
+      query: (filters) => ({
+        url: "/posts/explore/business",
         params: filters,
       }),
-      providesTags: ["Explore"],
+      providesTags: ["ExploreBusiness"],
     }),
 
     getEntertainmentReels: builder.query<Reel[], void>({
@@ -102,14 +116,6 @@ export const postsApi = rootApiSlice.injectEndpoints({
     //   query: () => "/posts/explore/business",
     //   providesTags: ["Explore"],
     // }),
-
-    getAngMart: builder.query<ExplorePost[], ExploreFilters | void>({
-      query: (filters) => ({
-        url: "/posts/explore/business",
-        params: filters,
-      }),
-      providesTags: ["Explore"],
-    }),
 
     getMyPosts: builder.query<MediaItem[], { type?: PostType }>({
       query: ({ type }) => ({
@@ -140,7 +146,7 @@ export const postsApi = rootApiSlice.injectEndpoints({
         url: `/posts/${id}/like`,
         method: "POST",
       }),
-      invalidatesTags: ["Post", "Explore", "MyPosts"],
+      invalidatesTags: ["Post", "ExploreSocial", "ExploreBusiness", "MyPosts"],
     }),
 
     addComment: builder.mutation<any, { postId: string; text: string }>({
@@ -193,5 +199,5 @@ export const {
   useGetMyFollowingQuery,
   useGetUserFollowersQuery,
   useGetUserFollowingQuery,
-  useGetEntertainmentReelsQuery
+  useGetEntertainmentReelsQuery,
 } = postsApi;

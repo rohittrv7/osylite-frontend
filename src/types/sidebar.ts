@@ -55,7 +55,7 @@ import {
   MapPin,
 } from "lucide-react";
 
-export const sidebarConfig: SidebarItem[] = [
+export const baseSidebarConfig: SidebarItem[] = [
   {
     id: "home",
     label: "Home",
@@ -126,6 +126,13 @@ export const sidebarConfig: SidebarItem[] = [
     type: "link",
     path: "/settings",
   },
+  // {
+  //   id: "associate",
+  //   label: "Become Associate",
+  //   icon: UserSquare2Icon,
+  //   type: "link",
+  //   path: "/associate-register",
+  // },
   {
     id: "logout",
     label: "Logout",

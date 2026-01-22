@@ -56,10 +56,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route
-            path="/associate-register"
-            element={<AssociateRegisterPage />}
-          />
+
           <Route path="/verify-otp" element={<OTPVerificationPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -73,6 +70,10 @@ function App() {
             </ProtectedRoute>
           }
         >
+          <Route
+            path="/associate-register"
+            element={<AssociateRegisterPage />}
+          />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/home" element={<HomeSections />} />
           <Route path="/mlife" element={<ExploreFeed />} />
