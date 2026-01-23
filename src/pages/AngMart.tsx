@@ -1,31 +1,36 @@
-import { useState } from "react";
 import { useGetAngMartQuery } from "@/store/api/postsApi";
 import MasonryFeed from "@/components/MasonryFeed";
 import SponsorAdsCarousel from "@/components/SponsorAdsCarousel";
 import { Loader2 } from "lucide-react";
-import type { ExploreFilters } from "@/types/post";
-import { AngMartFilters } from "@/components/AngMartFilters";
+import { useLocation } from "react-router-dom";
+import type { ExploreFilters, PostCategory } from "@/types/post";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function AngMart() {
-  const [filters, setFilters] = useState<ExploreFilters>({});
+  const location = useLocation();
+  const state = location.state as { category?: PostCategory } | null;
+
+  const filters: ExploreFilters | typeof skipToken = state?.category
+    ? { category: state.category }
+    : skipToken;
 
   const { data: posts = [], isLoading, isError } = useGetAngMartQuery(filters);
 
-  const handleFilterChange = (key: keyof ExploreFilters, value?: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value || undefined,
-    }));
-  };
+  // const handleFilterChange = (key: keyof ExploreFilters, value?: string) => {
+  //   setFilters((prev) => ({
+  //     ...prev,
+  //     [key]: value || undefined,
+  //   }));
+  // };
 
   return (
     <div className="min-h-screen bg-background pb-16">
       <div className="container mx-auto px-4 py-3">
         <h1 className="text-2xl font-bold mb-4">Ang Mart</h1>
 
-        <div className="mb-2">
+        {/* <div className="mb-2">
           <AngMartFilters filters={filters} onChange={handleFilterChange} />
-        </div>
+        </div> */}
 
         <div className="mb-8">
           <SponsorAdsCarousel />

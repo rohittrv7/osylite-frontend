@@ -1,10 +1,10 @@
-import { useEffect } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { useEffect, type ReactNode } from "react";
+import { Navigate } from "react-router-dom";
 import { useGetProfileQuery } from "@/store/api/authApi";
 import { UserRole } from "@/types/userRole";
 import { DOMAINS } from "@/config/config";
 
-export default function PublicRoute() {
+export default function PublicRoute({ children }: { children?: ReactNode }) {
   const { data: user, isLoading } = useGetProfileQuery();
 
   useEffect(() => {
@@ -51,5 +51,5 @@ export default function PublicRoute() {
     }
   }
 
-  return <Outlet />;
+  return <>{children}</>;
 }

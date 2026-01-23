@@ -43,7 +43,7 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <section className="py-20 lg:py-32 bg-background">
+    <section className="py-16 lg:py-20 bg-background">
       <div className="container">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
