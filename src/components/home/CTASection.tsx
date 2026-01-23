@@ -1,8 +1,9 @@
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const CTASection = () => {
+  const navigate = useNavigate();
   return (
     <section className="py-20 lg:py-32 bg-card">
       <div className="container">
@@ -14,13 +15,11 @@ const CTASection = () => {
             Start your journey with ANG Growth today.
           </p>
           <Button
-            asChild
-            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 py-6 text-lg"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full text-lg justify-center items-center gap-3 py-1 px-2"
+            onClick={() => navigate("/register")}
           >
-            <Link to="/register">
-              Create Account
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
+            Create Account
+            <ArrowRight className="h-8 w-8" />
           </Button>
         </div>
       </div>

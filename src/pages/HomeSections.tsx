@@ -64,12 +64,6 @@ export default function HomeSections() {
   return (
     <div className="w-full px-4 md:px-10 py-6 space-y-8 bg-background text-foreground">
       {/* Banner - gradient works in both modes */}
-      <div className="w-full rounded-xl bg-gradient-to-r from-orange-500 to-yellow-500 dark:from-orange-600 dark:to-yellow-600 text-white text-center py-3 font-medium shadow-sm">
-        Our official mobile app is now live!{" "}
-        <span className="underline cursor-pointer hover:opacity-90 transition-opacity">
-          Download Now →
-        </span>
-      </div>
 
       {/* Search */}
       <div className="max-w-3xl flex gap-5 items-center justify-center mx-auto">

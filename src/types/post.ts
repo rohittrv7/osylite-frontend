@@ -84,7 +84,7 @@ export interface ExploreFilters {
   audience?: PostAudience;
   displayArea?: DisplayArea;
   earningMod?: EarningMod;
-  category?: PostCategory;
+  category: PostCategory;
 }
 
 export interface ExplorePost {

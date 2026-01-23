@@ -1,8 +1,10 @@
 import { ArrowRight, BarChart3, Globe, ShieldCheck, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const features = [
     { icon: BarChart3, title: "Analytics" },
     { icon: Globe, title: "Global Reach" },
@@ -11,11 +13,17 @@ const HeroSection = () => {
   ];
 
   return (
-    <section className="relative py-20 lg:py-32 overflow-hidden">
+    <section className="relative py-20 lg:py-28 overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-card opacity-50" />
 
-      <div className="container relative">
+      <div className="container relative p-4">
+        {/* <div className="w-full rounded-xl bg-gradient-to-r from-orange-500 to-yellow-500 dark:from-orange-600 dark:to-yellow-600 text-white text-center py-3 font-medium shadow-sm">
+            Our official mobile app is now live!{" "}
+            <span className="underline cursor-pointer hover:opacity-90 transition-opacity">
+              Download Now →
+            </span>
+          </div> */}
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <div className="space-y-8">
@@ -39,15 +47,18 @@ const HeroSection = () => {
             </div>
 
             <div className="flex flex-wrap gap-4">
-              <Button className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-6">
-                Get Started
+              <Button
+                className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-6 cursor-pointer"
+                onClick={() => navigate("/login")}
+              >
+                Login ( Website)
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button
                 variant="outline"
                 className="rounded-full px-6 border-border"
               >
-                Learn More
+                Download Apps
               </Button>
             </div>
           </div>

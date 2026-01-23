@@ -19,7 +19,7 @@ export default function AssociateUploadContent({ onSuccess, type }: any) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  const [category, setCategory] = useState<string>("");
+  // const [category, setCategory] = useState<string>("");
   const [earningMod, setEarningMod] = useState<string>("free");
   const [price, setPrice] = useState<number | undefined>();
   const [visibility, setVisibility] = useState<string>("public");
@@ -29,9 +29,9 @@ export default function AssociateUploadContent({ onSuccess, type }: any) {
   const [isEnquiryPost, setIsEnquiryPost] = useState(false);
   const [ctaLabel, setCtaLabel] = useState("");
 
-  const [gameName, setGameName] = useState("");
-  const [organizer, setOrganizer] = useState("");
-  const [businessType, setBusinessType] = useState("");
+  // const [gameName, setGameName] = useState("");
+  // const [organizer, setOrganizer] = useState("");
+  // const [businessType, setBusinessType] = useState("");
 
   const [createPost, { isLoading }] = useCreateAssociatePostMutation();
 
@@ -39,14 +39,14 @@ export default function AssociateUploadContent({ onSuccess, type }: any) {
     try {
       if (!file) return alert("File required");
       if (!title.trim()) return alert("Title required");
-      if (!category) return alert("Category required");
+      // if (!category) return alert("Category required");
 
       const formData = new FormData();
 
       formData.append("title", title);
       formData.append("description", description);
       formData.append("type", type);
-      formData.append("category", category);
+      // formData.append("category", category);
       formData.append("earningMod", earningMod);
       formData.append("visibility", visibility);
       formData.append("audience", audience);
@@ -64,12 +64,12 @@ export default function AssociateUploadContent({ onSuccess, type }: any) {
       }
 
       const details: any = {};
-      if (category === "sports") {
-        details.gameName = gameName;
-        details.organizer = organizer;
-      } else if (category === "business") {
-        details.businessType = businessType;
-      }
+      // if (category === "sports") {
+      //   details.gameName = gameName;
+      //   details.organizer = organizer;
+      // } else if (category === "business") {
+      //   details.businessType = businessType;
+      // }
       formData.append("categoryDetails", JSON.stringify(details));
 
       await createPost(formData).unwrap();
@@ -99,7 +99,7 @@ export default function AssociateUploadContent({ onSuccess, type }: any) {
         onChange={(e) => setFile(e.target.files?.[0] || null)}
       />
 
-      <Select onValueChange={setCategory}>
+      {/* <Select onValueChange={setCategory}>
         <SelectTrigger>
           <SelectValue placeholder="Select Category" />
         </SelectTrigger>
@@ -110,9 +110,9 @@ export default function AssociateUploadContent({ onSuccess, type }: any) {
           <SelectItem value="sports">Sports</SelectItem>
           <SelectItem value="other">Other</SelectItem>
         </SelectContent>
-      </Select>
+      </Select> */}
 
-      {category === "sports" && (
+      {/* {category === "sports" && (
         <div className="space-y-3 pl-4 border-l-2 border-primary/20">
           <Label>Sports Details</Label>
           <Input
@@ -137,7 +137,7 @@ export default function AssociateUploadContent({ onSuccess, type }: any) {
             onChange={(e) => setBusinessType(e.target.value)}
           />
         </div>
-      )}
+      )} */}
 
       <Select onValueChange={setVisibility} defaultValue="public">
         <SelectTrigger>

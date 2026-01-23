@@ -1,6 +1,9 @@
-import type { AssociateApplyPayload } from "@/types/associate";
+import type {
+  AssociateApplyPayload,
+  AssociateCategory,
+} from "@/types/associate";
 import { rootApiSlice } from "./rootApiSlice";
-import type { AssociateCategory, BusinessDetails } from "@/config/associate";
+import type { BusinessDetails } from "@/config/associate";
 
 export type AssociateProfile = {
   id: string;
@@ -25,10 +28,10 @@ export const associateApi = rootApiSlice.injectEndpoints({
       { success: true; id: string },
       AssociateApplyPayload
     >({
-      query: (data) => ({
+      query: (payload) => ({
         url: "/associates/apply",
         method: "POST",
-        body: data,
+        body: payload,
       }),
     }),
 

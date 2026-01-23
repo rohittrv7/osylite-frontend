@@ -12,7 +12,6 @@ import { Loader } from "lucide-react";
 import HomePage from "./pages/home/MainPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/Register";
-import AssociateRegisterPage from "./pages/AssociateRegisterPage";
 import OTPVerificationPage from "./pages/OtpVerification";
 import ForgotPassword from "./pages/ForgotPage";
 import ResetPasswordPage from "./pages/ResetPassword";
@@ -25,6 +24,10 @@ import ExploreFeed from "./pages/Feed";
 import AngMart from "./pages/AngMart";
 import PublicProfile from "./pages/UserProfile";
 import Entertainment from "./pages/Entertainment";
+import Layout from "./pages/home/Layout";
+import ServicesSection from "./components/home/ServicesSection";
+import { AssociateRegistrationForm } from "./components/associae-form/AssociateRegistrationForm";
+import SelectCategoryPage from "./pages/SelectCategoryPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -52,8 +55,15 @@ function App() {
     <ThemeProvider>
       <Routes>
         {/* PUBLIC */}
-        <Route element={<PublicRoute />}>
+        <Route
+          element={
+            <PublicRoute>
+              <Layout />
+            </PublicRoute>
+          }
+        >
           <Route path="/" element={<HomePage />} />
+          <Route path="/services" element={<ServicesSection />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
@@ -72,12 +82,13 @@ function App() {
         >
           <Route
             path="/associate-register"
-            element={<AssociateRegisterPage />}
+            element={<AssociateRegistrationForm />}
           />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/home" element={<HomeSections />} />
           <Route path="/mlife" element={<ExploreFeed />} />
-          <Route path="/ang-mart" element={<AngMart />} />
+          <Route path="/ang-mart" element={<SelectCategoryPage />} />
+          <Route path="/ang-mart/:category" element={<AngMart />} />
           {/* <Route path="/mlife/wall" element={<WallPage />} /> */}
           <Route path="/account" element={<Account />} />
           <Route path="/entertainment" element={<Entertainment />} />

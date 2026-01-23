@@ -25,7 +25,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-background border-t border-border">
-      <div className="container py-16">
+      <div className="container py-16 px-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="space-y-4">
@@ -35,6 +35,8 @@ const Footer = () => {
                 ANG Growth
               </span>
             </div>
+            <p>GSTIN: 10CDQPP4007H1ZQ</p>
+            <p className="text-muted-foreground text- leading-relaxed">Ramkrishan Nagar bypass Rd Patna 800027</p>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Empowering businesses with digital tools, modern solutions and
               seamless experiences to help you grow faster.
@@ -81,11 +83,11 @@ const Footer = () => {
             <ul className="space-y-4">
               <li className="flex items-start gap-3 text-muted-foreground">
                 <MapPin className="h-5 w-5 shrink-0 mt-0.5" />
-                <span>Delhi, India</span>
+                <span>Ramkrishan Nagar bypass Rd Patna 800027</span>
               </li>
               <li className="flex items-center gap-3 text-muted-foreground">
                 <Phone className="h-5 w-5 shrink-0" />
-                <span>+91 90000 00000</span>
+                <span>+91 84060 99340</span>
               </li>
               <li className="flex items-center gap-3 text-muted-foreground">
                 <Mail className="h-5 w-5 shrink-0" />
