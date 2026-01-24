@@ -20,6 +20,15 @@ export default function PublicRoute({ children }: { children?: ReactNode }) {
         }
       }
 
+      if (user.role === UserRole.ASSOCIATE) {
+        if (
+          currentHost !== "associate.osylite.com" &&
+          !currentHost.includes("localhost")
+        ) {
+          window.location.href = DOMAINS.ADMIN_URL;
+        }
+      }
+
       if (user.role === UserRole.USER) {
         if (currentHost === "admin.osylite.com") {
           window.location.href = DOMAINS.MAIN_URL + "/home";
@@ -36,6 +45,16 @@ export default function PublicRoute({ children }: { children?: ReactNode }) {
     if (user.role === UserRole.ADMIN) {
       if (
         currentHost === "admin.osylite.com" ||
+        currentHost.includes("localhost")
+      ) {
+        return <Navigate to="/dashboard" replace />;
+      }
+      return null;
+    }
+
+    if (user.role === UserRole.ASSOCIATE) {
+      if (
+        currentHost === "associate.osylite.com" ||
         currentHost.includes("localhost")
       ) {
         return <Navigate to="/dashboard" replace />;

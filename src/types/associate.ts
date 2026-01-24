@@ -157,7 +157,7 @@ export const AssociateCategory = {
 
 export type AssociateCategory =
   (typeof AssociateCategory)[keyof typeof AssociateCategory];
-  
+
 export const CATEGORY_LABELS: Record<AssociateCategory, string> = {
   [AssociateCategory.VIDEO_CREATOR]: "Video Creator",
   [AssociateCategory.DELIVERY_BOY]: "Delivery Boy",
@@ -377,4 +377,30 @@ export interface AssociateFormData {
   // Delivery fields
   vehicleType?: string;
   deliveryLocation?: string;
+}
+
+export interface ProductExploreFilters {
+  category?: string;
+  search?: string;
+  page?: number;
+}
+
+export interface ServiceExploreFilters {
+  category?: string;
+  search?: string;
+  page?: number;
+}
+
+export interface VideoExploreFilters {
+  category?: string;
+  search?: string;
+  page?: number;
+}
+
+// 🔹 Common response type
+export interface ExplorePost {
+  id: string;
+  title: string;
+  description?: string;
+  thumbnail?: string;
 }

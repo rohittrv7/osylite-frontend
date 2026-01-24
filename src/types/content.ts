@@ -1,93 +1,136 @@
-import { AssociateCategory } from "./associate";
+export const PRODUCT_CATEGORY = {
+  B2B_PRODUCTS: "B2B Products",
+  ELECTRONICS: "Electronics",
+  GROCERY: "Grocery",
+  FASHION: "Fashion",
+  PERSONAL_CARE: "Personal Care",
+  FURNITURE: "Furniture",
+  FOOD_AND_MORE: "Food & More",
+  MEDICINE: "Medicine",
+  HEALTH_CARE: "Health Care",
+  KITCHEN_APPLIANCES: "Kitchen Appliances",
+  TOYS_AND_BABY: "Toys & Baby Products",
+  CONSTRUCTION: "Construction",
+  STATIONARY: "Stationary",
+  CONSTRUCTION_PRODUCTS: "Construction Products",
+  REFURBISHED_ITEMS: "Refurbished Items",
+  SPORTS_GOODS: "Sports Goods",
+  OLD_CARS_BIKES: "Old Cars & Bikes",
+  INDUSTRIAL_MATERIALS: "Industrial Materials",
+  STONE_PRODUCTS: "Stone Products",
+  TILES_MARBLES: "Tiles & Marbles",
+  HAND_MADE_ITEMS: "Hand Made Items",
+  LABORATORY: "Laboratory",
+  HARDWARE_PIPE: "Hardware & Pipe",
+  UPVC_DOORS_WINDOWS: "Upvc Doors & Windows",
+} as const;
 
-export const ASSOCIATE_CATEGORY_OPTIONS = [
-  { value: AssociateCategory.VIDEO_CREATOR, label: "Video creator" },
-  { value: AssociateCategory.DELIVERY_BOY, label: "Delivery boy" },
-  { value: AssociateCategory.COMPANY_EMPLOYEE, label: "Company employee" },
-  { value: AssociateCategory.COMMISSION_AGENT, label: "Commission agent" },
-  { value: AssociateCategory.REPORTER, label: "Reporter" },
+export type ProductCategory =
+  (typeof PRODUCT_CATEGORY)[keyof typeof PRODUCT_CATEGORY];
 
-  { value: AssociateCategory.CA, label: "Chartered accountant" },
-  { value: AssociateCategory.ADVOCATE, label: "Advocate" },
-  { value: AssociateCategory.INTERIOR_DESIGNER, label: "Interior designer" },
+export const PRODUCT_CATEGORY_OPTIONS = Object.values(PRODUCT_CATEGORY).map(
+  (category) => ({
+    value: category,
+    label: category,
+  }),
+);
 
-  { value: AssociateCategory.DOCTOR, label: "Doctor" },
-  {
-    value: AssociateCategory.HOSPITAL_DIRECTOR_DOCTOR,
-    label: "Hospital director",
-  },
-  { value: AssociateCategory.CLINIC_OWNER, label: "Clinic owner" },
-  { value: AssociateCategory.MEDICAL_SHOP_OWNER, label: "Medical shop owner" },
-  { value: AssociateCategory.PATHOLOGY_LAB, label: "Pathology lab" },
+export const SERVICE_CATEGORY = {
+  ANG_PAY: "ANG Pay",
+  CREDIT_CARD: "Credit Card",
+  APP_HUB: "App Hub",
+  ANG_TOKEN: "ANG Token",
+  HIRE_WORKER: "Hire Worker",
+  HOME_SERVICES: "Home Services",
+  BOOK_EXPLORE: "Book Explore",
+  TRAVELLING_TICKETS: "Travelling Tickets",
+  SHOP_REGISTRATION: "Shop Registration",
+  GET_APPOINTMENT: "Get Appointment",
+  TICKETS: "Tickets",
+  TAX_RETURN_FILING: "Tax & Return Filing",
+  SEARCH_JOB: "Search Job",
+  ORDER_FOOD: "Order Food",
+  WEBSITE_DEVELOPMENT: "Website Development",
+  LOAN_SERVICES: "Loan Services",
+  MATRIMONY: "Matrimony",
+  SOFTWARE_DEVELOPMENT: "Software Development",
+  BOOK_COURIER: "Book Courier",
+  DOCTOR_APPOINTMENT: "Doctor Appointment",
+  EMERGENCY_SERVICES: "Emergency Services",
+  PATHOLOGY_SERVICES: "Pathology Services",
+  BANKING_SERVICES: "Banking Services",
+  CATERING_COOKING: "Catering & Cooking",
+} as const;
 
-  { value: AssociateCategory.ANG_STORE_PARTNER, label: "ANG store partner" },
-  {
-    value: AssociateCategory.PRODUCT_SUPPLIES_PARTNER,
-    label: "Product supplies partner",
-  },
-  { value: AssociateCategory.SERVICE_PROVIDER, label: "Service provider" },
-  { value: AssociateCategory.AGENCY, label: "Agency" },
-  { value: AssociateCategory.DISTRIBUTOR, label: "Distributor" },
-  { value: AssociateCategory.CNF, label: "CNF" },
-  { value: AssociateCategory.TRADING, label: "Trading" },
+export type ServiceCategory =
+  (typeof SERVICE_CATEGORY)[keyof typeof SERVICE_CATEGORY];
 
-  { value: AssociateCategory.FACTORY_OWNER, label: "Factory owner" },
+export const SERVICE_CATEGORY_OPTIONS = Object.values(SERVICE_CATEGORY).map(
+  (category) => ({
+    value: category,
+    label: category,
+  }),
+);
 
-  { value: AssociateCategory.RESTAURANT_OWNER, label: "Restaurant owner" },
-  {
-    value: AssociateCategory.CLOUD_KITCHEN_OWNER,
-    label: "Cloud kitchen owner",
-  },
-  { value: AssociateCategory.TEA_SHOP_OWNER, label: "Tea shop owner" },
-  { value: AssociateCategory.CATERING_COOKING, label: "Catering / cooking" },
+export const VIDEO_CATEGORY = {
+  LIVE_TV: "Live TV",
+  LIVE_NEWS: "Live News",
+  LIVE_SPORTS: "Live Sports",
+  LIVE_EDUCATION: "Live Education",
+  LIVE_EVENT: "Live Event",
+  LIVE_ME: "Live Me",
 
-  { value: AssociateCategory.PETROL_PUMP_OWNER, label: "Petrol pump owner" },
-  { value: AssociateCategory.GROCERY_SHOP_OWNER, label: "Grocery shop owner" },
-  {
-    value: AssociateCategory.FASHION_STORE_OWNER,
-    label: "Fashion store owner",
-  },
-  {
-    value: AssociateCategory.HARDWARE_STORE_OWNER,
-    label: "Hardware store owner",
-  },
-  { value: AssociateCategory.CEMENT_OWNER, label: "Cement owner" },
+  COMEDY: "Comedy",
+  FAMILY: "Family",
+  KIDS: "Kids",
+  DRAMA: "Drama",
+  CRIME: "Crime",
+  MOVIES: "Movies",
+  BHOJPURI: "Bhojpuri",
+  EDUCATION: "Education",
+  SPORTS: "Sports",
+  BUSINESS: "Business",
+  MIXED_VIDEOS: "Mixed Videos",
+} as const;
 
-  {
-    value: AssociateCategory.CREATE_STORE_PRODUCT,
-    label: "Create store product",
-  },
-  {
-    value: AssociateCategory.CREATE_STORE_SERVICE,
-    label: "Create store service",
-  },
-  { value: AssociateCategory.CREATE_STORE_BOTH, label: "Create store both" },
+export type VideoCategory =
+  (typeof VIDEO_CATEGORY)[keyof typeof VIDEO_CATEGORY];
 
-  { value: AssociateCategory.PRE_SCHOOL_OWNER, label: "Pre-school owner" },
-  {
-    value: AssociateCategory.MIDDLE_SCHOOL_OWNER,
-    label: "Middle school owner",
-  },
-  { value: AssociateCategory.HIGH_SCHOOL_OWNER, label: "High school owner" },
-  { value: AssociateCategory.COLLEGE_DIRECTOR, label: "College director" },
-  {
-    value: AssociateCategory.UNIVERSITY_DIRECTOR,
-    label: "University director",
-  },
-  {
-    value: AssociateCategory.COACHING_CENTRE_OWNER,
-    label: "Coaching centre owner",
-  },
-  {
-    value: AssociateCategory.TRAINING_INSTITUTE_OWNER,
-    label: "Training institute owner",
-  },
+export const VIDEO_CATEGORY_OPTIONS = Object.values(VIDEO_CATEGORY).map(
+  (category) => ({
+    value: category,
+    label: category,
+  }),
+);
 
-  { value: AssociateCategory.GYM_OWNER, label: "Gym owner" },
-  { value: AssociateCategory.PARK_DIRECTOR, label: "Park director" },
-  { value: AssociateCategory.CINEMA_HALL_OWNER, label: "Cinema hall owner" },
-  { value: AssociateCategory.GARDEN, label: "Garden" },
-
-  { value: AssociateCategory.BANK_BM_OTHERS, label: "Bank BM / Others" },
-  { value: AssociateCategory.OTHERS, label: "Others" },
-] as const;
+// --- 4. VIDEO GENRES (Sub-category for Movies/Shows) ---
+// Extracted from WhatsApp Image Note Point
+// export enum VideoGenre {
+//   ROMANCE = "Romance",
+//   DRAMA = "Drama",
+//   FAMILY = "Family",
+//   REALITY = "Reality",
+//   COMEDY = "Comedy",
+//   MYTHOLOGY = "Mythology",
+//   CRIME = "Crime",
+//   ACTION = "Action",
+//   TALKSHOW = "Talkshow",
+//   LIFESTYLE = "Lifestyle",
+//   TEEN = "Teen",
+//   AWARDS = "Awards",
+//   BIOPIC = "Biopic",
+//   SCIENCE = "Science",
+//   TRAVEL = "Travel",
+//   FASHION = "Fashion",
+//   DOCUMENTARY = "Documentary",
+//   HORROR = "Horror",
+//   THRILLER = "Thriller",
+//   ANIME = "Anime",
+//   ADVENTURE = "Adventure",
+//   ANIMATION = "Animation",
+//   CONCERT_FILM = "Concert Film",
+//   FANTASY = "Fantasy",
+//   HISTORICAL = "Historical",
+//   MUSICAL = "Musical",
+//   MYSTERY = "Mystery",
+// }

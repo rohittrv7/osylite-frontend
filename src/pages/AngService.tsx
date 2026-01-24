@@ -4,9 +4,9 @@ import { Loader2 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import type { ExploreFilters, PostCategory } from "@/types/post";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { useGetExploreProductsQuery } from "@/store/api/associateApi";
+import { useGetExploreServicesQuery } from "@/store/api/associateApi";
 
-export default function AngMart() {
+export default function AngService() {
   const location = useLocation();
   const state = location.state as { category?: PostCategory } | null;
 
@@ -18,7 +18,7 @@ export default function AngMart() {
     data: posts = [],
     isLoading,
     isError,
-  } = useGetExploreProductsQuery(filters);
+  } = useGetExploreServicesQuery(filters);
 
   // const handleFilterChange = (key: keyof ExploreFilters, value?: string) => {
   //   setFilters((prev) => ({
