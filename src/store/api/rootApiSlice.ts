@@ -88,5 +88,8 @@ export const rootApiSlice = createApi({
     "UserFollowing",
     "UserProfile",
     "Reels",
+    "ExploreProducts",
+    "ExploreServices",
+    "ExploreVideos",
   ],
 });

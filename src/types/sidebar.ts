@@ -92,11 +92,11 @@ export const baseSidebarConfig: SidebarItem[] = [
     path: "/ang-mart",
   },
   {
-    id: "ang-services",
+    id: "ang-service",
     label: "ANG Services",
     icon: Briefcase,
     type: "link",
-    path: "/ang-services",
+    path: "/ang-service",
   },
   {
     id: "venue-explore",

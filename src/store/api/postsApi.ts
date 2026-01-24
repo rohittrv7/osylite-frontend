@@ -4,13 +4,13 @@ import type { PublicUserProfile } from "@/types/user";
 import type {
   CreatePostPayload,
   ExploreFilters,
-  ExplorePost,
   FollowResponse,
   PostMedia,
   PostType,
   Reel,
 } from "@/types/post";
 import type { FollowUser } from "@/components/FollowList";
+import type { ExplorePost } from "@/types/associate";
 
 export const postsApi = rootApiSlice.injectEndpoints({
   endpoints: (builder) => ({

@@ -1,6 +1,10 @@
 import type {
   AssociateApplyPayload,
   AssociateCategory,
+  ExplorePost,
+  ProductExploreFilters,
+  ServiceExploreFilters,
+  VideoExploreFilters,
 } from "@/types/associate";
 import { rootApiSlice } from "./rootApiSlice";
 import type { BusinessDetails } from "@/config/associate";
@@ -41,8 +45,46 @@ export const associateApi = rootApiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+
+    getExploreProducts: builder.query<
+      ExplorePost[],
+      ProductExploreFilters | undefined
+    >({
+      query: (filters) => ({
+        url: "/posts/products",
+        ...(filters ? { params: filters } : {}),
+      }),
+      providesTags: ["ExploreProducts"],
+    }),
+
+    getExploreServices: builder.query<
+      ExplorePost[],
+      ServiceExploreFilters | undefined
+    >({
+      query: (filters) => ({
+        url: "/posts/services",
+        ...(filters ? { params: filters } : {}),
+      }),
+      providesTags: ["ExploreServices"],
+    }),
+
+    getExploreVideos: builder.query<
+      ExplorePost[],
+      VideoExploreFilters | undefined
+    >({
+      query: (filters) => ({
+        url: "/posts/videos",
+        ...(filters ? { params: filters } : {}),
+      }),
+      providesTags: ["ExploreVideos"],
+    }),
   }),
 });
 
-export const { useApplyAssociateMutation, useGetMyAssociateProfileQuery } =
-  associateApi;
+export const {
+  useApplyAssociateMutation,
+  useGetMyAssociateProfileQuery,
+  useGetExploreProductsQuery,
+  useGetExploreServicesQuery,
+  useGetExploreVideosQuery,
+} = associateApi;
