@@ -15,16 +15,12 @@ import type { ExplorePost } from "@/types/associate";
 export const postsApi = rootApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     createPost: builder.mutation<any, CreatePostPayload>({
-      query: ({ caption, type, file, isEnquiryPost, ctaLabel }) => {
+      query: ({ caption, type, file }) => {
         const formData = new FormData();
         formData.append("type", type);
         formData.append("file", file);
 
         if (caption) formData.append("caption", caption);
-        if (typeof isEnquiryPost === "boolean") {
-          formData.append("isEnquiryPost", String(isEnquiryPost));
-        }
-        if (ctaLabel) formData.append("ctaLabel", ctaLabel);
 
         return {
           url: "/posts",
@@ -178,6 +174,33 @@ export const postsApi = rootApiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Post"],
     }),
+
+    getFeed: builder.query<
+      any,
+      { type: "post" | "video" | "reel"; page: number; limit: number }
+    >({
+      query: ({ type, page, limit = 10 }) => ({
+        url: "/posts/feed",
+        params: {
+          type,
+          page,
+          limit,
+        },
+      }),
+
+      serializeQueryArgs: ({ endpointName, queryArgs }) => {
+        return `${endpointName}-${queryArgs.type}`;
+      },
+
+      merge: (currentCache, newData) => {
+        currentCache.data.push(...newData.data);
+        currentCache.meta = newData.meta;
+      },
+
+      forceRefetch({ currentArg, previousArg }) {
+        return currentArg?.page !== previousArg?.page;
+      },
+    }),
   }),
 });
 
@@ -199,5 +222,6 @@ export const {
   useGetMyFollowingQuery,
   useGetUserFollowersQuery,
   useGetUserFollowingQuery,
+  useGetFeedQuery,
   useGetEntertainmentReelsQuery,
 } = postsApi;
