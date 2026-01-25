@@ -6,8 +6,8 @@ export interface CreatePostPayload {
   caption?: string;
   type: "post" | "reel" | "video";
   file: File;
-  isEnquiryPost?: boolean;
-  ctaLabel?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface PostStats {
@@ -92,7 +92,7 @@ export interface ExplorePost {
   title: string | null;
   caption: string | null;
   fileUrl: string;
-  thumbnailUrl: string | null;
+  thumbnailUrl: string | undefined;
   description: string;
 
   type: "post" | "reel" | "video";

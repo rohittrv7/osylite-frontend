@@ -49,6 +49,7 @@ const sections = [
 
 export default function HomeSections() {
   const navigate = useNavigate();
+
   const { data: feedData = [] } = useGetExploreQuery();
   // const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>(
   //   {},
