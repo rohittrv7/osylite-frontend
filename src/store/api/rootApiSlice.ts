@@ -91,5 +91,6 @@ export const rootApiSlice = createApi({
     "ExploreProducts",
     "ExploreServices",
     "ExploreVideos",
+    "Chat",
   ],
 });

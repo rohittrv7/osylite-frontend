@@ -275,12 +275,14 @@ import {
   useToggleLikeMutation,
 } from "@/store/api/postsApi";
 import type { ExplorePost } from "@/types/feed";
+import { useNavigate } from "react-router-dom";
 
 interface FeedCardProps {
   post: ExplorePost;
 }
 
 const FeedCard = ({ post }: FeedCardProps) => {
+  const navigate = useNavigate();
   const feedVideoRef = useRef<HTMLVideoElement>(null);
 
   /** ---------------- Local Optimistic State ---------------- */
@@ -388,7 +390,10 @@ const FeedCard = ({ post }: FeedCardProps) => {
     <>
       <Card className="mb-4 overflow-hidden border-border/50">
         {/* HEADER */}
-        <CardHeader className="p-3 pb-2">
+        <CardHeader
+          className="p-3 pb-2"
+          onClick={() => navigate(`/profile/${post.channel.user.id}`)}
+        >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-semibold">
               {post.channel.name.charAt(0).toUpperCase()}

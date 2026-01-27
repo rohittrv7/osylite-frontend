@@ -127,7 +127,7 @@ const FeedCard = ({ post }: FeedCardProps) => {
           }
         >
           {post.isAd && (
-            <div className="absolute top-2 left-2 z-10 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded">
+            <div className="absolute top-2 left-2 z-10 bg-black/70 text-background text-[10px] px-2 py-0.5 rounded">
               Ad
             </div>
           )}
@@ -232,15 +232,15 @@ const FeedCard = ({ post }: FeedCardProps) => {
             </div>
           )}
 
-          {post.isEnquiryPost && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                className="border-green-500/90 text-green-600"
-                onClick={() => console.log("Open Enquiry Form for:", post.id)}
-              >
-                MChat
-              </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="border-green-500/90 text-green-600"
+              onClick={() => navigate(`/mchat?userId=${post.channel.user.id}`)}
+            >
+              MChat
+            </Button>
+            {post.isEnquiryPost && (
               <Button
                 variant="outline"
                 className="border-green-600/70 text-green-600"
@@ -248,8 +248,8 @@ const FeedCard = ({ post }: FeedCardProps) => {
               >
                 {post.ctaLabel || "Enquiry Form"}
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </CardContent>
       </Card>
 
