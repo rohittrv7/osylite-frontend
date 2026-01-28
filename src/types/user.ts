@@ -104,7 +104,7 @@ export interface PublicUserProfile {
   createdAt: string;
 
   stats: ProfileStats;
-
+  isFriend: boolean;
   isFollowing: boolean;
   isMe: boolean;
 }

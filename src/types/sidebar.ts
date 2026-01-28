@@ -53,6 +53,7 @@ import {
   Music,
   Briefcase,
   MapPin,
+  Handshake,
 } from "lucide-react";
 
 export const baseSidebarConfig: SidebarItem[] = [
@@ -111,6 +112,13 @@ export const baseSidebarConfig: SidebarItem[] = [
     icon: Music,
     type: "link",
     path: "/entertainment",
+  },
+  {
+    id: "friend",
+    label: "Friends",
+    icon: Handshake,
+    type: "link",
+    path: "/friends",
   },
   {
     id: "profile",

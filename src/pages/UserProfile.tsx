@@ -7,7 +7,7 @@ import {
   useUnfollowUserMutation,
 } from "@/store/api/postsApi";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { Badge, Bookmark, Contact, Grid3X3 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import {
@@ -24,6 +24,7 @@ import { FollowStatsDialog } from "../components/FollowListDialog";
 
 export default function PublicProfile() {
   const { id: userId = "" } = useParams();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"post" | "video" | "reel">("post");
 
   const { data: userData, isLoading } = useGetPublicProfileQuery({
@@ -58,10 +59,6 @@ export default function PublicProfile() {
     } catch (error) {
       apiErrorToastHandler(error);
     }
-  };
-
-  const message = () => {
-    console.log();
   };
 
   return (
@@ -121,63 +118,61 @@ export default function PublicProfile() {
                   followUser(userData.id);
                 }
               }}
-              className={`flex-1 ${userData.isFollowing ? "bg-secondary hover:bg-secondary/80 text-secondary-foreground" : "bg-primary hover:bg-primary/90 text-primary-foreground"} font-semibold rounded-lg`}
+              className={`flex-1 ${userData.isFollowing ? "bg-secondary hover:bg-secondary/80 text-secondary-foreground" : "bg-primary hover:bg-primary/90 text-primary-foreground"} font-semibold rounded-lg cursor-pointer`}
             >
               {userData.isFollowing ? "Following" : "Follow"}
             </Button>
             <Button
               variant="secondary"
-              disabled={!userData.isFollowing}
-              onClick={message}
-              className="flex-1 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold rounded-lg"
+              disabled={!userData.isFriend}
+              onClick={() => navigate(`/mchat?userId=${userData.id}`)}
+              className="flex-1 bg-secondary cursor-pointer hover:bg-secondary/80 text-secondary-foreground font-semibold rounded-lg"
             >
               Message
             </Button>
           </div>
         </div>
       </div>
-      {userData.channel && userData?.channel.status === "approved" && (
-        <Tabs
-          value={activeTab}
-          onValueChange={(value) =>
-            setActiveTab(value as "post" | "video" | "reel")
-          }
-          className="w-full"
-        >
-          <TabsList className="w-full bg-transparent border border-gray-800 rounded-none h-auto p-0 flex justify-center gap-12">
-            <TabsTrigger
-              value="post"
-              className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-foreground text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
-            >
-              <Grid3X3 size={12} /> Posts
-            </TabsTrigger>
-            <TabsTrigger
-              value="video"
-              className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-foreground text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
-            >
-              <Bookmark size={12} /> Video
-            </TabsTrigger>
-            <TabsTrigger
-              value="reel"
-              className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-foreground text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
-            >
-              <Contact size={12} /> Reel
-            </TabsTrigger>
-          </TabsList>
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) =>
+          setActiveTab(value as "post" | "video" | "reel")
+        }
+        className="w-full"
+      >
+        <TabsList className="w-full bg-transparent border border-gray-800 rounded-none h-auto p-0 flex justify-center gap-12">
+          <TabsTrigger
+            value="post"
+            className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-foreground text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+          >
+            <Grid3X3 size={12} /> Posts
+          </TabsTrigger>
+          <TabsTrigger
+            value="video"
+            className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-foreground text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+          >
+            <Bookmark size={12} /> Video
+          </TabsTrigger>
+          <TabsTrigger
+            value="reel"
+            className="rounded-none border-t border-transparent data-[state=active]:border-white data-[state=active]:text-foreground text-gray-500 uppercase text-xs tracking-widest py-3 gap-2"
+          >
+            <Contact size={12} /> Reel
+          </TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="post">
-            <PostMediaGrid items={Content} />
-          </TabsContent>
+        <TabsContent value="post">
+          <PostMediaGrid items={Content} />
+        </TabsContent>
 
-          <TabsContent value="video">
-            <PostMediaGrid items={Content} />
-          </TabsContent>
+        <TabsContent value="video">
+          <PostMediaGrid items={Content} />
+        </TabsContent>
 
-          <TabsContent value="reel">
-            <PostMediaGrid items={Content} isReel />
-          </TabsContent>
-        </Tabs>
-      )}
+        <TabsContent value="reel">
+          <PostMediaGrid items={Content} isReel />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

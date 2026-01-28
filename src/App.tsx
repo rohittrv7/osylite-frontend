@@ -33,6 +33,7 @@ import AngService from "./pages/AngService";
 import EntertainMentPage from "./pages/EntertainMentPage";
 import VenueExplore from "./pages/VenueExplore";
 import { Loader2 } from "lucide-react";
+import Friends from "./pages/Friends";
 
 function App() {
   const dispatch = useDispatch();
@@ -97,33 +98,27 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/home" element={<HomeSections />} />
           <Route path="/mlife" element={<ExploreFeed />} />
-
           <Route
             path="/associate-register"
             element={<AssociateRegistrationForm />}
           />
-
           <Route path="/ang-mart" element={<SelectCategoryPage />} />
           <Route path="/ang-mart/:category" element={<AngMart />} />
-
           <Route path="/ang-service" element={<SelectServicePage />} />
           <Route path="/ang-service/:category" element={<AngService />} />
-
           <Route path="/venue-explore" element={<VenueExplore />} />
-
           <Route path="/entertainment" element={<SelectEntertainment />} />
           <Route
             path="/entertainment/:category"
             element={<EntertainMentPage />}
           />
-
           <Route path="/account" element={<Account />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:id" element={<PublicProfile />} />
           <Route path="/mchat" element={<Chat />} />
+          <Route path="/friends" element={<Friends />} />
         </Route>
 
-        {/* CATCH ALL - Agar koi galat url dale toh /mlife par bhej do agar login hai, warna public handle karega */}
         <Route path="*" element={<Navigate to="/mlife" replace />} />
       </Routes>
       <Toaster richColors theme="system" position="top-right" />
