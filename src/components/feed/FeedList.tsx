@@ -20,7 +20,6 @@ export const FeedList = ({ type }: FeedListProps) => {
     limit: 10,
   });
 
-  // Reset page when type changes
   useEffect(() => {
     setPage(1);
   }, [type]);
@@ -31,7 +30,6 @@ export const FeedList = ({ type }: FeedListProps) => {
     }
   }, [data?.meta.hasMore, isFetching]);
 
-  // Infinite scroll observer
   useEffect(() => {
     if (observerRef.current) {
       observerRef.current.disconnect();

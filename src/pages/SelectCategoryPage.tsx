@@ -22,7 +22,7 @@ const SelectCategoryPage = () => {
           <Card
             onClick={() => handleSelect(category.value)}
             className="h-32 cursor-pointer flex items-center justify-center
-                       text-lg font-medium text-white
+                       text-lg font-medium text-foreground
                        hover:shadow-md transition"
           >
             {category.label}

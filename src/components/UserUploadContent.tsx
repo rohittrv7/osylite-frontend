@@ -12,8 +12,6 @@ type Props = {
 export default function UserUploadContent({ type = "post", onSuccess }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [caption, setCaption] = useState("");
-  // const [latitude, setLatitude] = useState<number>(0);
-  // const [longitude, setLongitude] = useState<number>(0);
 
   const [createPost, { isLoading }] = useCreatePostMutation();
 
@@ -24,8 +22,6 @@ export default function UserUploadContent({ type = "post", onSuccess }: Props) {
       type,
       caption: caption.trim() || undefined,
       file,
-      // latitude,
-      // longitude,
     }).unwrap();
 
     setFile(null);
@@ -33,24 +29,6 @@ export default function UserUploadContent({ type = "post", onSuccess }: Props) {
 
     onSuccess?.();
   };
-
-  // useEffect(() => {
-  //   if (navigator.geolocation) {
-  //     navigator.geolocation.getCurrentPosition(
-  //       (position) => {
-  //         // const latitude = position.coords.latitude;
-  //         // const longitude = position.coords.longitude;
-  //         // setLatitude(latitude);
-  //         // setLongitude(longitude);
-  //       },
-  //       (error) => {
-  //         console.error("Error getting location:", error.message);
-  //       },
-  //     );
-  //   } else {
-  //     console.log("Geolocation is not supported by this browser.");
-  //   }
-  // });
 
   return (
     <div className="space-y-2">

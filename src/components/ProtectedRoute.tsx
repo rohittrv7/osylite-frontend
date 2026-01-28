@@ -1,66 +1,44 @@
-import { useEffect } from "react";
-import { Navigate } from "react-router-dom";
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useSelector } from "react-redux";
+import { Navigate, useLocation } from "react-router-dom";
 import { UserRole } from "@/types/userRole";
-import {
-  selectAuthLoading,
-  selectAuthUser,
-} from "@/store/selectors/authSelectors";
+import { selectAuthUser } from "@/store/selectors/authSelectors";
 
 const DOMAIN_CONFIG: Record<string, string> = {
-  [UserRole.ADMIN]: import.meta.env.VITE_ADMIN_URL,
-  [UserRole.ASSOCIATE]: import.meta.env.VITE_ASSOCIATE_URL,
-  [UserRole.USER]: import.meta.env.VITE_MAIN_URL,
+  [UserRole.ADMIN]: import.meta.env.VITE_ADMIN_URL || "",
+  [UserRole.ASSOCIATE]: import.meta.env.VITE_ASSOCIATE_URL || "",
+  [UserRole.USER]: import.meta.env.VITE_MAIN_URL || "",
 };
-const MAIN_DOMAIN = import.meta.env.VITE_MAIN_URL;
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const user = useSelector(selectAuthUser);
-  const isLoading = useSelector(selectAuthLoading);
+  const location = useLocation();
 
-  const currentOrigin = window.location.origin;
-  const normalizedCurrent = currentOrigin.replace(/\/$/, "");
-  const normalizedMain = MAIN_DOMAIN.replace(/\/$/, "");
-
-  const isOnMainDomain = normalizedCurrent === normalizedMain;
-
-  const targetBaseUrl = user ? DOMAIN_CONFIG[user.role as UserRole] : null;
-  const normalizedTarget = targetBaseUrl
-    ? targetBaseUrl.replace(/\/$/, "")
-    : "";
-
-  const isWrongDomainForUser =
-    user && normalizedTarget && normalizedCurrent !== normalizedTarget;
+  const processingRef = useRef(false);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (!user || processingRef.current) return;
 
-    if (!user && !isOnMainDomain) {
-      window.location.href = `${normalizedMain}/`;
-      return;
+    const currentOrigin = window.location.origin.replace(/\/$/, "");
+    const targetDomain = DOMAIN_CONFIG[user.role as UserRole]?.replace(
+      /\/$/,
+      "",
+    );
+
+    if (
+      targetDomain &&
+      targetDomain !== "" &&
+      currentOrigin !== targetDomain &&
+      !currentOrigin.includes("localhost")
+    ) {
+      processingRef.current = true;
+      window.location.href = `${targetDomain}${location.pathname}`;
     }
-
-    if (user && isWrongDomainForUser) {
-      window.location.href = `${normalizedTarget}/home`;
-    }
-  }, [
-    user,
-    isLoading,
-    isOnMainDomain,
-    isWrongDomainForUser,
-    normalizedMain,
-    normalizedTarget,
-  ]);
-
-  if (isLoading) return null;
+  }, [user, location.pathname]);
 
   if (!user) {
-    if (isOnMainDomain) return <Navigate to="/" replace />;
-    return null;
+    return <Navigate to="/login" replace />;
   }
-
-  if (isWrongDomainForUser) return null;
 
   return <>{children}</>;
 }

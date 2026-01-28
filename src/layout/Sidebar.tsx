@@ -41,8 +41,12 @@ export default function Sidebar() {
     if (isLoggingOut) return;
     try {
       await logoutApi().unwrap();
+
       dispatch(clearAuth());
+      dispatch({ type: "api/resetApiState" }); // RTK Query cache clear
+
       toast.success("Logged out successfully");
+
       navigate("/", { replace: true });
     } catch (error) {
       apiErrorToastHandler(error);
@@ -50,13 +54,15 @@ export default function Sidebar() {
   };
 
   if (!isLoading && (!profile || profile.status === "rejected")) {
-    sidebarConfig.splice(sidebarConfig.length - 1, 0, {
-      id: "associate",
-      label: "Become Associate",
-      icon: UserSquare2Icon,
-      type: "link",
-      path: "/associate-register",
-    });
+    if (!sidebarConfig.some((item) => item.id === "associate")) {
+      sidebarConfig.splice(sidebarConfig.length - 1, 0, {
+        id: "associate",
+        label: "Become Associate",
+        icon: UserSquare2Icon,
+        type: "link",
+        path: "/associate-register",
+      });
+    }
   }
 
   return (
@@ -80,8 +86,8 @@ export default function Sidebar() {
               <div
                 key={item.id}
                 onClick={() => navigate(item.path)}
-                className={`flex items-center gap-4 px-4 py-3 rounded-lg cursor-pointer
-                  ${item.danger ? "text-destructive" : ""}
+                className={`flex items-center gap-4 px-4 py-3 rounded-lg cursor-pointer transition-colors
+                  ${item.danger ? "text-destructive hover:bg-destructive/10" : ""}
                   ${
                     isActive
                       ? "bg-muted border border-border"
@@ -101,11 +107,11 @@ export default function Sidebar() {
                 key={item.id}
                 onClick={() => handleLogout()}
                 className={`flex items-center gap-4 px-4 py-3 rounded-lg
-                text-destructive transition
+                text-destructive transition-colors
                 ${
                   isLoggingOut
                     ? "opacity-60 cursor-not-allowed"
-                    : "cursor-pointer hover:bg-muted/50"
+                    : "cursor-pointer hover:bg-destructive/10"
                 }
                   `}
               >
@@ -127,7 +133,7 @@ export default function Sidebar() {
               <div key={item.id}>
                 <div
                   onClick={() => setManualOpen(isOpen ? "" : item.id)}
-                  className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer
+                  className={`flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer transition-colors
                     ${
                       isOpen
                         ? "bg-muted border border-border"
@@ -139,7 +145,7 @@ export default function Sidebar() {
                     {item.label}
                   </div>
                   <ChevronDown
-                    className={`transition-transform ${
+                    className={`transition-transform duration-200 ${
                       isOpen ? "rotate-180" : ""
                     }`}
                   />
@@ -155,7 +161,7 @@ export default function Sidebar() {
                         <div
                           key={child.id}
                           onClick={() => navigate(child.path)}
-                          className={`flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer
+                          className={`flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer transition-colors
                             ${
                               isActive
                                 ? "bg-muted border border-border"

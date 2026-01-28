@@ -82,7 +82,6 @@ export function AssociateRegistrationForm() {
     }
   };
 
-  // Determine which category-specific fields to show
   const showMedical =
     selectedCategory && MEDICAL_CATEGORIES.includes(selectedCategory);
   const showEducation =
