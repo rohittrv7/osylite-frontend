@@ -37,10 +37,6 @@ const Header = () => {
     {
       name: "Services",
       href: "/services",
-      // children: [
-      //   { name: "Web Development", href: "/services/web-development" },
-      //   { name: "Design", href: "/services/design" },
-      //   { name: "SEO", href: "/services/seo" },
       // ],
     },
     { name: "Contact", href: "/contact" },

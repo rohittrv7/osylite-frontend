@@ -5,9 +5,7 @@ export type KycDocuments = {
 };
 
 export type AssociateApplyPayload = {
-  // -----------------
   // Required
-  // -----------------
   category: AssociateCategory;
   address: string;
   city: string;
@@ -15,67 +13,47 @@ export type AssociateApplyPayload = {
   pincode: string;
   businessMobile: string;
 
-  // -----------------
   // Optional common
-  // -----------------
   subCategory?: string;
   businessName?: string;
   latitude?: number;
   longitude?: number;
 
-  // -----------------
   // Trade / Manufacturing
-  // -----------------
   unitNo?: string;
   brand?: string;
   typeOfProduct?: string;
 
-  // -----------------
   // Medical
-  // -----------------
   registrationNumber?: string;
   specialization?: string;
 
-  // -----------------
   // Education
-  // -----------------
   board?: string;
   universityAffiliation?: string;
 
-  // -----------------
   // Banking
-  // -----------------
   branchCode?: string;
   govtOrPvt?: "govt" | "pvt";
 
-  // -----------------
   // Food
-  // -----------------
   fssaiLicense?: string;
 
-  // -----------------
   // Creator
-  // -----------------
   channelName?: string;
 
-  // -----------------
   // Delivery
-  // -----------------
   vehicleType?: string;
   deliveryLocation?: string;
 
-  // -----------------
   // Business Info
-  // -----------------
   website?: string;
   openingTime?: string;
   closingTime?: string;
   offDays?: string[];
   gstNumber?: string;
 
-  // -----------------
   // KYC
-  // -----------------
   kycDocuments?: KycDocuments;
 };
 

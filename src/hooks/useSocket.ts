@@ -16,7 +16,6 @@ export const useSocket = () => {
     });
 
     return () => {
-      // ❌ disconnect yahan mat karo
       // ChatPage unmount hone pe bhi
       // socket alive rehna chahiye
     };
