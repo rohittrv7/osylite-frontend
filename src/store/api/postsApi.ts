@@ -14,27 +14,13 @@ import type { ExplorePost } from "@/types/associate";
 
 export const postsApi = rootApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    createPost: builder.mutation<any, CreatePostPayload>({
-      query: ({ caption, type, file }) => {
-        const formData = new FormData();
-        formData.append("type", type);
-        formData.append("file", file);
-
-        if (caption) formData.append("caption", caption);
-
-        return {
-          url: "/posts",
-          method: "POST",
-          body: formData,
-        };
-      },
-      invalidatesTags: [
-        "Post",
-        "MyPosts",
-        "ExploreSocial",
-        "ExploreBusiness",
-        "UserStats",
-      ],
+    createPost: builder.mutation<void, CreatePostPayload>({
+      query: (body) => ({
+        url: "posts",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["MyPosts"],
     }),
 
     createAssociatePost: builder.mutation<any, FormData>({

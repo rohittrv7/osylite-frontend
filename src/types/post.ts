@@ -5,7 +5,7 @@ export type PostType = "post" | "reel" | "video";
 export interface CreatePostPayload {
   caption?: string;
   type: "post" | "reel" | "video";
-  file: File;
+  fileUrl: string;
   latitude?: number;
   longitude?: number;
 }
