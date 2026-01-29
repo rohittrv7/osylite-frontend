@@ -19,7 +19,9 @@ export default function Sidebar() {
   const location = useLocation();
   const [manualOpen, setManualOpen] = useState<string>("");
 
-  const { data: profile, isLoading } = useGetMyAssociateProfileQuery();
+  const { data: profile, isLoading } =
+    useGetMyAssociateProfileQuery();
+    // {skip: !isLoading}
 
   const sidebarConfig = [...baseSidebarConfig];
 
@@ -43,7 +45,7 @@ export default function Sidebar() {
       await logoutApi().unwrap();
 
       dispatch(clearAuth());
-      dispatch({ type: "api/resetApiState" }); // RTK Query cache clear
+      dispatch({ type: "api/resetApiState" });
 
       toast.success("Logged out successfully");
 
