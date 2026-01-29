@@ -2,7 +2,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+
 import { useCreatePostMutation } from "@/store/api/postsApi";
+import { useLazyGetUploadSignatureQuery } from "@/store/api/cloudinaryApi";
+import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
+import { Progress } from "./ui/progress";
+import { toast } from "sonner";
+import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
 
 type Props = {
   type?: "post" | "reel" | "video";
@@ -12,26 +18,48 @@ type Props = {
 export default function UserUploadContent({ type = "post", onSuccess }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [caption, setCaption] = useState("");
+  const [progress, setProgress] = useState(0);
 
   const [createPost, { isLoading }] = useCreatePostMutation();
+  const [getSignatureTrigger] = useLazyGetUploadSignatureQuery();
+
+  const getSignature = async ({ folder }: { folder: string }) => {
+    return await getSignatureTrigger({ folder }).unwrap();
+  };
 
   const submit = async () => {
-    if (!file) return alert("Please select a file");
+    if (!file) return toast.warning("Please select a file");
 
-    await createPost({
-      type,
-      caption: caption.trim() || undefined,
-      file,
-    }).unwrap();
+    try {
+      setProgress(0);
 
-    setFile(null);
-    setCaption("");
+      const uploadRes = await uploadToCloudinary({
+        file,
+        postType: type,
+        getSignature,
+        onProgress: setProgress,
+      });
 
-    onSuccess?.();
+      await createPost({
+        type,
+        fileUrl: uploadRes.secure_url,
+        caption: caption.trim() || undefined,
+        // thumbnailUrl: uploadRes.eager?.[0]?.secure_url, // optional
+      }).unwrap();
+
+      setFile(null);
+      setCaption("");
+      setProgress(0);
+
+      onSuccess?.();
+    } catch (err) {
+      console.error(err);
+      apiErrorToastHandler(err);
+    }
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <Textarea
         placeholder="Write a caption..."
         value={caption}
@@ -44,25 +72,17 @@ export default function UserUploadContent({ type = "post", onSuccess }: Props) {
         onChange={(e) => setFile(e.target.files?.[0] || null)}
       />
 
-      {/* <div className="flex items-center justify-between rounded-lg border p-3">
-        <Label htmlFor="enquiry">Enable Enquiry</Label>
-        <Switch
-          id="enquiry"
-          checked={isEnquiryPost}
-          onCheckedChange={setIsEnquiryPost}
-        />
-      </div>
-
-      {isEnquiryPost && (
-        <Input
-          placeholder="CTA Label (e.g. Apply Now)"
-          value={ctaLabel}
-          onChange={(e) => setCtaLabel(e.target.value)}
-        />
-      )} */}
+      {progress > 0 && (
+        <div className="space-y-1">
+          <Progress value={progress} />
+          <p className="text-xs text-muted-foreground">
+            Uploading... {progress}%
+          </p>
+        </div>
+      )}
 
       <Button className="w-full" disabled={isLoading || !file} onClick={submit}>
-        {isLoading ? "Uploading..." : "Post"}
+        {isLoading ? "Posting..." : "Post"}
       </Button>
     </div>
   );

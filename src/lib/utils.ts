@@ -8,3 +8,4 @@ export function cn(...inputs: ClassValue[]) {
 export function getCurrentDomain() {
   return window.location.hostname;
 }
+
