@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import SponsorAdsCarousel from "@/components/SponsorAdsCarousel";
 import { Skeleton } from "@/components/ui/skeleton";
 import CreateMenu from "@/components/CreateMenu";
-import { useGetExploreQuery } from "@/store/api/postsApi";
 import MasonryFeed from "@/components/MasonryFeed";
 import FriendSuggestion from "@/components/friend/FriendSuggestion";
 
@@ -51,7 +50,8 @@ const sections = [
 export default function HomeSections() {
   const navigate = useNavigate();
 
-  const { data: feedData = [] } = useGetExploreQuery();
+  // const { data: feedData = [] } = useGetExploreQuery();
+  const feedData: any[] = [];
   // const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>(
   //   {},
   // );

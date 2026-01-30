@@ -125,6 +125,7 @@ export interface ExplorePost {
   isEnquiryPost: boolean;
   ctaLabel: string;
   isAd: boolean;
+  isLiked: boolean;
 
   channel: ChannelInfo;
 

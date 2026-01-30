@@ -70,13 +70,13 @@ export const postsApi = rootApiSlice.injectEndpoints({
       providesTags: ["UserProfile"],
     }),
 
-    getExplore: builder.query<ExplorePost[], ExploreFilters | void>({
-      query: (filters) => ({
-        url: "/posts/explore/social",
-        params: filters ?? undefined,
-      }),
-      providesTags: ["ExploreSocial"],
-    }),
+    // getExplore: builder.query<ExplorePost[], ExploreFilters | void>({
+    //   query: (filters) => ({
+    //     url: "/posts/explore/social",
+    //     params: filters ?? undefined,
+    //   }),
+    //   providesTags: ["ExploreSocial"],
+    // }),
 
     getAngMart: builder.query<ExplorePost[], ExploreFilters | undefined>({
       query: (filters) => ({
@@ -194,7 +194,6 @@ export const {
   useCreatePostMutation,
   useCreateAssociatePostMutation,
   useGetMyPostsQuery,
-  useGetExploreQuery,
   useGetAngMartQuery,
   useToggleLikeMutation,
   useAddCommentMutation,

@@ -1,11 +1,25 @@
 import { useRef, useState } from "react";
-import { Eye, Heart, Loader2, MessageCircle, Send } from "lucide-react";
+import {
+  Eye,
+  Heart,
+  Loader2,
+  MessageCircle,
+  Send,
+  Share2,
+  Play,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAddCommentMutation } from "@/store/api/postsApi";
+import {
+  useAddCommentMutation,
+  useToggleLikeMutation,
+  useIncrementViewMutation,
+  useIncrementShareMutation,
+} from "@/store/api/postsApi";
 import { PreviewModal } from "./PreviewModal";
+import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
 import type { ExplorePost } from "@/types/post";
 import { useNavigate } from "react-router-dom";
 
@@ -16,18 +30,22 @@ interface FeedCardProps {
 const FeedCard = ({ post }: FeedCardProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const feedVideoRef = useRef<HTMLVideoElement | null>(null);
-
   const navigate = useNavigate();
 
-  const goToProfile = () => {
-    navigate(`/profile/${post.channel.user.id}`);
-  };
-
+  /** ---------------- States ---------------- */
   const [isExpanded, setIsExpanded] = useState(false);
-  const description = post.description ?? "";
   const [commentText, setCommentText] = useState("");
 
+  // Optimistic UI States
+  const [liked, setLiked] = useState(post.isLiked);
+  const [likesCount, setLikesCount] = useState(post.likesCount);
+  const [viewsCount, setViewsCount] = useState(post.viewsCount);
+
+  /** ---------------- RTK Mutations ---------------- */
   const [addComment, { isLoading: isCommenting }] = useAddCommentMutation();
+  const [toggleLike, { isLoading: isLiking }] = useToggleLikeMutation();
+  const [incrementView] = useIncrementViewMutation();
+  const [incrementShare] = useIncrementShareMutation();
 
   const [preview, setPreview] = useState<{
     open: boolean;
@@ -39,6 +57,56 @@ const FeedCard = ({ post }: FeedCardProps) => {
     type: "image",
   });
 
+  /** ---------------- Helpers ---------------- */
+  const formatCount = (num: number): string => {
+    if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
+    if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
+    return num.toString();
+  };
+
+  /** ---------------- Handlers ---------------- */
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isLiking) return;
+
+    // Optimistic Update
+    const previousLiked = liked;
+    setLiked(!liked);
+    setLikesCount((prev) => (liked ? prev - 1 : prev + 1));
+
+    try {
+      await toggleLike(post.id).unwrap();
+    } catch (err) {
+      // Rollback on failure
+      setLiked(previousLiked);
+      setLikesCount((prev) => (previousLiked ? prev : prev - 1));
+      apiErrorToastHandler(err);
+    }
+  };
+
+  const hasViewedRef = useRef(false);
+  const incrementViewOnce = async () => {
+    if (hasViewedRef.current || post.isAd) return;
+    hasViewedRef.current = true;
+
+    setViewsCount((prev) => prev + 1);
+    try {
+      await incrementView({ postId: post.id }).unwrap();
+    } catch (err) {
+      console.error("View count failed", err);
+    }
+  };
+
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await incrementShare({ postId: post.id }).unwrap();
+      // Yahan aap window.navigator.share bhi call kar sakte hain
+    } catch (err) {
+      apiErrorToastHandler(err);
+    }
+  };
+
   const handleCommentSubmit = async () => {
     if (!commentText.trim()) return;
     try {
@@ -49,7 +117,7 @@ const FeedCard = ({ post }: FeedCardProps) => {
       setCommentText("");
       inputRef.current?.blur();
     } catch (err) {
-      console.error("Failed to comment:", err);
+      apiErrorToastHandler(err);
     }
   };
 
@@ -61,17 +129,14 @@ const FeedCard = ({ post }: FeedCardProps) => {
   };
 
   const openPreview = (url: string, type: "image" | "video") => {
-    if (feedVideoRef.current) {
-      feedVideoRef.current.pause();
-    }
+    if (feedVideoRef.current) feedVideoRef.current.pause();
+    incrementViewOnce();
     setPreview({ open: true, url, type });
   };
 
   const closePreview = () => {
     setPreview((p) => ({ ...p, open: false }));
-    if (feedVideoRef.current) {
-      feedVideoRef.current.play().catch(() => {});
-    }
+    if (feedVideoRef.current) feedVideoRef.current.play().catch(() => {});
   };
 
   return (
@@ -85,7 +150,7 @@ const FeedCard = ({ post }: FeedCardProps) => {
       >
         <CardHeader
           className="flex flex-row items-center gap-3 px-3 cursor-pointer"
-          onClick={goToProfile}
+          onClick={() => navigate(`/profile/${post.channel.user.id}`)}
         >
           <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center font-semibold text-sm shrink-0">
             {post.channel.logoUrl ? (
@@ -98,7 +163,6 @@ const FeedCard = ({ post }: FeedCardProps) => {
               post.channel.name.charAt(0).toUpperCase()
             )}
           </div>
-
           <div className="leading-tight min-w-0 flex items-center gap-2">
             <div className="min-w-0">
               <CardTitle className="text-sm font-semibold truncate">
@@ -108,7 +172,6 @@ const FeedCard = ({ post }: FeedCardProps) => {
                 @{post.channel.handle}
               </p>
             </div>
-
             {post.isAd && (
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 font-medium">
                 Sponsored
@@ -133,7 +196,7 @@ const FeedCard = ({ post }: FeedCardProps) => {
           )}
 
           {post.type === "video" || post.type === "reel" ? (
-            <>
+            <div className="relative aspect-video bg-black flex items-center">
               <video
                 src={post.fileUrl}
                 ref={feedVideoRef}
@@ -141,13 +204,12 @@ const FeedCard = ({ post }: FeedCardProps) => {
                 muted
                 loop
                 playsInline
-                preload="metadata"
-                className="w-full h-auto object-cover bg-black"
+                className="w-full h-full object-contain"
               />
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="bg-black/40 rounded-full p-3 text-white">▶</div>
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/10">
+                <Play className="w-10 h-10 text-white/80" />
               </div>
-            </>
+            </div>
           ) : (
             <img
               src={post.fileUrl}
@@ -158,50 +220,69 @@ const FeedCard = ({ post }: FeedCardProps) => {
           )}
         </div>
 
-        <CardContent className="px-3 py-3 space-y-2 text-sm">
+        <CardContent className="px-3 py-3 space-y-3 text-sm">
           {post.title && (
             <h4 className="font-semibold leading-snug">{post.title}</h4>
           )}
-
           {post.caption && (
-            <p className="text-muted-foreground text-xs">{post.caption}</p>
+            <p className="text-muted-foreground text-xs italic">
+              {post.caption}
+            </p>
           )}
 
-          {description && (
-            <>
+          {post.description && (
+            <div className="space-y-1">
               <p
                 className={cn(
                   "text-muted-foreground leading-relaxed transition-all duration-200",
-                  !isExpanded && "line-clamp-3",
+                  !isExpanded && "line-clamp-2 text-xs",
                 )}
               >
-                {description}
+                {post.description}
               </p>
-
-              {description.length > 120 && (
+              {post.description.length > 100 && (
                 <button
-                  onClick={() => setIsExpanded(!isExpanded)}
-                  className="text-xs font-medium text-primary hover:underline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsExpanded(!isExpanded);
+                  }}
+                  className="text-[10px] font-bold text-primary hover:underline"
                 >
-                  {isExpanded ? "See less" : "See more"}
+                  {isExpanded ? "SHOW LESS" : "SHOW MORE"}
                 </button>
               )}
-            </>
+            </div>
           )}
 
-          <div className="flex items-center gap-5 pt-2 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Eye className="w-3.5 h-3.5" />
-              {post.viewsCount}
+          {/* Interaction Bar */}
+          <div className="flex items-center gap-6 py-1 text-xs text-muted-foreground border-y border-border/40 my-2">
+            <span className="flex items-center gap-1.5">
+              <Eye className="w-4 h-4" />
+              {formatCount(viewsCount)}
             </span>
-            <span className="flex items-center gap-1">
-              <Heart className="w-3.5 h-3.5" />
-              {post.likesCount}
+
+            <button
+              onClick={handleLike}
+              className={cn(
+                "flex items-center gap-1.5 transition-colors",
+                liked && "text-red-500",
+              )}
+            >
+              <Heart className={cn("w-4 h-4", liked && "fill-current")} />
+              {formatCount(likesCount)}
+            </button>
+
+            <span className="flex items-center gap-1.5">
+              <MessageCircle className="w-4 h-4" />
+              {formatCount(post.commentsCount ?? 0)}
             </span>
-            <span className="flex items-center gap-1">
-              <MessageCircle className="w-3.5 h-3.5" />
-              {post.commentsCount ?? 0}
-            </span>
+
+            <button
+              onClick={handleShare}
+              className="hover:text-primary transition-colors"
+            >
+              <Share2 className="w-4 h-4" />
+            </button>
           </div>
 
           {!post.isAd && (
@@ -213,40 +294,41 @@ const FeedCard = ({ post }: FeedCardProps) => {
                 onChange={(e) => setCommentText(e.target.value)}
                 onKeyDown={handleKeyDown}
                 disabled={isCommenting}
-                className="pr-12 py-6"
+                className="pr-12 h-10 text-xs focus-visible:ring-primary"
               />
-
               <Button
                 size="icon"
                 variant="ghost"
-                className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
                 disabled={!commentText.trim() || isCommenting}
                 onClick={handleCommentSubmit}
               >
                 {isCommenting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-3 w-3 animate-spin" />
                 ) : (
-                  <Send className="h-4 w-4" />
+                  <Send className="h-3 w-3" />
                 )}
               </Button>
             </div>
           )}
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center w-full justify-between gap-2">
             <Button
+              size="sm"
               variant="outline"
-              className="border-green-500/90 text-green-600"
+              className="px-5 py-2 cursor-pointer text-xs border-green-500/50 text-green-600 hover:bg-green-50"
               onClick={() => navigate(`/mchat?userId=${post.channel.user.id}`)}
             >
               MChat
             </Button>
             {post.isEnquiryPost && (
               <Button
-                variant="outline"
-                className="border-green-600/70 text-green-600"
-                onClick={() => console.log("Open Enquiry Form for:", post.id)}
+                size="sm"
+                variant="default"
+                className="px-5 py-2 text-xs bg-green-600 hover:bg-green-700 cursor-pointer"
+                onClick={() => console.log("Enquiry Post:", post.id)}
               >
-                {post.ctaLabel || "Enquiry Form"}
+                {post.ctaLabel || "Enquiry"}
               </Button>
             )}
           </div>
