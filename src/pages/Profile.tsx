@@ -13,6 +13,7 @@ import {
 } from "@/store/api/postsApi";
 import { useState } from "react";
 import { FollowStatsDialog } from "@/components/FollowListDialog";
+import { ProfilePhotoDialog } from "@/components/ProfilePhotoDialog";
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"post" | "video" | "reel">("post");
@@ -34,12 +35,16 @@ export default function ProfilePage() {
       <div className="flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-8">
         {/* Avatar */}
         <div className="flex justify-center sm:justify-start">
-          <Avatar className="h-24 w-24 sm:h-32 sm:w-32">
-            <AvatarImage src={userData.avatarUrl ?? ""} />
-            <AvatarFallback>
-              {userData.username.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <ProfilePhotoDialog
+            avatarUrl={userData.avatarUrl}
+          >
+            <Avatar className="h-24 w-24 sm:h-32 sm:w-32 cursor-pointer border-2 border-transparent hover:border-muted transition-all">
+              <AvatarImage src={userData.avatarUrl ?? ""} className="object-cover" />
+              <AvatarFallback className="text-2xl">
+                {userData.username.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </ProfilePhotoDialog>
         </div>
 
         <div className="flex-1 space-y-4 text-center sm:text-left">

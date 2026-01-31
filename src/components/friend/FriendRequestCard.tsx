@@ -1,9 +1,10 @@
-import { Users, Check, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import type { FriendRequest } from "@/store/api/friendsApi";
+import type { FriendRequestResponse } from "@/types/friend";
+import { useNavigate } from "react-router-dom";
 
 interface FriendRequestCardProps {
-  request: FriendRequest;
+  request: FriendRequestResponse;
   onConfirm: (id: string) => void;
   onDelete: (id: string) => void;
 }
@@ -13,35 +14,38 @@ const FriendRequestCard = ({
   onConfirm,
   onDelete,
 }: FriendRequestCardProps) => {
-
+  const navigate = useNavigate();
   return (
     <div className="flex items-center gap-4 p-4 bg-card rounded-xl shadow-sm hover:shadow-md transition-shadow animate-slide-up">
       {/* Avatar */}
       <img
         src={
-          request.avatar?.trim()
-            ? request.avatar
-            : `https://ui-avatars.com/api/?name=${request.name}`
+          request.sender.avatarUrl?.trim()
+            ? request.sender.avatarUrl
+            : `https://ui-avatars.com/api/?name=${request.sender.fullName}`
         }
-        alt={request.name}
-        className="w-16 h-16 rounded-full object-cover ring-2 ring-border"
+        alt={request.sender.fullName}
+        className="w-16 h-16 rounded-full object-cover ring-2 ring-border cursor-pointer"
+        onClick={() => navigate(`/profile/${request.sender.id}`)}
         onError={(e) => {
-          e.currentTarget.src = `https://ui-avatars.com/api/?name=${request.name}`;
+          e.currentTarget.src = `https://ui-avatars.com/api/?name=${request.sender.fullName}`;
         }}
       />
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-foreground">{request.name}</h3>
-        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+        <h3 className="font-semibold text-foreground">
+          {request.sender.fullName}
+        </h3>
+        {/* <div className="flex items-center gap-1 text-sm text-muted-foreground">
           <Users className="w-3 h-3" />
-          <span>{request.mutualFriends} mutual friends</span>
-        </div>
-        {(request.work || request.location) && (
+          <span>{request.sender.mutualFriends} mutual friends</span>
+        </div> */}
+        {/* {(request.sender.work || request.location) && (
           <p className="text-xs text-muted-foreground truncate mt-0.5">
             {request.work || request.location}
           </p>
-        )}
+        )} */}
         <p className="text-xs text-muted-foreground mt-1">
           {formatDistanceToNow(request.createdAt, { addSuffix: true })}
         </p>
@@ -54,7 +58,7 @@ const FriendRequestCard = ({
           className="flex items-center gap-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors"
         >
           <Check className="w-4 h-4" />
-          <span className="hidden sm:inline">Confirm</span>
+          <span className="hidden sm:inline cursor-pointer">Confirm</span>
         </button>
         <button
           onClick={() => onDelete(request.id)}

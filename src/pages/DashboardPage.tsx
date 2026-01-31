@@ -42,7 +42,7 @@ export default function Dashboard() {
             <CardContent className="p-5 flex flex-col items-center text-center gap-1">
               <Wallet className="h-8 w-8 text-primary mb-1" />
               <p className="text-sm text-muted-foreground">Wallet Balance</p>
-              <p className="text-2xl font-bold">₹{userData?.walletBalance}</p>
+              <p className="text-2xl font-bold">₹{userData?.angCoins * 2}</p>
             </CardContent>
           </Card>
 
@@ -58,7 +58,9 @@ export default function Dashboard() {
             <CardContent className="p-5 flex flex-col items-center text-center gap-1">
               <ShieldCheck className="h-8 w-8 text-emerald-500 mb-1" />
               <p className="text-sm text-muted-foreground">Membership</p>
-              <p className="text-xl font-semibold text-emerald-400">{userData.membershipType}</p>
+              <p className="text-xl font-semibold text-emerald-400">
+                {userData.membershipType}
+              </p>
             </CardContent>
           </Card>
 
@@ -66,7 +68,9 @@ export default function Dashboard() {
             <CardContent className="p-5 flex flex-col items-center text-center gap-1">
               <CircleCheck className="h-8 w-8 text-green-500 mb-1" />
               <p className="text-sm text-muted-foreground">Account Status</p>
-              <p className="text-xl font-semibold text-green-400">{userData.isVerified ? "Active" : "Inactive"}</p>
+              <p className="text-xl font-semibold text-green-400">
+                {userData.isVerified ? "Active" : "Inactive"}
+              </p>
             </CardContent>
           </Card>
         </div>

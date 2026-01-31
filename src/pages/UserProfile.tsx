@@ -8,7 +8,16 @@ import {
 } from "@/store/api/postsApi";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import { Badge, Bookmark, Contact, Grid3X3 } from "lucide-react";
+import {
+  BadgeCheck,
+  Bookmark,
+  Contact,
+  Grid3X3,
+  MessageCircle,
+  UserCheck,
+  UserMinus,
+  UserPlus,
+} from "lucide-react";
 import { Button } from "../components/ui/button";
 import {
   Tabs,
@@ -21,10 +30,16 @@ import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
 import { toast } from "sonner";
 import PostMediaGrid from "../components/PostMediaGrid";
 import { FollowStatsDialog } from "../components/FollowListDialog";
+import {
+  useAcceptFriendRequestByUserIdMutation, // 👈 Import Correct Hook
+  useCancelFriendRequestMutation,
+  useSendFriendRequestMutation,
+} from "@/store/api/friendsApi";
 
 export default function PublicProfile() {
   const { id: userId = "" } = useParams();
   const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState<"post" | "video" | "reel">("post");
 
   const { data: userData, isLoading } = useGetPublicProfileQuery({
@@ -37,6 +52,11 @@ export default function PublicProfile() {
 
   const [follow] = useFollowUserMutation();
   const [unFollow] = useUnfollowUserMutation();
+  const [cancelRequest] = useCancelFriendRequestMutation();
+  const [sendRequest] = useSendFriendRequestMutation();
+
+  // 👈 Change this to use the new mutation
+  const [acceptRequest] = useAcceptFriendRequestByUserIdMutation();
 
   if (!userData || isLoading) return <div>Loading...</div>;
   if (!userData) {
@@ -61,6 +81,34 @@ export default function PublicProfile() {
     }
   };
 
+  const handleAddFriend = async (id: string, name: string) => {
+    try {
+      await sendRequest(id).unwrap();
+      toast.success(`Friend request sent to ${name}`);
+    } catch (error) {
+      apiErrorToastHandler(error);
+    }
+  };
+
+  const handleAcceptRequest = async (id: string) => {
+    try {
+      // Ab ye Backend par User ID bhejega aur wahan sahi logic chalega
+      await acceptRequest(id).unwrap();
+      toast.success("Friend request accepted");
+    } catch (error) {
+      apiErrorToastHandler(error);
+    }
+  };
+
+  const handleCancelRequest = async (userId: string) => {
+    try {
+      await cancelRequest(userId).unwrap();
+      toast.success("Request canceled");
+    } catch (error) {
+      apiErrorToastHandler(error);
+    }
+  };
+
   return (
     <div className="bg-background p-6 max-w-4xl mx-auto space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-8">
@@ -75,11 +123,11 @@ export default function PublicProfile() {
         </div>
 
         <div className="flex-1 space-y-4 text-center sm:text-left">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-            <h2 className="text-lg sm:text-xl font-semibold">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 justify-between max-w-96">
+            <h2 className="text-lg sm:text-xl font-semibold flex gap-2 items-center justify-center sm:justify-start">
               {userData.username}
+              {userData.isVerified && <BadgeCheck />}
             </h2>
-            {userData.isVerified && <Badge />}
           </div>
 
           {/* Stats */}
@@ -122,14 +170,61 @@ export default function PublicProfile() {
             >
               {userData.isFollowing ? "Following" : "Follow"}
             </Button>
-            <Button
-              variant="secondary"
-              disabled={!userData.isFriend}
-              onClick={() => navigate(`/mchat?userId=${userData.id}`)}
-              className="flex-1 bg-secondary cursor-pointer hover:bg-secondary/80 text-secondary-foreground font-semibold rounded-lg"
-            >
-              Message
-            </Button>
+            {(() => {
+              const { friendStatus, friendRequestSentByMe } = userData;
+
+              if (friendStatus === "accepted") {
+                return (
+                  <Button
+                    variant="default"
+                    onClick={() => navigate(`/mchat?userId=${userData.id}`)}
+                    className="flex-1 cursor-pointer font-semibold rounded-lg gap-2"
+                  >
+                    <MessageCircle size={18} />
+                    Chat
+                  </Button>
+                );
+              }
+
+              if (friendStatus === "pending") {
+                if (friendRequestSentByMe) {
+                  return (
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleCancelRequest(userData.id)}
+                      className="flex-1 cursor-pointer font-semibold rounded-lg gap-2"
+                    >
+                      <UserMinus size={18} />
+                      Cancel Request
+                    </Button>
+                  );
+                } else {
+                  return (
+                    <Button
+                      variant="default"
+                      onClick={() => handleAcceptRequest(userData.id)}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white cursor-pointer font-semibold rounded-lg gap-2"
+                    >
+                      <UserCheck size={18} />
+                      Accept Request
+                    </Button>
+                  );
+                }
+              }
+
+              return (
+                <Button
+                  variant="secondary"
+                  onClick={() =>
+                    handleAddFriend(userData.id, userData.firstName)
+                  }
+                  className="flex-1 bg-secondary cursor-pointer hover:bg-secondary/80 text-secondary-foreground font-semibold rounded-lg gap-2"
+                >
+                  <UserPlus size={18} />
+                  Add Friend
+                </Button>
+              );
+            })()}
           </div>
         </div>
       </div>

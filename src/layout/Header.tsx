@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { selectAuthUser } from "@/store/selectors/authSelectors";
 import {
+  HandCoins,
   IndianRupee,
   Lock,
   LogOut,
@@ -58,6 +59,13 @@ const Header = () => {
           <Wallet size={16} className="text-primary" />
           <span className="flex items-center font-medium text-sm">
             <IndianRupee size={12} />
+            {(user?.angCoins ?? 0) * 2}
+          </span>
+        </div>
+
+        <div className="flex gap-2 items-center justify-center px-3 py-1.5 border border-border rounded-full bg-muted/20 backdrop:blur-sm">
+          <HandCoins size={18} />
+          <span className="flex items-center font-medium text-sm">
             {user?.angCoins || 0}
           </span>
         </div>

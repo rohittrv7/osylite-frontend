@@ -7,28 +7,46 @@ export const friendsApi = rootApiSlice.injectEndpoints({
       providesTags: ["FriendSuggestions"],
     }),
 
+    getFriendRequests: builder.query<any[], void>({
+      query: () => "/friends/requests",
+      providesTags: ["FriendRequests"],
+    }),
+
     sendFriendRequest: builder.mutation<void, string>({
       query: (receiverId) => ({
         url: "/friends/request",
         method: "POST",
         body: { receiverId },
       }),
-      invalidatesTags: ["FriendSuggestions"],
+      invalidatesTags: ["FriendSuggestions", "Profile"],
     }),
 
-    getFriendRequests: builder.query<FriendRequest[], void>({
-      query: () => "/friends/requests",
-      providesTags: ["FriendRequests"],
-    }),
-
+    // --- List ke liye ---
     acceptFriendRequest: builder.mutation<void, string>({
       query: (requestId) => ({
         url: `/friends/accept/${requestId}`,
         method: "PATCH",
       }),
-      invalidatesTags: ["FriendRequests", "Friends"],
+      invalidatesTags: ["FriendRequests", "Friends", "Profile"],
     }),
 
+    acceptFriendRequestByUserId: builder.mutation<void, string>({
+      query: (senderId) => ({
+        url: `/friends/accept-user/${senderId}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["FriendRequests", "Friends", "Profile"],
+    }),
+
+    cancelFriendRequest: builder.mutation<void, string>({
+      query: (receiverId) => ({
+        url: `/friends/cancel/${receiverId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["FriendSuggestions", "Profile"],
+    }),
+
+    // ... Other endpoints (reject, unfriend, etc.)
     rejectFriendRequest: builder.mutation<void, string>({
       query: (requestId) => ({
         url: `/friends/reject/${requestId}`,
@@ -37,8 +55,7 @@ export const friendsApi = rootApiSlice.injectEndpoints({
       invalidatesTags: ["FriendRequests"],
     }),
 
-    /* ---------- FRIENDS ---------- */
-    getFriends: builder.query<Friend[], void>({
+    getFriends: builder.query<any[], void>({
       query: () => "/friends/list",
       providesTags: ["Friends"],
     }),
@@ -48,7 +65,7 @@ export const friendsApi = rootApiSlice.injectEndpoints({
         url: `/friends/remove/${friendId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Friends"],
+      invalidatesTags: ["Friends", "Profile"],
     }),
   }),
 });
@@ -58,9 +75,11 @@ export const {
   useSendFriendRequestMutation,
   useGetFriendRequestsQuery,
   useAcceptFriendRequestMutation,
+  useAcceptFriendRequestByUserIdMutation,
   useRejectFriendRequestMutation,
   useGetFriendsQuery,
   useUnfriendMutation,
+  useCancelFriendRequestMutation,
 } = friendsApi;
 
 export interface FriendSuggestion {
@@ -72,20 +91,11 @@ export interface FriendSuggestion {
 
 export interface FriendRequest {
   id: string;
-  name: string;
+  fullName: string;
   avatar: string | null;
   mutualFriends: number;
   work?: string;
   location?: string;
   createdAt: string;
   status?: "pending" | "accepted" | "rejected";
-}
-
-export interface Friend {
-  id: string;
-  name: string;
-  avatar: string | null;
-  mutualFriends: number;
-  work?: string;
-  location?: string;
 }

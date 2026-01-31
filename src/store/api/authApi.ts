@@ -70,6 +70,15 @@ export const authApi = rootApiSlice.injectEndpoints({
       providesTags: ["Profile"],
     }),
 
+    updateAvatar: builder.mutation<void, { avatarUrl: string | null }>({
+      query: (body) => ({
+        url: "/users/avatar",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["Profile"],
+    }),
+
     resendOtp: builder.mutation<LoginResponse, void>({
       query: () => ({
         url: "/auth/resend-otp",
@@ -134,4 +143,5 @@ export const {
   useResetPasswordMutation,
   useGetConnectionsQuery,
   useGetUserStatsQuery,
+  useUpdateAvatarMutation,
 } = authApi;
