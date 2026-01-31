@@ -7,10 +7,10 @@ import type {
   FollowResponse,
   PostMedia,
   PostType,
-  Reel,
 } from "@/types/post";
 import type { FollowUser } from "@/components/FollowList";
 import type { ExplorePost } from "@/types/associate";
+import type { ReelResponse } from "@/types/reel";
 
 export const postsApi = rootApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -67,16 +67,15 @@ export const postsApi = rootApiSlice.injectEndpoints({
       { targetUserId: string }
     >({
       query: ({ targetUserId }) => `/users/profile/${targetUserId}`,
-      providesTags: ["UserProfile"],
+      providesTags: [
+        "UserProfile",
+        "Friends",
+        "Followers",
+        "Following",
+        "FriendRequests",
+        "FriendSuggestions",
+      ],
     }),
-
-    // getExplore: builder.query<ExplorePost[], ExploreFilters | void>({
-    //   query: (filters) => ({
-    //     url: "/posts/explore/social",
-    //     params: filters ?? undefined,
-    //   }),
-    //   providesTags: ["ExploreSocial"],
-    // }),
 
     getAngMart: builder.query<ExplorePost[], ExploreFilters | undefined>({
       query: (filters) => ({
@@ -86,18 +85,13 @@ export const postsApi = rootApiSlice.injectEndpoints({
       providesTags: ["ExploreBusiness"],
     }),
 
-    getEntertainmentReels: builder.query<Reel[], void>({
+    getEntertainmentReels: builder.query<ReelResponse[], void>({
       query: () => ({
-        url: "/posts/reels/entertainment",
+        url: "/posts/reels",
         method: "GET",
       }),
       providesTags: ["Reels"],
     }),
-
-    // getAngMart: builder.query<ExplorePost[], void>({
-    //   query: () => "/posts/explore/business",
-    //   providesTags: ["Explore"],
-    // }),
 
     getMyPosts: builder.query<MediaItem[], { type?: PostType }>({
       query: ({ type }) => ({

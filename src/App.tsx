@@ -17,7 +17,6 @@ import ForgotPassword from "./pages/ForgotPage";
 import ResetPasswordPage from "./pages/ResetPassword";
 import Dashboard from "./pages/DashboardPage";
 import HomeSections from "./pages/HomeSections";
-import Account from "./pages/Account";
 import ProfilePage from "./pages/Profile";
 import Chat from "./pages/Chat";
 import ExploreFeed from "./pages/Feed";
@@ -112,7 +111,6 @@ function App() {
             path="/entertainment/:category"
             element={<EntertainMentPage />}
           />
-          <Route path="/account" element={<Account />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:id" element={<PublicProfile />} />
           <Route path="/mchat" element={<Chat />} />

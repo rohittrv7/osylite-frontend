@@ -2,11 +2,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import SponsorAdsCarousel from "@/components/SponsorAdsCarousel";
 import { Skeleton } from "@/components/ui/skeleton";
 import CreateMenu from "@/components/CreateMenu";
 import MasonryFeed from "@/components/MasonryFeed";
 import FriendSuggestion from "@/components/friend/FriendSuggestion";
+import ReelCarousel from "@/components/ReelCarousel";
+import { useGetEntertainmentReelsQuery } from "@/store/api/postsApi";
+import SponsorAdsCarousel from "@/components/SponsorAdsCarousel";
 
 const sections = [
   {
@@ -49,6 +51,10 @@ const sections = [
 
 export default function HomeSections() {
   const navigate = useNavigate();
+  const { data: ReelVideoes, isLoading } = useGetEntertainmentReelsQuery();
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   // const { data: feedData = [] } = useGetExploreQuery();
   const feedData: any[] = [];
@@ -132,6 +138,8 @@ export default function HomeSections() {
           </Card>
         ))}
       </div>
+
+      <ReelCarousel stories={ReelVideoes} />
 
       <FriendSuggestion />
       <SponsorAdsCarousel />

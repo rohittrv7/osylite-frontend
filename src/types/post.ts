@@ -6,6 +6,7 @@ export interface CreatePostPayload {
   caption?: string;
   type: "post" | "reel" | "video";
   fileUrl: string;
+  thumbnailUrl: string | undefined;
   latitude?: number;
   longitude?: number;
 }

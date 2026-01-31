@@ -44,7 +44,7 @@ export default function UserUploadContent({ type = "post", onSuccess }: Props) {
         type,
         fileUrl: uploadRes.secure_url,
         caption: caption.trim() || undefined,
-        // thumbnailUrl: uploadRes.eager?.[0]?.secure_url, // optional
+        thumbnailUrl: uploadRes.eager?.[0]?.secure_url, // optional
       }).unwrap();
 
       setFile(null);

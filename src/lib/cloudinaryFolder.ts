@@ -1,4 +1,4 @@
-export type PostType = "post" | "video" | "reel";
+export type PostType = "post" | "video" | "reel" | "avatar";
 
 export const getFolderByPostType = (postType: PostType) => {
   switch (postType) {
@@ -9,6 +9,6 @@ export const getFolderByPostType = (postType: PostType) => {
     case "reel":
       return "ang_reels";
     default:
-      return "ang_default";
+      return "avatar";
   }
 };

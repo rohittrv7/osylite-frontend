@@ -16,7 +16,7 @@ export interface User {
   lastName: string;
   fullName: string | null;
 
-  avatarUrl: string | null;
+  avatarUrl: string | undefined;
   bio: string | null;
 
   pincode: string;
@@ -104,6 +104,8 @@ export interface PublicUserProfile {
   createdAt: string;
 
   stats: ProfileStats;
+  friendStatus: "pending" | "accepted" | "none";
+  friendRequestSentByMe: boolean;
   isFriend: boolean;
   isFollowing: boolean;
   isMe: boolean;
