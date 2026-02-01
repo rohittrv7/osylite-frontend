@@ -6,6 +6,16 @@ interface LoginRequest {
   password: string;
 }
 
+export interface Transaction {
+  id: string;
+  amount: number;
+  type: "credit" | "debit";
+  currency: string;
+  reason: string;
+  description?: string;
+  referenceId?: string;
+  createdAt: string;
+}
 interface RegisterRequest {
   email: string;
   password: string;
@@ -129,6 +139,10 @@ export const authApi = rootApiSlice.injectEndpoints({
       }),
       providesTags: ["Connections"],
     }),
+
+    getTransactionHistory: builder.query<Transaction[], void>({
+      query: () => "/wallet/history",
+    }),
   }),
 });
 
@@ -144,4 +158,5 @@ export const {
   useGetConnectionsQuery,
   useGetUserStatsQuery,
   useUpdateAvatarMutation,
+  useGetTransactionHistoryQuery,
 } = authApi;

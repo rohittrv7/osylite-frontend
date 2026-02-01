@@ -2,10 +2,12 @@ import Footer from "@/components/home/Footer";
 import Header from "@/components/home/Header";
 import MobileNav from "@/components/home/MobileNav";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsTablet } from "@/hooks/use-tablet";
 import { Outlet } from "react-router-dom";
 
 const Layout = () => {
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
 
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
@@ -26,11 +28,12 @@ const Layout = () => {
       <Footer />
 
       {/* Mobile bottom navigation */}
-      {isMobile && (
-        <div className="fixed bottom-0 left-0 w-full z-50">
-          <MobileNav />
-        </div>
-      )}
+      {isMobile ||
+        (isTablet && (
+          <div className="fixed bottom-0 left-0 w-full z-50">
+            <MobileNav />
+          </div>
+        ))}
     </div>
   );
 };

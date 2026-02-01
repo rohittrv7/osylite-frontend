@@ -4,6 +4,7 @@ import {
   useGetUserFollowersQuery,
   useGetUserFollowingQuery,
   useGetUserPostsQuery,
+  useTransferCoinsMutation,
   useUnfollowUserMutation,
 } from "@/store/api/postsApi";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
@@ -12,7 +13,9 @@ import {
   BadgeCheck,
   Bookmark,
   Contact,
+  Gift,
   Grid3X3,
+  Loader2,
   MessageCircle,
   UserCheck,
   UserMinus,
@@ -31,10 +34,21 @@ import { toast } from "sonner";
 import PostMediaGrid from "../components/PostMediaGrid";
 import { FollowStatsDialog } from "../components/FollowListDialog";
 import {
-  useAcceptFriendRequestByUserIdMutation, // 👈 Import Correct Hook
+  useAcceptFriendRequestByUserIdMutation,
   useCancelFriendRequestMutation,
   useSendFriendRequestMutation,
 } from "@/store/api/friendsApi";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import type { PublicUserProfile } from "@/types/user";
 
 export default function PublicProfile() {
   const { id: userId = "" } = useParams();
@@ -55,7 +69,6 @@ export default function PublicProfile() {
   const [cancelRequest] = useCancelFriendRequestMutation();
   const [sendRequest] = useSendFriendRequestMutation();
 
-  // 👈 Change this to use the new mutation
   const [acceptRequest] = useAcceptFriendRequestByUserIdMutation();
 
   if (!userData || isLoading) return <div>Loading...</div>;
@@ -92,7 +105,6 @@ export default function PublicProfile() {
 
   const handleAcceptRequest = async (id: string) => {
     try {
-      // Ab ye Backend par User ID bhejega aur wahan sahi logic chalega
       await acceptRequest(id).unwrap();
       toast.success("Friend request accepted");
     } catch (error) {
@@ -128,6 +140,10 @@ export default function PublicProfile() {
               {userData.username}
               {userData.isVerified && <BadgeCheck />}
             </h2>
+            <div className="text-sm text-muted-foreground cursor-pointer">
+              <TransferCoinsModal user={userData} />
+              {/* <Gift /> */}
+            </div>
           </div>
 
           {/* Stats */}
@@ -155,7 +171,7 @@ export default function PublicProfile() {
             <p className="font-medium text-foreground">
               {userData.firstName} {userData.lastName}
             </p>
-            <p>🚀 Building cool stuff with code</p>
+            <p>{userData.bio || "🚀 Building cool stuff with code"}</p>
           </div>
           <div className="flex gap-2 w-full max-w-md">
             <Button
@@ -271,3 +287,88 @@ export default function PublicProfile() {
     </div>
   );
 }
+
+const TransferCoinsModal = ({ user }: { user: PublicUserProfile }) => {
+  const [open, setOpen] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [note, setNote] = useState("");
+
+  const [transferCoins, { isLoading }] = useTransferCoinsMutation();
+
+  const handleTransfer = async () => {
+    const coinAmount = Number(amount);
+
+    if (!coinAmount || coinAmount < 1) {
+      return toast.error("Amount must be at least 1");
+    }
+
+    try {
+      await transferCoins({
+        receiverId: user.id, // 🔥 AUTO
+        amount: coinAmount,
+        note: note || undefined,
+      }).unwrap();
+
+      toast.success(`Transferred ${coinAmount} ANG to ${user.firstName}`);
+      setOpen(false);
+      setAmount("");
+      setNote("");
+    } catch {
+      toast.error("Transfer failed");
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <div className="text-sm text-muted-foreground cursor-pointer hover:text-amber-600">
+          <Gift className="w-5 h-5" />
+        </div>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-[420px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Gift className="text-amber-500" />
+            Transfer Coins to {user.firstName}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label>Amount (ANG) *</Label>
+            <Input
+              type="number"
+              placeholder="e.g. 50"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label>Note (Optional)</Label>
+            <Input
+              placeholder="Gift / Payment / Thanks"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            className="bg-amber-600 hover:bg-amber-700"
+            onClick={handleTransfer}
+            disabled={isLoading}
+          >
+            {isLoading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+            Transfer
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};

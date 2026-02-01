@@ -69,7 +69,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className="hidden md:flex fixed top-0 left-0 w-64 h-screen
+      className="hidden md:flex fixed top-0 left-0 w-64 lg:w-80 md:w-64 h-screen
       bg-background text-foreground border-r border-border flex-col z-40"
     >
       <div className="px-6 py-4 text-2xl font-bold text-primary border-b border-border">

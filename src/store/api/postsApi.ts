@@ -181,6 +181,17 @@ export const postsApi = rootApiSlice.injectEndpoints({
         return currentArg?.page !== previousArg?.page;
       },
     }),
+
+    transferCoins: builder.mutation<
+      void,
+      { receiverId: string; amount: number; note?: string }
+    >({
+      query: (body) => ({
+        url: "/wallet/transfer",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -203,4 +214,5 @@ export const {
   useGetUserFollowingQuery,
   useGetFeedQuery,
   useGetEntertainmentReelsQuery,
+  useTransferCoinsMutation,
 } = postsApi;
