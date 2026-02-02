@@ -29,18 +29,24 @@ import {
   DELIVERY_CATEGORIES,
 } from "@/types/associate";
 import { toast } from "sonner";
-import { UserPlus, Loader2 } from "lucide-react";
+import { UserPlus, Loader2, CheckCircle2 } from "lucide-react";
 import {
   associateFormSchema,
   type AssociateFormSchema,
 } from "@/lib/validationSchema";
 import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
+import { useGetMyAssociateProfileQuery } from "@/store/api/associateApi";
 import { useNavigate } from "react-router-dom";
 import { useApplyAssociateMutation } from "@/store/api/authApi";
 
 export function AssociateRegistrationForm() {
   const navigate = useNavigate();
-  const [registerAssociate] = useApplyAssociateMutation();
+  const [applyAssociate] = useApplyAssociateMutation();
+  const {
+    data: profile,
+    isLoading: profileIsLoading,
+    isSuccess,
+  } = useGetMyAssociateProfileQuery();
 
   const form = useForm<AssociateFormSchema>({
     resolver: zodResolver(associateFormSchema),
@@ -50,6 +56,7 @@ export function AssociateRegistrationForm() {
       lastName: "",
       email: "",
       password: "",
+      confirmPassword: "", // Present for validation UI only
       businessName: "",
       address: "",
       city: "",
@@ -70,11 +77,24 @@ export function AssociateRegistrationForm() {
 
   const onSubmit = async (data: AssociateFormSchema) => {
     try {
+      // 1. Generate Unique Username
+      // Example: rohitkumar + random numbers
+      const baseName = `${data.firstName}${data.lastName}`
+        .toLowerCase()
+        .replace(/\s+/g, "");
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+      const uniqueUsername = `${baseName}${randomSuffix}`;
+
+      // 2. Prepare Payload - Remove confirmPassword using destructuring
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { confirmPassword: _, ...restData } = data;
+
       const payload = {
-        ...data,
+        ...restData,
+        username: uniqueUsername,
       };
 
-      await registerAssociate(payload).unwrap();
+      await applyAssociate(payload).unwrap();
 
       navigate("/verify-otp", {
         state: { email: data.email },
@@ -100,8 +120,28 @@ export function AssociateRegistrationForm() {
   const showDelivery =
     selectedCategory && DELIVERY_CATEGORIES.includes(selectedCategory);
 
+  if (profileIsLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (isSuccess && profile?.status === "pending") {
+    return (
+      <div className="flex flex-col items-center justify-center h-96 text-center p-6">
+        <CheckCircle2 className="w-16 h-16 text-green-500 mb-4" />
+        <h2 className="text-2xl font-bold">Application Pending</h2>
+        <p className="text-muted-foreground mt-2">
+          You have already applied. Please wait for admin approval.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-background py-8 px-4 sm:px-6 lg:px-8 border rounded-lg shadow-md mx-auto max-w-2xl">
+    <div className="min-h-screen bg-gray-50/50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-2xl">
         <div className="mb-8 text-center space-y-2">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">

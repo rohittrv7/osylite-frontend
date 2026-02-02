@@ -66,16 +66,17 @@ export const authApi = rootApiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
-      applyAssociate: builder.mutation<
-          { success: true; id: string },
-          AssociateApplyPayload
-        >({
-          query: (payload) => ({
-            url: "/auth/register-associate",
-            method: "POST",
-            body: payload,
-          }),
-        }),
+    
+    applyAssociate: builder.mutation<
+      { success: true; id: string },
+      AssociateApplyPayload
+    >({
+      query: (payload) => ({
+        url: "/auth/register-associate",
+        method: "POST",
+        body: payload,
+      }),
+    }),
 
     otpVerify: builder.mutation<OtpVerifyResponse, OtpVerifyRequest>({
       query: (credentials) => ({

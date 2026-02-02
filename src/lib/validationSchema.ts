@@ -13,8 +13,7 @@ import {
 // Helper for conditional validation
 const emptyStringToUndefined = z.literal("").transform(() => undefined);
 
-// 🔹 FIX 1: Cast values to the specific Enum Type, not just generic strings.
-// This ensures z.infer returns "doctor" | "video_creator" etc., instead of just string.
+// 🔹 FIX: Cast values to the specific Enum Type to satisfy Zod and TypeScript
 const associateCategoryValues = Object.values(AssociateCategory) as [
   AssociateCategory,
   ...AssociateCategory[],
@@ -22,14 +21,14 @@ const associateCategoryValues = Object.values(AssociateCategory) as [
 
 export const associateFormSchema = z
   .object({
-    // --- Basic User DTO Fields ---
+    // --- Personal Information ---
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
     email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(1, "Confirm password is required"),
 
-    // --- Create Associate DTO Fields ---
-    // Since we cast associateCategoryValues correctly above, we don't need .transform() anymore.
+    // --- Business / Category Information ---
     category: z.enum(associateCategoryValues),
 
     businessName: z.string().optional(),
@@ -41,6 +40,8 @@ export const associateFormSchema = z
     state: z.string().min(1, "State is required"),
     pincode: z.string().regex(/^[0-9]{6}$/, "Pincode must be exactly 6 digits"),
     website: z.string().url().optional().or(emptyStringToUndefined),
+
+    // --- Conditional Fields ---
 
     // Trade Fields
     unitNo: z.string().optional(),
@@ -72,10 +73,12 @@ export const associateFormSchema = z
     vehicleType: z.string().optional(),
     deliveryLocation: z.string().optional(),
   })
-
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  })
   .superRefine((data, ctx) => {
-    // We cast the category arrays (e.g. TRADE_CATEGORIES) to readonly arrays of the Enum type
-    // This allows TS to verify if data.category exists in that array without 'any'.
+    // 🔹 FIX: Type safe inclusion checks
 
     // Trade Logic
     if (
@@ -115,7 +118,6 @@ export const associateFormSchema = z
         });
     }
 
-    // Narrow check for Doctors
     const doctorCats: AssociateCategory[] = [
       AssociateCategory.DOCTOR,
       AssociateCategory.HOSPITAL_DIRECTOR_DOCTOR,
