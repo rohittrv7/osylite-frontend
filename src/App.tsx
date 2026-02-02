@@ -85,6 +85,10 @@ function App() {
           <Route path="/verify-otp" element={<OTPVerificationPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route
+            path="/associate-register"
+            element={<AssociateRegistrationForm />}
+          />
         </Route>
 
         {/* PROTECTED ROUTES - Accessible only when LOGGED IN */}
@@ -98,10 +102,6 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/home" element={<HomeSections />} />
           <Route path="/mlife" element={<ExploreFeed />} />
-          <Route
-            path="/associate-register"
-            element={<AssociateRegistrationForm />}
-          />
           <Route path="/ang-mart" element={<SelectCategoryPage />} />
           <Route path="/ang-mart/:category" element={<AngMart />} />
           <Route path="/ang-service" element={<SelectServicePage />} />

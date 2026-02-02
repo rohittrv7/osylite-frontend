@@ -1,5 +1,6 @@
 import type { User } from "@/types/user";
 import { rootApiSlice } from "./rootApiSlice";
+import type { AssociateApplyPayload } from "@/types/associate";
 
 interface LoginRequest {
   email: string;
@@ -65,6 +66,16 @@ export const authApi = rootApiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
+      applyAssociate: builder.mutation<
+          { success: true; id: string },
+          AssociateApplyPayload
+        >({
+          query: (payload) => ({
+            url: "/auth/register-associate",
+            method: "POST",
+            body: payload,
+          }),
+        }),
 
     otpVerify: builder.mutation<OtpVerifyResponse, OtpVerifyRequest>({
       query: (credentials) => ({
@@ -159,4 +170,5 @@ export const {
   useGetUserStatsQuery,
   useUpdateAvatarMutation,
   useGetTransactionHistoryQuery,
+  useApplyAssociateMutation,
 } = authApi;

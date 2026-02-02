@@ -31,6 +31,7 @@ export function BankFields({ form }: BankFieldsProps) {
         type="select"
         label="Bank Type"
         placeholder="Select bank type"
+        className='py-2'
         value={watch('govtOrPvt') || ''}
         onChange={(v) => setValue('govtOrPvt', v as 'govt' | 'pvt', { shouldValidate: true })}
         error={errors.govtOrPvt}

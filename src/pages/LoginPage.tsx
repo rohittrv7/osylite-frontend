@@ -59,7 +59,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md space-y-8 border border-zinc-500 p-8 rounded-lg shadow-lg">
         <div className="text-center">
           <h1 className="text-3xl font-bold">Login</h1>{" "}
@@ -111,7 +111,7 @@ export default function LoginPage() {
               </Button>
             </div>
 
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full cursor-pointer">
               {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
@@ -122,7 +122,7 @@ export default function LoginPage() {
           Don't have an account?{" "}
           <Button
             variant="link"
-            className="px-1"
+            className="px-1 coursor-pointer"
             type="button"
             onClick={() => navigate("/register")}
           >

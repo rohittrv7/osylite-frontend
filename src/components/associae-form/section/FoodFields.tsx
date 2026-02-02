@@ -26,6 +26,7 @@ export function FoodFields({ form }: FoodFieldsProps) {
         type="time"
         label="Opening Time"
         placeholder="Select opening time"
+        className='py-2'
         value={watch('openingTime') || ''}
         onChange={(v) => setValue('openingTime', v, { shouldValidate: true })}
         error={errors.openingTime}
@@ -34,6 +35,7 @@ export function FoodFields({ form }: FoodFieldsProps) {
         type="time"
         label="Closing Time"
         placeholder="Select closing time"
+        className='py-2'
         value={watch('closingTime') || ''}
         onChange={(v) => setValue('closingTime', v, { shouldValidate: true })}
         error={errors.closingTime}

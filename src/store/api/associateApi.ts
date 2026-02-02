@@ -1,5 +1,4 @@
 import type {
-  AssociateApplyPayload,
   AssociateCategory,
   ExplorePost,
   ProductExploreFilters,
@@ -28,17 +27,6 @@ export type AssociateProfile = {
 
 export const associateApi = rootApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    applyAssociate: builder.mutation<
-      { success: true; id: string },
-      AssociateApplyPayload
-    >({
-      query: (payload) => ({
-        url: "/associates/apply",
-        method: "POST",
-        body: payload,
-      }),
-    }),
-
     getMyAssociateProfile: builder.query<AssociateProfile, void>({
       query: () => ({
         url: "/associates/me",
@@ -82,7 +70,6 @@ export const associateApi = rootApiSlice.injectEndpoints({
 });
 
 export const {
-  useApplyAssociateMutation,
   useGetMyAssociateProfileQuery,
   useGetExploreProductsQuery,
   useGetExploreServicesQuery,
