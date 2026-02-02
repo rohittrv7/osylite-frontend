@@ -59,6 +59,7 @@ export function MedicalFields({ form }: MedicalFieldsProps) {
           type="select"
           label="Specialization"
           placeholder="Select specialization"
+          className="py-2"
           value={watch("specialization") || ""}
           onChange={(v) =>
             setValue("specialization", v, { shouldValidate: true })

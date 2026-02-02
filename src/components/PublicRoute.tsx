@@ -9,7 +9,6 @@ import {
 import { useSelector } from "react-redux";
 
 export default function PublicRoute({ children }: { children?: ReactNode }) {
-  // const { data: user, isLoading } = useGetProfileQuery();
   const user = useSelector(selectAuthUser);
   const isLoading = useSelector(selectAuthLoading);
 

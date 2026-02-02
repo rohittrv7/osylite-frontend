@@ -1,209 +1,223 @@
-import { z } from "zod";
+import * as z from "zod";
 import {
   AssociateCategory,
   MEDICAL_CATEGORIES,
-  EDUCATION_CATEGORIES,
   TRADE_CATEGORIES,
+  EDUCATION_CATEGORIES,
   FOOD_CATEGORIES,
   BANK_CATEGORIES,
   CREATOR_CATEGORIES,
   DELIVERY_CATEGORIES,
-  HIGHER_EDUCATION_CATEGORIES,
-  DOCTOR_CATEGORIES,
 } from "@/types/associate";
+
+// Helper for conditional validation
+const emptyStringToUndefined = z.literal("").transform(() => undefined);
+
+// 🔹 FIX 1: Cast values to the specific Enum Type, not just generic strings.
+// This ensures z.infer returns "doctor" | "video_creator" etc., instead of just string.
+const associateCategoryValues = Object.values(AssociateCategory) as [
+  AssociateCategory,
+  ...AssociateCategory[],
+];
 
 export const associateFormSchema = z
   .object({
-    category: z.nativeEnum(AssociateCategory).refine(Boolean, {
-      message: "Please select a category",
-    }),
+    // --- Basic User DTO Fields ---
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
 
-    subCategory: z.string().optional(),
+    // --- Create Associate DTO Fields ---
+    // Since we cast associateCategoryValues correctly above, we don't need .transform() anymore.
+    category: z.enum(associateCategoryValues),
 
-    // Common fields
     businessName: z.string().optional(),
-    address: z
-      .string()
-      .min(1, "Address is required")
-      .max(500, "Address must be less than 500 characters"),
-    city: z
-      .string()
-      .min(1, "City is required")
-      .max(100, "City must be less than 100 characters"),
-    state: z
-      .string()
-      .min(1, "State is required")
-      .max(100, "State must be less than 100 characters"),
-    pincode: z.string().regex(/^[0-9]{6}$/, "Pincode must be exactly 6 digits"),
     businessMobile: z
       .string()
-      .regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit mobile number"),
+      .regex(/^[6-9]\d{9}$/, "Invalid 10-digit mobile number"),
+    address: z.string().min(5, "Address is required"),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(1, "State is required"),
+    pincode: z.string().regex(/^[0-9]{6}$/, "Pincode must be exactly 6 digits"),
+    website: z.string().url().optional().or(emptyStringToUndefined),
 
-    // Optional common fields
-    website: z.string().url("Enter a valid URL").optional().or(z.literal("")),
-    openingTime: z.string().optional(),
-    closingTime: z.string().optional(),
-    offDays: z.array(z.string()).optional(),
-    gstNumber: z.string().optional(),
-    latitude: z.number().optional(),
-    longitude: z.number().optional(),
-
-    // Medical fields
-    registrationNumber: z.string().optional(),
-    specialization: z.string().optional(),
-
-    // Education fields
-    board: z.string().optional(),
-    universityAffiliation: z.string().optional(),
-
-    // Trade fields
+    // Trade Fields
     unitNo: z.string().optional(),
     brand: z.string().optional(),
     typeOfProduct: z.string().optional(),
+    gstNumber: z.string().optional(),
 
-    // Food fields
-    fssaiLicense: z.string().optional(),
+    // Medical Fields
+    registrationNumber: z.string().optional(),
+    specialization: z.string().optional(),
 
-    // Bank fields
+    // Education Fields
+    board: z.string().optional(),
+    universityAffiliation: z.string().optional(),
+
+    // Bank Fields
     branchCode: z.string().optional(),
     govtOrPvt: z.enum(["govt", "pvt"]).optional(),
 
-    // Creator fields
+    // Food Fields
+    fssaiLicense: z.string().optional(),
+    openingTime: z.string().optional(),
+    closingTime: z.string().optional(),
+
+    // Creator Fields
     channelName: z.string().optional(),
 
-    // Delivery fields
+    // Delivery Fields
     vehicleType: z.string().optional(),
     deliveryLocation: z.string().optional(),
   })
+
   .superRefine((data, ctx) => {
-    const category = data.category;
+    // We cast the category arrays (e.g. TRADE_CATEGORIES) to readonly arrays of the Enum type
+    // This allows TS to verify if data.category exists in that array without 'any'.
 
-    // Medical validations
-    if (MEDICAL_CATEGORIES.includes(category)) {
-      if (!data.registrationNumber || data.registrationNumber.trim() === "") {
+    // Trade Logic
+    if (
+      (TRADE_CATEGORIES as readonly AssociateCategory[]).includes(data.category)
+    ) {
+      if (!data.unitNo)
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Medical Registration/License Number is required",
-          path: ["registrationNumber"],
-        });
-      }
-    }
-
-    if (DOCTOR_CATEGORIES.includes(category)) {
-      if (!data.specialization || data.specialization.trim() === "") {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Specialization is required for Doctors",
-          path: ["specialization"],
-        });
-      }
-    }
-
-    // Education validations
-    if (EDUCATION_CATEGORIES.includes(category)) {
-      if (!data.board || data.board.trim() === "") {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Board affiliation (CBSE/ICSE/State) is required",
-          path: ["board"],
-        });
-      }
-    }
-
-    if (HIGHER_EDUCATION_CATEGORIES.includes(category)) {
-      if (
-        !data.universityAffiliation ||
-        data.universityAffiliation.trim() === ""
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "University Affiliation is required",
-          path: ["universityAffiliation"],
-        });
-      }
-    }
-
-    // Trade validations
-    if (TRADE_CATEGORIES.includes(category)) {
-      if (!data.unitNo || data.unitNo.trim() === "") {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Unit Number is required for this category",
+          message: "Unit Number is required",
           path: ["unitNo"],
         });
-      }
-      if (!data.brand || data.brand.trim() === "") {
+      if (!data.brand)
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Brand name is required for this category",
+          message: "Brand name is required",
           path: ["brand"],
         });
-      }
-      if (!data.typeOfProduct || data.typeOfProduct.trim() === "") {
+      if (!data.typeOfProduct)
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Type of Product (Physical/Soft) is required",
+          message: "Type of Product is required",
           path: ["typeOfProduct"],
         });
-      }
     }
 
-    // Food validations
-    if (FOOD_CATEGORIES.includes(category)) {
-      if (!data.fssaiLicense || data.fssaiLicense.trim() === "") {
+    // Medical Logic
+    if (
+      (MEDICAL_CATEGORIES as readonly AssociateCategory[]).includes(
+        data.category,
+      )
+    ) {
+      if (!data.registrationNumber)
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "FSSAI License number is required for food business",
-          path: ["fssaiLicense"],
+          message: "License Number is required",
+          path: ["registrationNumber"],
         });
-      }
     }
 
-    // Bank validations
-    if (BANK_CATEGORIES.includes(category)) {
-      if (!data.branchCode || data.branchCode.trim() === "") {
+    // Narrow check for Doctors
+    const doctorCats: AssociateCategory[] = [
+      AssociateCategory.DOCTOR,
+      AssociateCategory.HOSPITAL_DIRECTOR_DOCTOR,
+    ];
+    if (doctorCats.includes(data.category)) {
+      if (!data.specialization)
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Bank Branch Code is required",
+          message: "Specialization is required",
+          path: ["specialization"],
+        });
+    }
+
+    // Education Logic
+    if (
+      (EDUCATION_CATEGORIES as readonly AssociateCategory[]).includes(
+        data.category,
+      )
+    ) {
+      if (!data.board)
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Board affiliation is required",
+          path: ["board"],
+        });
+    }
+
+    const higherEduCats: AssociateCategory[] = [
+      AssociateCategory.COLLEGE_DIRECTOR,
+      AssociateCategory.UNIVERSITY_DIRECTOR,
+    ];
+    if (higherEduCats.includes(data.category)) {
+      if (!data.universityAffiliation)
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "University affiliation is required",
+          path: ["universityAffiliation"],
+        });
+    }
+
+    // Bank Logic
+    if (
+      (BANK_CATEGORIES as readonly AssociateCategory[]).includes(data.category)
+    ) {
+      if (!data.branchCode)
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Branch Code is required",
           path: ["branchCode"],
         });
-      }
-      if (!data.govtOrPvt) {
+      if (!data.govtOrPvt)
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Please specify if Bank is Govt or Pvt",
+          message: "Bank type is required",
           path: ["govtOrPvt"],
         });
-      }
     }
 
-    // Creator validations
-    if (CREATOR_CATEGORIES.includes(category)) {
-      if (!data.channelName || data.channelName.trim() === "") {
+    // Food Logic
+    if (
+      (FOOD_CATEGORIES as readonly AssociateCategory[]).includes(data.category)
+    ) {
+      if (!data.fssaiLicense)
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "FSSAI License is required",
+          path: ["fssaiLicense"],
+        });
+    }
+
+    // Creator Logic
+    if (
+      (CREATOR_CATEGORIES as readonly AssociateCategory[]).includes(
+        data.category,
+      )
+    ) {
+      if (!data.channelName)
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Channel Name is required",
           path: ["channelName"],
         });
-      }
     }
 
-    // Delivery validations
-    if (DELIVERY_CATEGORIES.includes(category)) {
-      if (!data.vehicleType || data.vehicleType.trim() === "") {
+    // Delivery Logic
+    if (
+      (DELIVERY_CATEGORIES as readonly AssociateCategory[]).includes(
+        data.category,
+      )
+    ) {
+      if (!data.vehicleType)
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Vehicle Type is required",
           path: ["vehicleType"],
         });
-      }
-      if (!data.deliveryLocation || data.deliveryLocation.trim() === "") {
+      if (!data.deliveryLocation)
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Preferred Delivery Location is required",
+          message: "Delivery Location is required",
           path: ["deliveryLocation"],
         });
-      }
     }
   });
 

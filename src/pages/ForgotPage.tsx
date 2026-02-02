@@ -45,7 +45,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-4">
+    <div className="flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center gap-2 mb-1">
@@ -87,7 +87,10 @@ export default function ForgotPassword() {
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
             login with password?{" "}
-            <Link to="/login" className="text-primary hover:underline">
+            <Link
+              to="/login"
+              className="text-primary hover:underline cursor-pointer"
+            >
               Login
             </Link>
           </div>

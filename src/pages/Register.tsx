@@ -265,19 +265,34 @@ export default function RegisterPage() {
               )}
             /> */}
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="w-full cursor-pointer"
+              disabled={isLoading}
+            >
               {isLoading ? "Registering..." : "Register"}
             </Button>
           </form>
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-sm mt-2 text-muted-foreground">
             Don't have an account?{" "}
             <Button
               variant="link"
-              className="px-1"
+              className="px-1 cursor-pointer"
               type="button"
               onClick={() => navigate("/login")}
             >
               Sign in
+            </Button>
+          </p>
+          <p className="text-center text-sm text-muted-foreground">
+            Want to becaome Associate?{" "}
+            <Button
+              variant="link"
+              className="px-1 cursor-pointer text-blue-400"
+              type="button"
+              onClick={() => navigate("/associate-register")}
+            >
+              Associate
             </Button>
           </p>
         </Form>

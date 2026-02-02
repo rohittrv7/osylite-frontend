@@ -29,31 +29,27 @@ import {
   DELIVERY_CATEGORIES,
 } from "@/types/associate";
 import { toast } from "sonner";
-import { UserPlus, Loader2, CheckCircle2 } from "lucide-react";
+import { UserPlus, Loader2 } from "lucide-react";
 import {
   associateFormSchema,
   type AssociateFormSchema,
 } from "@/lib/validationSchema";
 import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
-import {
-  useApplyAssociateMutation,
-  useGetMyAssociateProfileQuery,
-} from "@/store/api/associateApi";
 import { useNavigate } from "react-router-dom";
+import { useApplyAssociateMutation } from "@/store/api/authApi";
 
 export function AssociateRegistrationForm() {
   const navigate = useNavigate();
-  const [applyAssociate] = useApplyAssociateMutation();
-  const {
-    data: profile,
-    isLoading: profileIsLoading,
-    isSuccess,
-  } = useGetMyAssociateProfileQuery();
+  const [registerAssociate] = useApplyAssociateMutation();
 
   const form = useForm<AssociateFormSchema>({
     resolver: zodResolver(associateFormSchema),
     defaultValues: {
       category: "" as AssociateCategory,
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
       businessName: "",
       address: "",
       city: "",
@@ -74,8 +70,15 @@ export function AssociateRegistrationForm() {
 
   const onSubmit = async (data: AssociateFormSchema) => {
     try {
-      await applyAssociate(data).unwrap();
-      navigate("/home");
+      const payload = {
+        ...data,
+      };
+
+      await registerAssociate(payload).unwrap();
+
+      navigate("/verify-otp", {
+        state: { email: data.email },
+      });
       toast.success("Registration submitted successfully!");
     } catch (error) {
       apiErrorToastHandler(error);
@@ -97,38 +100,31 @@ export function AssociateRegistrationForm() {
   const showDelivery =
     selectedCategory && DELIVERY_CATEGORIES.includes(selectedCategory);
 
-  if (profileIsLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isSuccess && profile?.status === "pending") {
-    return <div>You have already applied for associate.</div>;
-  }
-
   return (
-    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-3xl">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
-            <UserPlus className="h-8 w-8 text-primary" />
+    <div className="bg-background py-8 px-4 sm:px-6 lg:px-8 border rounded-lg shadow-md mx-auto max-w-2xl">
+      <div className="mx-auto max-w-2xl">
+        <div className="mb-8 text-center space-y-2">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+            <UserPlus className="h-7 w-7 text-primary" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Associate Registration
           </h1>
-          <p className="mt-2 text-muted-foreground">
-            Fill in your details to become a registered associate partner
+          <p className="text-muted-foreground max-w-sm mx-auto">
+            Fill in your details to become a registered associate partner with
+            ANG
           </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Category Selection Card */}
-          <Card className="border-2 border-dashed border-primary/20 bg-card shadow-sm">
+          <Card className="border-2 border-dashed border-primary/20 bg-card shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg">Choose Your Category</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                1. Choose Category
+              </CardTitle>
               <CardDescription>
-                Select the category that best describes your business or
-                profession
+                Select the category that best describes your business
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -140,9 +136,9 @@ export function AssociateRegistrationForm() {
                 error={errors.category}
               />
               {selectedCategory && (
-                <div className="mt-4 animate-fade-in">
-                  <span className="category-badge">
-                    {CATEGORY_LABELS[selectedCategory]}
+                <div className="mt-4 flex justify-center animate-in fade-in zoom-in duration-300">
+                  <span className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1 text-sm font-medium text-primary ring-1 ring-inset ring-primary/20">
+                    Selected: {CATEGORY_LABELS[selectedCategory]}
                   </span>
                 </div>
               )}
@@ -151,11 +147,11 @@ export function AssociateRegistrationForm() {
 
           {/* Dynamic Form Sections */}
           {selectedCategory && (
-            <div className="space-y-6 animate-slide-up">
-              {/* Common Fields - Always shown */}
+            <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+              {/* Common Fields (Personal + Business) */}
               <CommonFields form={form} />
 
-              {/* Category-specific fields */}
+              {/* Conditional Fields */}
               {showMedical && <MedicalFields form={form} />}
               {showEducation && <EducationFields form={form} />}
               {showTrade && <TradeFields form={form} />}
@@ -165,25 +161,25 @@ export function AssociateRegistrationForm() {
               {showDelivery && <DeliveryFields form={form} />}
 
               {/* Submit Button */}
-              <div className="flex justify-end pt-4">
+              <div className="flex flex-col gap-4 pt-6 border-t mt-8">
                 <Button
                   type="submit"
                   size="lg"
                   disabled={isSubmitting}
-                  className="min-w-[200px] bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="w-full text-lg font-semibold shadow-lg transition-transform active:scale-[0.98]"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Submitting...
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Creating Account...
                     </>
                   ) : (
-                    <>
-                      <CheckCircle2 className="mr-2 h-4 w-4" />
-                      Submit Registration
-                    </>
+                    <>Submit Application</>
                   )}
                 </Button>
+                <p className="text-xs text-center text-muted-foreground">
+                  By clicking submit, you agree to our Terms and Conditions.
+                </p>
               </div>
             </div>
           )}
