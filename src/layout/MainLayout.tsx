@@ -3,13 +3,15 @@ import BottomNavbar from "./BottomNavbar";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import { useIsTablet } from "@/hooks/use-tablet";
 
 const HEADER_HEIGHT = "pt-16";
-const SIDEBAR_DESKTOP = "lg:ml-64";
-const SIDEBAR_TABLET = "md:ml-20";
+const SIDEBAR_DESKTOP = "lg:ml-80";
+const SIDEBAR_TABLET = "md:ml-64";
 
 const MainLayout = () => {
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
@@ -28,7 +30,7 @@ const MainLayout = () => {
       >
         <Outlet />
       </main>
-
+      {isTablet && !isMobile && <BottomNavbar />}
       {isMobile && <BottomNavbar />}
     </div>
   );

@@ -54,6 +54,7 @@ import {
   Briefcase,
   MapPin,
   Handshake,
+  ReceiptIndianRupee,
 } from "lucide-react";
 
 export const baseSidebarConfig: SidebarItem[] = [
@@ -134,13 +135,13 @@ export const baseSidebarConfig: SidebarItem[] = [
     type: "link",
     path: "/settings",
   },
-  // {
-  //   id: "associate",
-  //   label: "Become Associate",
-  //   icon: UserSquare2Icon,
-  //   type: "link",
-  //   path: "/associate-register",
-  // },
+  {
+    id: "transactions",
+    label: "Transaction History",
+    icon: ReceiptIndianRupee,
+    type: "link",
+    path: "/transactions",
+  },
   {
     id: "logout",
     label: "Logout",
