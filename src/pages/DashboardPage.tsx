@@ -6,6 +6,9 @@ import {
   Wallet,
   Coins,
   UserCircle,
+  HandHeart,
+  BriefcaseBusiness,
+  Building,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useGetProfileQuery } from "@/store/api/authApi";
@@ -94,7 +97,7 @@ export default function Dashboard() {
             <CardContent className="space-y-3">
               <Button
                 variant="outline"
-                className="w-full justify-start gap-3 h-11"
+                className="w-full justify-start gap-3 h-11 cursor-pointer"
                 onClick={() => navigator("/profile")}
               >
                 <UserCircle className="h-5 w-5" />
@@ -103,15 +106,43 @@ export default function Dashboard() {
 
               <Button
                 variant="outline"
-                className="w-full justify-start gap-3 h-11"
+                className="w-full justify-start gap-3 h-11 cursor-pointer"
+                onClick={() => navigator("/transactions")}
               >
                 <Coins className="h-5 w-5" />
-                ANG Token
+                ANG Transaction
               </Button>
 
               <Button
                 variant="outline"
-                className="w-full justify-start gap-3 h-11"
+                className="w-full justify-start gap-3 h-11 cursor-pointer"
+                onClick={() => navigator("/matrimony")}
+              >
+                <HandHeart className="h-5 w-5" />
+                Create/View Matrimony profile
+              </Button>
+
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-3 h-11 cursor-pointer"
+                onClick={() => navigator("/job-profile")}
+              >
+                <BriefcaseBusiness className="h-5 w-5" />
+                Create/View Job profile
+              </Button>
+
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-3 h-11 cursor-pointer"
+                onClick={() => navigator("/property")}
+              >
+                <Building className="h-5 w-5" />
+                Create/View Broker profile
+              </Button>
+
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-3 h-11 cursor-pointer"
               >
                 <svg
                   className="h-5 w-5"

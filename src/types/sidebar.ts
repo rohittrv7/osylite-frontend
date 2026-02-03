@@ -54,7 +54,6 @@ import {
   Briefcase,
   MapPin,
   Handshake,
-  ReceiptIndianRupee,
 } from "lucide-react";
 
 export const baseSidebarConfig: SidebarItem[] = [
@@ -134,13 +133,6 @@ export const baseSidebarConfig: SidebarItem[] = [
     icon: Settings,
     type: "link",
     path: "/settings",
-  },
-  {
-    id: "transactions",
-    label: "Transaction History",
-    icon: ReceiptIndianRupee,
-    type: "link",
-    path: "/transactions",
   },
   {
     id: "logout",

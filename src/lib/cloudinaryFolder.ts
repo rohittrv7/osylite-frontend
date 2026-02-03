@@ -1,4 +1,4 @@
-export type PostType = "post" | "video" | "reel" | "avatar";
+export type PostType = "post" | "video" | "reel" | "avatar" | "raw";
 
 export const getFolderByPostType = (postType: PostType) => {
   switch (postType) {

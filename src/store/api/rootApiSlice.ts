@@ -95,5 +95,9 @@ export const rootApiSlice = createApi({
     "FriendSuggestions",
     "FriendRequests",
     "Friends",
+    "JobProfile",
+    "MyJobs",
+    "JobFeed",
+    "Applicants",
   ],
 });
