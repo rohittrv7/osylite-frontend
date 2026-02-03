@@ -33,7 +33,11 @@ import EntertainMentPage from "./pages/EntertainMentPage";
 import VenueExplore from "./pages/VenueExplore";
 import { Loader2 } from "lucide-react";
 import Friends from "./pages/Friends";
-import { TransactionHistory } from "./pages/TransactionHistory";
+import JobProfilePage from "./pages/JobProfilePage";
+import JobPostPage from "./pages/JobPostPage";
+import PropertyPage from "./pages/PropertyPage";
+import Matrimony from "./pages/matrimony";
+import TransactionHistory from "./pages/TransactionHistory";
 
 function App() {
   const dispatch = useDispatch();
@@ -117,6 +121,10 @@ function App() {
           <Route path="/mchat" element={<Chat />} />
           <Route path="/friends" element={<Friends />} />
           <Route path="/transactions" element={<TransactionHistory />} />
+          <Route path="/job-profile" element={<JobProfilePage />} />
+          <Route path="/post-job" element={<JobPostPage />} />
+          <Route path="/property" element={<PropertyPage />} />
+          <Route path="/matrimony" element={<Matrimony />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/mlife" replace />} />

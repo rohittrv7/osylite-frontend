@@ -1,6 +1,6 @@
-import { Image, Film, Video } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { ContentType } from '@/types/feed';
+import { Image, Film, Video } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { ContentType } from "@/types/feed";
 
 interface FeedTabsProps {
   activeTab: ContentType;
@@ -8,9 +8,9 @@ interface FeedTabsProps {
 }
 
 const tabs: { id: ContentType; label: string; icon: React.ReactNode }[] = [
-  { id: 'post', label: 'Posts', icon: <Image className="w-5 h-5" /> },
-  { id: 'reel', label: 'Reels', icon: <Film className="w-5 h-5" /> },
-  { id: 'video', label: 'Videos', icon: <Video className="w-5 h-5" /> },
+  { id: "post", label: "Posts", icon: <Image className="w-5 h-5" /> },
+  { id: "reel", label: "Reels", icon: <Film className="w-5 h-5" /> },
+  { id: "video", label: "Videos", icon: <Video className="w-5 h-5" /> },
 ];
 
 export const FeedTabs = ({ activeTab, onTabChange }: FeedTabsProps) => {
@@ -28,7 +28,7 @@ export const FeedTabs = ({ activeTab, onTabChange }: FeedTabsProps) => {
                 "flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium transition-all duration-300 relative",
                 activeTab === tab.id
                   ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {tab.icon}
@@ -36,7 +36,7 @@ export const FeedTabs = ({ activeTab, onTabChange }: FeedTabsProps) => {
 
               {/* Active indicator */}
               {activeTab === tab.id && (
-                <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-gradient-primary rounded-full" />
+                <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-gradient-primary rounded-full cursor-pointer" />
               )}
             </button>
           ))}
