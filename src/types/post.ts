@@ -88,50 +88,50 @@ export interface ExploreFilters {
   category: PostCategory;
 }
 
-export interface ExplorePost {
-  id: string;
-  title: string | null;
-  caption: string | null;
-  fileUrl: string;
-  thumbnailUrl: string | undefined;
-  description: string;
+// export interface ExplorePost {
+//   id: string;
+//   title: string | null;
+//   caption: string | null;
+//   fileUrl: string;
+//   thumbnailUrl: string | undefined;
+//   description: string;
 
-  type: "post" | "reel" | "video";
+//   type: "post" | "reel" | "video";
 
-  earningMod:
-    | "free"
-    | "running_ads"
-    | "on_rent"
-    | "paid_viewer"
-    | "copyright_sale";
+//   earningMod:
+//     | "free"
+//     | "running_ads"
+//     | "on_rent"
+//     | "paid_viewer"
+//     | "copyright_sale";
 
-  price: string;
+//   price: string;
 
-  category:
-    | "entertainment"
-    | "education"
-    | "business"
-    | "sports"
-    | "other"
-    | null;
+//   category:
+//     | "entertainment"
+//     | "education"
+//     | "business"
+//     | "sports"
+//     | "other"
+//     | null;
 
-  likesCount: number;
-  viewsCount: number;
-  commentsCount: number;
-  sharesCount: number;
+//   likesCount: number;
+//   viewsCount: number;
+//   commentsCount: number;
+//   sharesCount: number;
 
-  audience: string;
-  displayArea: string;
+//   audience: string;
+//   displayArea: string;
 
-  isEnquiryPost: boolean;
-  ctaLabel: string;
-  isAd: boolean;
-  isLiked: boolean;
+//   isEnquiryPost: boolean;
+//   ctaLabel: string;
+//   isAd: boolean;
+//   isLiked: boolean;
 
-  channel: ChannelInfo;
+//   channel: ChannelInfo;
 
-  createdAt: string;
-}
+//   createdAt: string;
+// }
 
 export interface ChannelInfo {
   id: string;

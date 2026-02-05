@@ -1,19 +1,29 @@
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { type JobPost, JobType, JOB_CATEGORIES } from '@/types/job';
-import { INDIAN_STATES } from '@/types/matrimony';
-import { PROPERTY_CITIES } from '@/types/property';
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+// 🔹 Import types strictly from API slice to match parent state
+import { type CreateJobPostDto, JobType } from "@/store/api/jobsApi";
+import { INDIAN_STATES } from "@/types/matrimony";
+import { PROPERTY_CITIES } from "@/types/property";
+import { JOB_CATEGORIES } from "@/types/job";
 
 interface JobBasicStepProps {
-  data: Partial<JobPost>;
-  onChange: (data: Partial<JobPost>) => void;
+  data: Partial<CreateJobPostDto>;
+  onChange: (data: Partial<CreateJobPostDto>) => void;
 }
 
 const jobTypes = [
-  { value: JobType.FULL_TIME, label: 'Full Time', emoji: '💼' },
-  { value: JobType.PART_TIME, label: 'Part Time', emoji: '⏰' },
-  { value: JobType.WORK_FROM_HOME, label: 'Work From Home', emoji: '🏠' },
-  { value: JobType.INTERNSHIP, label: 'Internship', emoji: '🎓' },
+  { value: JobType.FULL_TIME, label: "Full Time", emoji: "💼" },
+  { value: JobType.PART_TIME, label: "Part Time", emoji: "⏰" },
+  { value: JobType.INTERNSHIP, label: "Internship", emoji: "🎓" },
+  { value: JobType.CONTRACT, label: "Contract", emoji: "📜" },
+  { value: JobType.FREELANCE, label: "Freelance", emoji: "💻" },
 ];
 
 const JobBasicStep = ({ data, onChange }: JobBasicStepProps) => {
@@ -26,24 +36,24 @@ const JobBasicStep = ({ data, onChange }: JobBasicStepProps) => {
         </label>
         <Input
           placeholder="e.g., Senior Accountant, Delivery Driver"
-          value={data.jobTitle || ''}
+          value={data.jobTitle || ""}
           onChange={(e) => onChange({ ...data, jobTitle: e.target.value })}
           className="h-12"
         />
       </div>
 
       {/* Company Name */}
-      <div className="space-y-2">
+      {/* <div className="space-y-2">
         <label className="block text-sm font-medium text-foreground">
           Company Name <span className="text-destructive">*</span>
         </label>
         <Input
           placeholder="e.g., ABC Enterprises"
-          value={data.companyName || ''}
+          value={data.companyName || ""}
           onChange={(e) => onChange({ ...data, companyName: e.target.value })}
           className="h-12"
         />
-      </div>
+      </div> */}
 
       {/* Job Type */}
       <div className="space-y-2">
@@ -58,8 +68,8 @@ const JobBasicStep = ({ data, onChange }: JobBasicStepProps) => {
               onClick={() => onChange({ ...data, jobType: type.value })}
               className={`flex items-center gap-2 p-3 rounded-xl border-2 transition-all ${
                 data.jobType === type.value
-                  ? 'border-primary bg-primary/10 text-primary'
-                  : 'border-border hover:border-primary/50'
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border hover:border-primary/50"
               }`}
             >
               <span className="text-xl">{type.emoji}</span>
@@ -74,13 +84,18 @@ const JobBasicStep = ({ data, onChange }: JobBasicStepProps) => {
         <label className="block text-sm font-medium text-foreground">
           Job Category <span className="text-destructive">*</span>
         </label>
-        <Select value={data.roleCategory} onValueChange={(value) => onChange({ ...data, roleCategory: value })}>
+        <Select
+          value={data.roleCategory}
+          onValueChange={(value) => onChange({ ...data, roleCategory: value })}
+        >
           <SelectTrigger className="h-12">
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
           <SelectContent>
             {JOB_CATEGORIES.map((cat) => (
-              <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+              <SelectItem key={cat} value={cat}>
+                {cat}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -92,13 +107,18 @@ const JobBasicStep = ({ data, onChange }: JobBasicStepProps) => {
           <label className="block text-sm font-medium text-foreground">
             State <span className="text-destructive">*</span>
           </label>
-          <Select value={data.state} onValueChange={(value) => onChange({ ...data, state: value })}>
+          <Select
+            value={data.state}
+            onValueChange={(value) => onChange({ ...data, state: value })}
+          >
             <SelectTrigger className="h-12">
               <SelectValue placeholder="Select state" />
             </SelectTrigger>
             <SelectContent>
               {INDIAN_STATES.map((state) => (
-                <SelectItem key={state} value={state}>{state}</SelectItem>
+                <SelectItem key={state} value={state}>
+                  {state}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -107,17 +127,36 @@ const JobBasicStep = ({ data, onChange }: JobBasicStepProps) => {
           <label className="block text-sm font-medium text-foreground">
             City <span className="text-destructive">*</span>
           </label>
-          <Select value={data.city} onValueChange={(value) => onChange({ ...data, city: value })}>
+          <Select
+            value={data.city}
+            onValueChange={(value) => onChange({ ...data, city: value })}
+          >
             <SelectTrigger className="h-12">
               <SelectValue placeholder="Select city" />
             </SelectTrigger>
             <SelectContent>
               {PROPERTY_CITIES.map((city) => (
-                <SelectItem key={city} value={city}>{city}</SelectItem>
+                <SelectItem key={city} value={city}>
+                  {city}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      {/* Address Field */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-foreground">
+          Full Address{" "}
+          <span className="text-muted-foreground text-xs">(Optional)</span>
+        </label>
+        <Textarea
+          placeholder="Building No, Street Name, Landmark..."
+          value={data.address || ""}
+          onChange={(e) => onChange({ ...data, address: e.target.value })}
+          className="min-h-[80px] resize-none"
+        />
       </div>
     </div>
   );

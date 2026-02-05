@@ -9,8 +9,25 @@ import type {
   PostType,
 } from "@/types/post";
 import type { FollowUser } from "@/components/FollowList";
-import type { ExplorePost } from "@/types/associate";
 import type { ReelResponse } from "@/types/reel";
+import type { ExplorePost } from "@/types/feed";
+
+export interface CreateCommentDto {
+  postId: string;
+  text: string;
+}
+
+export interface CommentResponse {
+  id: string;
+  text: string;
+  createdAt: string;
+  user: {
+    id: string;
+    firstName: string;
+    lastName?: string;
+    avatarUrl?: string;
+  };
+}
 
 export const postsApi = rootApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -117,44 +134,6 @@ export const postsApi = rootApiSlice.injectEndpoints({
       invalidatesTags: ["Following", "UserProfile", "Followers"],
     }),
 
-    toggleLike: builder.mutation<void, string>({
-      query: (id) => ({
-        url: `/posts/${id}/like`,
-        method: "POST",
-      }),
-      invalidatesTags: ["Post", "ExploreSocial", "ExploreBusiness", "MyPosts"],
-    }),
-
-    addComment: builder.mutation<any, { postId: string; text: string }>({
-      query: ({ postId, text }) => ({
-        url: `/posts/${postId}/comment`,
-        method: "POST",
-        body: { text },
-      }),
-      invalidatesTags: ["Post"],
-    }),
-
-    incrementView: builder.mutation<{ viewsCount: number }, { postId: string }>(
-      {
-        query: ({ postId }) => ({
-          url: `/posts/${postId}/view`,
-          method: "POST",
-        }),
-        invalidatesTags: ["Post"],
-      },
-    ),
-
-    incrementShare: builder.mutation<
-      { sharesCount: number },
-      { postId: string }
-    >({
-      query: ({ postId }) => ({
-        url: `/posts/${postId}/share`,
-        method: "POST",
-      }),
-      invalidatesTags: ["Post"],
-    }),
-
     getFeed: builder.query<
       any,
       { type: "post" | "video" | "reel"; page: number; limit: number }
@@ -192,6 +171,61 @@ export const postsApi = rootApiSlice.injectEndpoints({
         body,
       }),
     }),
+
+    toggleLike: builder.mutation<void, string>({
+      query: (postId) => ({
+        url: `/posts/${postId}/like`,
+        method: "POST",
+      }),
+      // Invalidating tags to refresh UI if needed (optional for optimistic updates)
+      invalidatesTags: ["Post"],
+    }),
+
+    // Add Comment
+    addComment: builder.mutation<void, CreateCommentDto>({
+      query: ({ postId, text }) => ({
+        url: `/posts/${postId}/comment`,
+        method: "POST",
+        body: { text },
+      }),
+      invalidatesTags: ["Comments", "Post"],
+    }),
+
+    // Get Comments
+    getComments: builder.query<CommentResponse[], string>({
+      query: (postId) => ({
+        url: `/posts/${postId}/comments`,
+        method: "GET",
+      }),
+      providesTags: ["Comments"],
+    }),
+
+    // Increment View
+    incrementView: builder.mutation<void, { postId: string }>({
+      query: ({ postId }) => ({
+        url: `/posts/${postId}/view`,
+        method: "POST",
+      }),
+    }),
+
+    // Increment Share
+    incrementShare: builder.mutation<void, { postId: string }>({
+      query: ({ postId }) => ({
+        url: `/posts/${postId}/share`,
+        method: "POST",
+      }),
+    }),
+
+
+    // Public Feed
+    getPublicFeed: builder.query<ExplorePost[], any>({
+      query: (params) => ({
+        url: "/posts/feed",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["PostFeed"],
+    }),
   }),
 });
 
@@ -200,10 +234,6 @@ export const {
   useCreateAssociatePostMutation,
   useGetMyPostsQuery,
   useGetAngMartQuery,
-  useToggleLikeMutation,
-  useAddCommentMutation,
-  useIncrementViewMutation,
-  useIncrementShareMutation,
   useGetPublicProfileQuery,
   useFollowUserMutation,
   useUnfollowUserMutation,
@@ -215,4 +245,10 @@ export const {
   useGetFeedQuery,
   useGetEntertainmentReelsQuery,
   useTransferCoinsMutation,
+  useToggleLikeMutation,
+  useAddCommentMutation,
+  useGetCommentsQuery,
+  useIncrementViewMutation,
+  useIncrementShareMutation,
+  useGetPublicFeedQuery,
 } = postsApi;

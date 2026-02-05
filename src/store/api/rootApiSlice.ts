@@ -99,5 +99,7 @@ export const rootApiSlice = createApi({
     "MyJobs",
     "JobFeed",
     "Applicants",
+    "Comments",
+    "PostFeed",
   ],
 });

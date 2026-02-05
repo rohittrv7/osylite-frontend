@@ -10,11 +10,13 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
-import { type JobPost, EXPERIENCE_OPTIONS } from "@/types/job";
+// 🔹 Import types strictly from API slice
+import { type CreateJobPostDto } from "@/store/api/jobsApi";
+import { EXPERIENCE_OPTIONS } from "@/types/job";
 
 interface JobDetailsStepProps {
-  data: Partial<JobPost>;
-  onChange: (data: Partial<JobPost>) => void;
+  data: Partial<CreateJobPostDto>;
+  onChange: (data: Partial<CreateJobPostDto>) => void;
 }
 
 const commonSkills = [
@@ -25,28 +27,29 @@ const commonSkills = [
   "English",
   "Hindi",
   "Driving",
-  "Cooking",
   "Sales",
   "Marketing",
   "Accounting",
-  "Computer",
   "Data Entry",
-  "Customer Service",
 ];
 
 const JobDetailsStep = ({ data, onChange }: JobDetailsStepProps) => {
   const [skillInput, setSkillInput] = useState("");
-  const skills = data.skills || [];
+  // 🔹 Use correct key 'skillsRequired' from DTO
+  const skills = data.skillsRequired || [];
 
   const addSkill = (skill: string) => {
     if (skill && !skills.includes(skill)) {
-      onChange({ ...data, skills: [...skills, skill] });
+      onChange({ ...data, skillsRequired: [...skills, skill] });
     }
     setSkillInput("");
   };
 
   const removeSkill = (skill: string) => {
-    onChange({ ...data, skills: skills.filter((s) => s !== skill) });
+    onChange({
+      ...data,
+      skillsRequired: skills.filter((s) => s !== skill),
+    });
   };
 
   return (
@@ -68,7 +71,7 @@ const JobDetailsStep = ({ data, onChange }: JobDetailsStepProps) => {
           />
           <Input
             type="number"
-            placeholder="Max salary (optional)"
+            placeholder="Max salary"
             value={data.maxSalary || ""}
             onChange={(e) =>
               onChange({ ...data, maxSalary: Number(e.target.value) })
@@ -78,28 +81,47 @@ const JobDetailsStep = ({ data, onChange }: JobDetailsStepProps) => {
         </div>
       </div>
 
-      {/* Experience */}
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-foreground">
-          Experience Required <span className="text-destructive">*</span>
-        </label>
-        <Select
-          value={data.experienceRequired}
-          onValueChange={(value) =>
-            onChange({ ...data, experienceRequired: value })
-          }
-        >
-          <SelectTrigger className="h-12">
-            <SelectValue placeholder="Select experience" />
-          </SelectTrigger>
-          <SelectContent>
-            {EXPERIENCE_OPTIONS.map((exp) => (
-              <SelectItem key={exp} value={exp}>
-                {exp}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-2 gap-4">
+        {/* Experience */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-foreground">
+            Experience <span className="text-destructive">*</span>
+          </label>
+          <Select
+            value={data.experienceRequired}
+            onValueChange={(value) =>
+              onChange({ ...data, experienceRequired: value })
+            }
+          >
+            <SelectTrigger className="h-12">
+              <SelectValue placeholder="Select" />
+            </SelectTrigger>
+            <SelectContent>
+              {EXPERIENCE_OPTIONS.map((exp) => (
+                <SelectItem key={exp} value={exp}>
+                  {exp}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Vacancies */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-foreground">
+            Vacancies <span className="text-destructive">*</span>
+          </label>
+          <Input
+            type="number"
+            min={1}
+            placeholder="No. of openings"
+            value={data.vacancies || ""}
+            onChange={(e) =>
+              onChange({ ...data, vacancies: Number(e.target.value) })
+            }
+            className="h-12"
+          />
+        </div>
       </div>
 
       {/* Skills */}

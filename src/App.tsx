@@ -38,6 +38,10 @@ import JobPostPage from "./pages/JobPostPage";
 import PropertyPage from "./pages/PropertyPage";
 import Matrimony from "./pages/matrimony";
 import TransactionHistory from "./pages/TransactionHistory";
+import JobFeedPage from "./pages/JobFeedPage";
+import JobCandidatesPage from "./pages/JobCandidatesPage";
+import RecruiterJobsPage from "./pages/RecruiterJobsPage";
+import EditJobPage from "./components/job/EditJobPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -110,6 +114,8 @@ function App() {
           <Route path="/ang-mart/:category" element={<AngMart />} />
           <Route path="/ang-service" element={<SelectServicePage />} />
           <Route path="/ang-service/:category" element={<AngService />} />
+          <Route path="/jobs/manage/:jobId" element={<JobCandidatesPage />} />
+          <Route path="/jobs/my-posts" element={<RecruiterJobsPage />} />
           <Route path="/venue-explore" element={<VenueExplore />} />
           <Route path="/entertainment" element={<SelectEntertainment />} />
           <Route
@@ -120,9 +126,11 @@ function App() {
           <Route path="/profile/:id" element={<PublicProfile />} />
           <Route path="/mchat" element={<Chat />} />
           <Route path="/friends" element={<Friends />} />
+          <Route path="/jobs/feed" element={<JobFeedPage />} />
           <Route path="/transactions" element={<TransactionHistory />} />
           <Route path="/job-profile" element={<JobProfilePage />} />
           <Route path="/post-job" element={<JobPostPage />} />
+          <Route path="/jobs/edit/:jobId" element={<EditJobPage />} />
           <Route path="/property" element={<PropertyPage />} />
           <Route path="/matrimony" element={<Matrimony />} />
         </Route>

@@ -1,12 +1,12 @@
 import type {
   AssociateCategory,
-  ExplorePost,
   ProductExploreFilters,
   ServiceExploreFilters,
   VideoExploreFilters,
 } from "@/types/associate";
 import { rootApiSlice } from "./rootApiSlice";
 import type { BusinessDetails } from "@/config/associate";
+import type { ExplorePost } from "@/types/feed";
 
 export type AssociateProfile = {
   id: string;

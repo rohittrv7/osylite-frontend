@@ -2,7 +2,7 @@ import JobProfileForm from "@/components/job/JobProfileForm";
 
 const JobProfilePage = () => {
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="bg-gradient-hero">
       {/* Hero Section */}
       <section className="pt-8 pb-4 px-4 sm:px-6 text-center">
         <div className=" mx-auto">
