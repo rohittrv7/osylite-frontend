@@ -183,9 +183,11 @@ const FeedCard = ({ post }: FeedCardProps) => {
         </div>
 
         {/* CONTENT */}
-        <CardContent className="p-3 space-y-2">
-          {post.title && (
-            <h3 className="font-semibold text-sm">{post.title}</h3>
+        <CardContent className="px-3 space-y-3">
+          {(post.title || post.caption) && (
+            <h3 className="font-semibold text-sm line-clamp-2">
+              {post.title || post.caption}
+            </h3>
           )}
 
           {/* STATS */}

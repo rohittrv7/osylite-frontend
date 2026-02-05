@@ -73,12 +73,13 @@ export interface ExplorePost {
   isPaidContent: boolean;
   isVideo: boolean;
   isLiked: boolean;
-
+  location: string | null;
+  description: string | null;
   channel: Channel;
   author: Author;
   owner: Owner;
   stats: PostStats;
-
+  isAd: boolean;
   createdAt: string;
 }
 

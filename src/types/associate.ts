@@ -374,11 +374,3 @@ export interface VideoExploreFilters {
   search?: string;
   page?: number;
 }
-
-// 🔹 Common response type
-export interface ExplorePost {
-  id: string;
-  title: string;
-  description?: string;
-  thumbnail?: string;
-}

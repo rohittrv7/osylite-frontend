@@ -1,7 +1,49 @@
+import type { JobProfileType } from "@/store/api/jobsApi";
 import type { Channel } from "./channel";
 import type { UserRole } from "./userRole";
 
 export type MembershipType = "primary_free" | "primary_paid" | "associate";
+
+export interface workHistory {
+  role: string;
+  company: string;
+  startDate: string;
+  endDate: string;
+  description?: string;
+}
+
+export interface EducationDto {
+  degree: string; // B.Tech
+  college: string; // IIT Patna
+  yearOfPassing: number;
+}
+
+export interface JobProfile {
+  id: string;
+  profileType: JobProfileType;
+
+  // Candidate Fields
+  currentJobTitle?: string;
+  totalExperienceYears?: number;
+  highestQualification?: string;
+  skills?: string[];
+  aboutMe?: string;
+  expectedSalary?: string;
+  resumeUrl?: string;
+  education?: EducationDto[];
+  workHistory?: workHistory[];
+  preferredLocations?: string[];
+
+  // Recruiter Fields
+  companyName?: string;
+  designation?: string;
+  hiringFocus?: string[];
+  hiringIndustry?: string;
+  companyWebsite?: string;
+  operatingCity?: string;
+  officialEmail?: string;
+  companyAddress?: string;
+}
 
 export interface User {
   id: string;
@@ -34,7 +76,6 @@ export interface User {
 
   otpExpiresAt: string | null;
 
-  jobProfile: unknown | null;
   matrimonyProfile: unknown | null;
   associateProfile: unknown | null;
 
@@ -51,6 +92,7 @@ export interface User {
 
   isJobProfileCreated: boolean; // True agar profile bani hai, nahi to False
   jobProfileType: string | null;
+  jobProfile?: JobProfile;
 
   createdAt: string;
   updatedAt: string;
