@@ -7,6 +7,7 @@ import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetExploreServicesQuery } from "@/store/api/associateApi";
 import JobFeedPage from "@/pages/JobFeedPage";
 import { SERVICE_CATEGORY, type ServiceCategory } from "@/types/content";
+import MatrimonyFeedPage from "./MatrimonyFeedPage";
 
 export default function AngService() {
   const location = useLocation();
@@ -17,16 +18,21 @@ export default function AngService() {
   const category = state?.category;
 
   const isJobSearch = category === SERVICE_CATEGORY.SEARCH_JOB;
+  const isMatrimonySearch = category === SERVICE_CATEGORY.MATRIMONY;
 
   const filters: ExploreFilters | typeof skipToken =
     category && !isJobSearch
-      ? { category: category as PostCategory } // Type assertion safe here because we excluded JobSearch
+      ? { category: category as PostCategory }
       : skipToken;
 
   const { data: posts = [], isLoading } = useGetExploreServicesQuery(filters);
 
   if (isJobSearch) {
     return <JobFeedPage />;
+  }
+
+  if (isMatrimonySearch) {
+    return <MatrimonyFeedPage />;
   }
 
   return (

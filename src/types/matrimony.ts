@@ -1,22 +1,37 @@
+import type { User } from "./user";
+
+export interface MatrimonyFilterDto {
+  gender?: string;
+  state?: string;
+  city?: string;
+  religion?: string;
+  caste?: string;
+  minIncome?: string; // Changed to string to match your frontend dropdown values, or keep number if backend parses it
+  minAge?: number;
+  maxAge?: number;
+}
+
 export const Gender = {
-  MALE: "MALE",
-  FEMALE: "FEMALE",
+  MALE: "Male",
+  FEMALE: "Female",
 } as const;
 export type Gender = (typeof Gender)[keyof typeof Gender];
 
 export const ProfileCreatedFor = {
-  SELF: "SELF",
-  SON: "SON",
-  DAUGHTER: "DAUGHTER",
-  BROTHER: "BROTHER",
-  SISTER: "SISTER",
-  FRIEND: "FRIEND",
-  RELATIVE: "RELATIVE",
+  SELF: "Self",
+  SON: "Son",
+  DAUGHTER: "Daughter",
+  BROTHER: "Brother",
+  SISTER: "Ssister",
+  FRIEND: "Freind",
+  // RELATIVE: "RELATIVE",
 } as const;
 export type ProfileCreatedFor =
   (typeof ProfileCreatedFor)[keyof typeof ProfileCreatedFor];
 
 export interface MatrimonyProfile {
+  id?: string;
+  user?: User;
   profileFor: ProfileCreatedFor;
   gender: Gender;
   dob: string;
@@ -27,9 +42,10 @@ export interface MatrimonyProfile {
   city: string;
   education: string;
   occupation: string;
-  annualIncome?: number;
+  annualIncome?: string;
   photos?: string[];
   bio?: string;
+  isActive?: boolean;
 }
 
 export const RELIGIONS = [

@@ -1,4 +1,10 @@
-export type PostType = "post" | "video" | "reel" | "avatar" | "raw";
+export type PostType =
+  | "post"
+  | "video"
+  | "reel"
+  | "avatar"
+  | "raw"
+  | "matrimony";
 
 export const getFolderByPostType = (postType: PostType) => {
   switch (postType) {
