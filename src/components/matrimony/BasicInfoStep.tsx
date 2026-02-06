@@ -2,7 +2,11 @@ import { User, Users, Calendar } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Gender, ProfileCreatedFor, type MatrimonyProfile } from "@/types/matrimony";
+import {
+  Gender,
+  ProfileCreatedFor,
+  type MatrimonyProfile,
+} from "@/types/matrimony";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
 interface BasicInfoStepProps {
@@ -17,7 +21,6 @@ const profileForOptions = [
   { value: ProfileCreatedFor.BROTHER, label: "Brother", icon: Users },
   { value: ProfileCreatedFor.SISTER, label: "Sister", icon: Users },
   { value: ProfileCreatedFor.FRIEND, label: "Friend", icon: Users },
-  { value: ProfileCreatedFor.RELATIVE, label: "Relative", icon: Users },
 ];
 
 const BasicInfoStep = ({ formData, updateFormData }: BasicInfoStepProps) => {

@@ -90,9 +90,10 @@ export interface User {
   isChannelCreated: boolean;
   channelHandle: string | null;
 
-  isJobProfileCreated: boolean; // True agar profile bani hai, nahi to False
+  isJobProfileCreated: boolean;
   jobProfileType: string | null;
   jobProfile?: JobProfile;
+  isMatrimonyProfile?: boolean;
 
   createdAt: string;
   updatedAt: string;

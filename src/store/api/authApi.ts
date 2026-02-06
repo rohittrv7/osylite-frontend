@@ -66,7 +66,7 @@ export const authApi = rootApiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Auth"],
     }),
-    
+
     applyAssociate: builder.mutation<
       { success: true; id: string },
       AssociateApplyPayload
@@ -89,7 +89,7 @@ export const authApi = rootApiSlice.injectEndpoints({
 
     getProfile: builder.query<User, void>({
       query: () => "/users/me",
-      providesTags: ["Profile"],
+      providesTags: ["Profile", "MatrimonyProfile", "MatrimonyFeed", "JobFeed"],
     }),
 
     updateAvatar: builder.mutation<void, { avatarUrl: string | null }>({

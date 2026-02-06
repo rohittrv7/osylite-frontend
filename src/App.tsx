@@ -42,6 +42,7 @@ import JobFeedPage from "./pages/JobFeedPage";
 import JobCandidatesPage from "./pages/JobCandidatesPage";
 import RecruiterJobsPage from "./pages/RecruiterJobsPage";
 import EditJobPage from "./components/job/EditJobPage";
+import MatrimonyProfileDetails from "./components/matrimony/MatrimonyProfileDetails";
 
 function App() {
   const dispatch = useDispatch();
@@ -133,6 +134,10 @@ function App() {
           <Route path="/jobs/edit/:jobId" element={<EditJobPage />} />
           <Route path="/property" element={<PropertyPage />} />
           <Route path="/matrimony" element={<Matrimony />} />
+          <Route
+            path="/matrimony/profile/:id"
+            element={<MatrimonyProfileDetails />}
+          />
         </Route>
 
         <Route path="*" element={<Navigate to="/mlife" replace />} />

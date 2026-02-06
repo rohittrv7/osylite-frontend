@@ -101,5 +101,7 @@ export const rootApiSlice = createApi({
     "Applicants",
     "Comments",
     "PostFeed",
+    "MatrimonyProfile",
+    "MatrimonyFeed",
   ],
 });
