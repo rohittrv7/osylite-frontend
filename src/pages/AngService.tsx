@@ -2,12 +2,12 @@ import MasonryFeed from "@/components/MasonryFeed";
 import { Loader2 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import type { ExploreFilters, PostCategory } from "@/types/post";
-// import { SERVICE_CATEGORY, type ServiceCategory } from "@/types/service"; // 👈 Ensure correct import path for SERVICE_CATEGORY
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetExploreServicesQuery } from "@/store/api/associateApi";
 import JobFeedPage from "@/pages/JobFeedPage";
 import { SERVICE_CATEGORY, type ServiceCategory } from "@/types/content";
 import MatrimonyFeedPage from "./MatrimonyFeedPage";
+import Index from "./property/Index";
 
 export default function AngService() {
   const location = useLocation();
@@ -19,6 +19,7 @@ export default function AngService() {
 
   const isJobSearch = category === SERVICE_CATEGORY.SEARCH_JOB;
   const isMatrimonySearch = category === SERVICE_CATEGORY.MATRIMONY;
+  const isProperty = category === SERVICE_CATEGORY.PROPERTY;
 
   const filters: ExploreFilters | typeof skipToken =
     category && !isJobSearch
@@ -33,6 +34,10 @@ export default function AngService() {
 
   if (isMatrimonySearch) {
     return <MatrimonyFeedPage />;
+  }
+
+  if (isProperty) {
+    return <Index />;
   }
 
   return (

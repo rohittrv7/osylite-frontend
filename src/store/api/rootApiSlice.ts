@@ -103,5 +103,10 @@ export const rootApiSlice = createApi({
     "PostFeed",
     "MatrimonyProfile",
     "MatrimonyFeed",
+    "Leads",
+    "Wishlist",
+    "MyAds",
+    "Properties",
+    ""
   ],
 });

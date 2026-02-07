@@ -10,11 +10,11 @@ import { useDispatch } from "react-redux";
 import { clearAuth, setUser } from "@/store/slices/authSlice";
 
 import HomePage from "./pages/home/MainPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/Register";
-import OTPVerificationPage from "./pages/OtpVerification";
-import ForgotPassword from "./pages/ForgotPage";
-import ResetPasswordPage from "./pages/ResetPassword";
+import LoginPage from "./pages/auth/LoginPage";
+import RegisterPage from "./pages/auth/Register";
+import OTPVerificationPage from "./pages/auth/OtpVerification";
+import ForgotPassword from "./pages/auth/ForgotPage";
+import ResetPasswordPage from "./pages/auth/ResetPassword";
 import Dashboard from "./pages/DashboardPage";
 import HomeSections from "./pages/HomeSections";
 import ProfilePage from "./pages/Profile";
@@ -35,7 +35,6 @@ import { Loader2 } from "lucide-react";
 import Friends from "./pages/Friends";
 import JobProfilePage from "./pages/JobProfilePage";
 import JobPostPage from "./pages/JobPostPage";
-import PropertyPage from "./pages/PropertyPage";
 import Matrimony from "./pages/matrimony";
 import TransactionHistory from "./pages/TransactionHistory";
 import JobFeedPage from "./pages/JobFeedPage";
@@ -43,6 +42,10 @@ import JobCandidatesPage from "./pages/JobCandidatesPage";
 import RecruiterJobsPage from "./pages/RecruiterJobsPage";
 import EditJobPage from "./components/job/EditJobPage";
 import MatrimonyProfileDetails from "./components/matrimony/MatrimonyProfileDetails";
+import PropertyDetails from "./pages/property/PropertyDetails";
+import PostProperty from "./pages/property/PostProperty";
+import SavedProperties from "./pages/property/SavedProperties";
+import PropertyFeed from "./pages/property/PropertyFeed";
 
 function App() {
   const dispatch = useDispatch();
@@ -132,12 +135,17 @@ function App() {
           <Route path="/job-profile" element={<JobProfilePage />} />
           <Route path="/post-job" element={<JobPostPage />} />
           <Route path="/jobs/edit/:jobId" element={<EditJobPage />} />
-          <Route path="/property" element={<PropertyPage />} />
           <Route path="/matrimony" element={<Matrimony />} />
           <Route
             path="/matrimony/profile/:id"
             element={<MatrimonyProfileDetails />}
           />
+
+          {/* <Route path="/property-feed" element={<Index />} /> */}
+          <Route path="/property/:id" element={<PropertyDetails />} />
+          <Route path="/post-property/:id?" element={<PostProperty />} />
+          <Route path="/property" element={<PropertyFeed />} />
+          <Route path="/saved" element={<SavedProperties />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/mlife" replace />} />
