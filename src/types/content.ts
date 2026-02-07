@@ -201,6 +201,7 @@ export const SERVICE_CATEGORY = {
   PATHOLOGY_SERVICES: "Pathology Services",
   BANKING_SERVICES: "Banking Services",
   CATERING_COOKING: "Catering & Cooking",
+  PROPERTY: "Property"
 } as const;
 
 export type ServiceCategory =
@@ -309,6 +310,12 @@ export const SERVICE_CATEGORY_OPTIONS = [
     label: "Matrimony",
     image:
       "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=500&q=80",
+  },
+  {
+    value: SERVICE_CATEGORY.PROPERTY,
+    label: "Property",
+    image:
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?q=80&w=1174",
   },
   {
     value: SERVICE_CATEGORY.SOFTWARE_DEVELOPMENT,

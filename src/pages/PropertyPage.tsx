@@ -1,5 +1,3 @@
-import PropertyForm from "@/components/property/PropertyForm";
-
 const PropertyPage = () => {
   return (
     <div className="min-h-screen bg-gradient-hero">
@@ -41,7 +39,7 @@ const PropertyPage = () => {
 
       {/* Form Section */}
       <section className="py-8 px-4 sm:px-6">
-        <PropertyForm />
+        {/* <PropertyForm /> */}
       </section>
     </div>
   );
