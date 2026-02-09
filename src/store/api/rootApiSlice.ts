@@ -107,6 +107,8 @@ export const rootApiSlice = createApi({
     "Wishlist",
     "MyAds",
     "Properties",
-    ""
+    "Wallet",
+    "History",
+    "BankAccounts",
   ],
 });

@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "./components/theme-provider";
-import { ProtectedRoute } from "./components/ProtectedRoute";
-import PublicRoute from "./components/PublicRoute";
+import { ProtectedRoute } from "./components/routes/ProtectedRoute";
+import PublicRoute from "./components/routes/PublicRoute";
 import MainLayout from "./layout/MainLayout";
 import { useGetProfileQuery } from "@/store/api/authApi";
 import { useDispatch } from "react-redux";
@@ -46,6 +46,10 @@ import PropertyDetails from "./pages/property/PropertyDetails";
 import PostProperty from "./pages/property/PostProperty";
 import SavedProperties from "./pages/property/SavedProperties";
 import PropertyFeed from "./pages/property/PropertyFeed";
+import Settings from "./pages/wallet/Settings";
+import BuyCoins from "./pages/wallet/BuyCoins";
+import Withdraw from "./pages/wallet/Withdraw";
+import WalletHome from "./pages/wallet/WalletHome";
 
 function App() {
   const dispatch = useDispatch();
@@ -146,6 +150,11 @@ function App() {
           <Route path="/post-property/:id?" element={<PostProperty />} />
           <Route path="/property" element={<PropertyFeed />} />
           <Route path="/saved" element={<SavedProperties />} />
+          <Route path="/wallet" element={<WalletHome />} />
+          <Route path="/buy-coins" element={<BuyCoins />} />
+          <Route path="/withdraw" element={<Withdraw />} />
+          {/* <Route path="/history" element={<TransactionHistory />} /> */}
+          <Route path="/settings" element={<Settings />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/mlife" replace />} />
