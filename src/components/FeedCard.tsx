@@ -1,24 +1,20 @@
 import { useState } from "react";
-import {
-  Eye,
-  Heart,
-  MessageCircle,
-  Share2,
-  Send,
-  MessageSquare,
-  IndianRupee,
-  MapPin,
-} from "lucide-react";
+import { IndianRupee, MapPin, Star, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import type { ExplorePost } from "@/types/feed";
 import { MediaGrid } from "./ang-mart/MediaGrid";
 import { PostModal } from "./ang-mart/PostModal";
-import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
+import { useRatePostMutation } from "@/store/api/associateApi";
 
 interface FeedCardProps {
   post: ExplorePost;
@@ -26,13 +22,6 @@ interface FeedCardProps {
 }
 
 const FeedCard = ({ post, viewMode = "grid" }: FeedCardProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [commentText, setCommentText] = useState("");
-  const [liked, setLiked] = useState(post.isLiked);
-  const [likesCount, setLikesCount] = useState(post.likesCount);
-  const [viewsCount, setViewsCount] = useState(post.viewsCount);
-  const [showCommentInput, setShowCommentInput] = useState(false);
-  const navigate = useNavigate();
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     initialIndex: number;
@@ -41,29 +30,58 @@ const FeedCard = ({ post, viewMode = "grid" }: FeedCardProps) => {
     initialIndex: 0,
   });
 
-  const formatCount = (num: number): string => {
-    if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
-    if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
-    return num.toString();
-  };
+  const [ratingOpen, setRatingOpen] = useState(false);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const [ratePost, { isLoading: isRating }] = useRatePostMutation();
 
   const mediaList = [post.fileUrl];
 
-  const handleLike = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setLiked(!liked);
-    setLikesCount((prev) => (liked ? prev - 1 : prev + 1));
-  };
+  // Use the myRating from backend (or 0 if not rated)
+  const userRating = post.myRating || 0;
 
   const handleMediaClick = (_url: string, index: number) => {
-    setViewsCount((prev) => prev + 1);
     setModalState({ isOpen: true, initialIndex: index });
   };
 
-  const handleCommentSubmit = () => {
-    if (!commentText.trim()) return;
-    setCommentText("");
-    setShowCommentInput(false);
+  const handleRate = async (value: number) => {
+    try {
+      await ratePost({ postId: post.id, value }).unwrap();
+      toast.success(`You rated this ${value} stars!`);
+      setRatingOpen(false);
+    } catch (error) {
+      apiErrorToastHandler(error);
+    }
+  };
+
+  const renderDisplayRating = (rating: number, count: number) => {
+    if (count === 0) {
+      return (
+        <div className="flex items-center gap-1 bg-muted/50 px-2 py-1 rounded-[4px] border border-border w-fit mt-1 cursor-pointer hover:bg-muted">
+          <span className="text-[10px] text-muted-foreground font-medium">
+            Rate
+          </span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-2 mt-1">
+        {/* Global Average Badge */}
+        <div className="flex items-center gap-1 bg-green-700 px-1.5 py-0.5 rounded-[4px] shadow-sm cursor-pointer hover:bg-green-800 transition-colors">
+          <span className="text-xs font-bold text-white leading-none mb-[1px]">
+            {rating.toFixed(1)}
+          </span>
+          <Star className="w-3 h-3 fill-white text-white" />
+        </div>
+
+        {/* Total Count */}
+        <span className="text-[11px] text-muted-foreground font-medium">
+          ({count})
+        </span>
+      </div>
+    );
   };
 
   return (
@@ -75,8 +93,7 @@ const FeedCard = ({ post, viewMode = "grid" }: FeedCardProps) => {
           post.isAd && "ring-1 ring-primary/20",
         )}
       >
-        {/* Header */}
-        <CardHeader className="px-3 py-0">
+        <CardHeader className="px-3 py-2">
           <div className="flex items-center gap-2.5">
             <Avatar className="w-8 h-8 ring-2 ring-background">
               <AvatarImage
@@ -97,7 +114,7 @@ const FeedCard = ({ post, viewMode = "grid" }: FeedCardProps) => {
             </div>
           </div>
         </CardHeader>
-        {/* Media Section */}
+
         <div
           className={cn(
             "relative overflow-hidden",
@@ -112,11 +129,9 @@ const FeedCard = ({ post, viewMode = "grid" }: FeedCardProps) => {
             mediaUrls={mediaList}
             type={post.type}
             onMediaClick={handleMediaClick}
-            // compact={viewMode === "list"}
           />
         </div>
 
-        {/* Content Section */}
         <div
           className={cn(
             "flex flex-col flex-1",
@@ -124,129 +139,107 @@ const FeedCard = ({ post, viewMode = "grid" }: FeedCardProps) => {
           )}
         >
           <CardContent className="p-3 pt-2 flex flex-col gap-2.5">
-            {/* Title & Description */}
             {post.title && (
               <div>
-                <h2 className="flex gap-1 items-center">
-                  <IndianRupee className="w-4 h-4" />
-                  {post.price || 0}
-                </h2>
-                <h4 className="font-semibold text-sm leading-snug line-clamp-2">
-                  {post.title ?? post.caption}
-                  {post.description && (
-                    <div className="space-y-0.5">
-                      <p
-                        className={cn(
-                          "text-xs text-muted-foreground leading-relaxed transition-all",
-                          !isExpanded && "line-clamp-2",
+                <div className="flex justify-between items-start">
+                  <h2 className="flex font-bold gap-1 items-center text-primary text-lg">
+                    <IndianRupee className="w-4 h-4" />
+                    {post.price || 0}
+                  </h2>
+
+                  {/* Rating Popover */}
+                  <Popover open={ratingOpen} onOpenChange={setRatingOpen}>
+                    <PopoverTrigger asChild>
+                      <button className="outline-none hover:opacity-80 transition-opacity">
+                        {renderDisplayRating(
+                          post.averageRating || 0,
+                          post.totalRatings || 0,
                         )}
-                      >
-                        {post.description}
-                      </p>
-                      {post.description.length > 80 && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setIsExpanded(!isExpanded);
-                          }}
-                          className="text-[10px] font-bold text-primary hover:underline"
-                        >
-                          {isExpanded ? "Show less" : "Show more"}
-                        </button>
-                      )}
-                    </div>
-                  )}
-                  {/* {post.description} */}
-                </h4>
-                <h4 className="font-semibold flex gap-1 items-center text-accent-foreground text-sm leading-snug line-clamp-2">
-                  <MapPin className="h-4 w-4" />
-                  {post.location || ""}
-                </h4>
-              </div>
-            )}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-3" align="end">
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-xs font-medium text-muted-foreground">
+                          {userRating > 0 ? "Your rating" : "Rate this post"}
+                        </span>
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => {
+                            const isFilled =
+                              star <= (hoverRating || userRating);
 
-            {/* Stats Bar */}
-            <div className="flex items-center gap-4 py-2 text-xs text-muted-foreground border-y">
-              <span className="flex items-center gap-1.5">
-                <Eye className="w-3.5 h-3.5" />
-                {formatCount(viewsCount)}
-              </span>
-              <button
-                onClick={handleLike}
-                className={cn(
-                  "flex items-center gap-1.5 transition-colors",
-                  liked && "text-destructive",
+                            return (
+                              <button
+                                key={star}
+                                type="button"
+                                className="focus:outline-none transition-transform hover:scale-110 active:scale-95"
+                                onMouseEnter={() => setHoverRating(star)}
+                                onMouseLeave={() => setHoverRating(0)}
+                                onClick={() => handleRate(star)}
+                                disabled={isRating}
+                              >
+                                <Star
+                                  className={cn(
+                                    "w-6 h-6 transition-colors",
+                                    isFilled
+                                      ? "fill-yellow-400 text-yellow-400"
+                                      : "text-muted-foreground/30",
+                                  )}
+                                />
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {isRating && (
+                          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            Submitting...
+                          </div>
+                        )}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <h4 className="font-medium text-sm leading-snug line-clamp-2 mt-1">
+                  {post.title ?? post.caption}
+                </h4>
+
+                {post.location && (
+                  <h4 className="font-normal flex gap-1 items-center text-muted-foreground text-xs leading-snug line-clamp-1 mt-1">
+                    <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                    {post.location}
+                  </h4>
                 )}
-              >
-                <Heart className={cn("w-3.5 h-3.5", liked && "fill-current")} />
-                {formatCount(likesCount)}
-              </button>
-              <button
-                className="flex items-center gap-1.5 hover:text-foreground transition-colors"
-                onClick={() => setModalState({ isOpen: true, initialIndex: 0 })}
-              >
-                <MessageCircle className="w-3.5 h-3.5" />
-                {formatCount(post.commentsCount ?? 0)}
-              </button>
-              <button className="hover:text-foreground transition-colors ml-auto">
-                <Share2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            {/* Comment Section */}
-            {showCommentInput && !post.isAd && (
-              <div className="flex gap-2 animate-fade-in">
-                <Input
-                  placeholder="Add a comment..."
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleCommentSubmit()}
-                  className="text-xs h-9 rounded-xl bg-muted/50 border-0 focus-visible:ring-1"
-                />
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-9 w-9 rounded-xl shrink-0"
-                  disabled={!commentText.trim()}
-                  onClick={handleCommentSubmit}
-                >
-                  <Send className="h-3.5 w-3.5" />
-                </Button>
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2">
-              {!post.isAd && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="flex-1 h-9 rounded-xl text-xs gap-1.5 hover:bg-muted"
-                  onClick={() => setShowCommentInput(!showCommentInput)}
+            {post.description && (
+              <div className="space-y-0.5">
+                <p
+                  className={cn(
+                    "text-xs text-muted-foreground leading-relaxed transition-all",
+                    !isExpanded && "line-clamp-2",
+                  )}
                 >
-                  <MessageSquare className="w-3.5 h-3.5" />
-                  Comment
-                </Button>
-              )}
-              <Button
-                size="sm"
-                variant="outline"
-                className="flex-1 h-9 rounded-md text-xs border-primary/30 text-primary hover:bg-accent"
-                onClick={() => navigate(`/mchat/${post.channel.user.id}`)}
-              >
-                MChat
-              </Button>
-              {post.isEnquiryPost && (
-                <Button size="sm" className="flex-1 h-9 rounded-md text-xs">
-                  {post.ctaLabel || "Enquiry"}
-                </Button>
-              )}
-            </div>
+                  {post.description}
+                </p>
+                {post.description.length > 80 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsExpanded(!isExpanded);
+                    }}
+                    className="text-[10px] font-bold text-primary hover:underline"
+                  >
+                    {isExpanded ? "Show less" : "Show more"}
+                  </button>
+                )}
+              </div>
+            )}
           </CardContent>
         </div>
       </Card>
 
-      {/* Modal */}
       {modalState.isOpen && (
         <PostModal
           post={post}

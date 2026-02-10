@@ -64,17 +64,20 @@ export interface ExplorePost {
   price: string;
 
   isEnquiryPost: boolean;
-  ctaLabel: string | null;
+  ctaLabel: string[];
 
   likesCount: number;
   commentsCount: number;
   viewsCount: number;
-
+  averageRating: number;
+  totalRatings: number;
   isPaidContent: boolean;
   isVideo: boolean;
   isLiked: boolean;
   location: string | null;
   description: string | null;
+  isRated: boolean;
+  myRating: number;
   channel: Channel;
   author: Author;
   owner: Owner;

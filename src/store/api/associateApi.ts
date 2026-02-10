@@ -40,9 +40,18 @@ export const associateApi = rootApiSlice.injectEndpoints({
     >({
       query: (filters) => ({
         url: "/posts/products",
-        ...(filters ? { params: filters } : {}),
+        params: filters,
       }),
-      providesTags: ["ExploreProducts"],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ id }) => ({
+                type: "ExploreProducts" as const,
+                id,
+              })),
+              { type: "ExploreProducts", id: "LIST" },
+            ]
+          : [{ type: "ExploreProducts", id: "LIST" }],
     }),
 
     getExploreServices: builder.query<
@@ -51,9 +60,32 @@ export const associateApi = rootApiSlice.injectEndpoints({
     >({
       query: (filters) => ({
         url: "/posts/services",
-        ...(filters ? { params: filters } : {}),
+        params: filters,
       }),
-      providesTags: ["ExploreServices"],
+      providesTags: (result) =>
+        result
+          ? [
+              ...result.map(({ id }) => ({
+                type: "ExploreServices" as const,
+                id,
+              })),
+              { type: "ExploreServices", id: "LIST" },
+            ]
+          : [{ type: "ExploreServices", id: "LIST" }],
+    }),
+
+    ratePost: builder.mutation<void, { postId: string; value: number }>({
+      query: ({ postId, value }) => ({
+        url: `/posts/${postId}/rate`,
+        method: "POST",
+        body: { value },
+      }),
+      invalidatesTags: (_result, _error, { postId }) => [
+        { type: "ExploreProducts", id: postId }, // Sirf specific product update hoga
+        { type: "ExploreServices", id: postId }, // Sirf specific service update hogi
+        { type: "Post", id: postId }, // Detail page update hoga
+        "PostFeed", // Home feed update hoga (general tag)
+      ],
     }),
 
     getExploreVideos: builder.query<
@@ -74,4 +106,5 @@ export const {
   useGetExploreProductsQuery,
   useGetExploreServicesQuery,
   useGetExploreVideosQuery,
+  useRatePostMutation,
 } = associateApi;
