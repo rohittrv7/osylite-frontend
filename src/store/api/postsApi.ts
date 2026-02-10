@@ -216,7 +216,6 @@ export const postsApi = rootApiSlice.injectEndpoints({
       }),
     }),
 
-
     // Public Feed
     getPublicFeed: builder.query<ExplorePost[], any>({
       query: (params) => ({
@@ -226,6 +225,8 @@ export const postsApi = rootApiSlice.injectEndpoints({
       }),
       providesTags: ["PostFeed"],
     }),
+
+    
   }),
 });
 
