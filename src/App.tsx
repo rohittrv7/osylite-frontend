@@ -50,6 +50,9 @@ import Settings from "./pages/wallet/Settings";
 import BuyCoins from "./pages/wallet/BuyCoins";
 import Withdraw from "./pages/wallet/Withdraw";
 import WalletHome from "./pages/wallet/WalletHome";
+import PostDetailsPage from "./pages/PostDetailsPage";
+import { AssociatesList } from "./pages/AssociatesList";
+import AssociateProfile from "./pages/AssociateProfile";
 
 function App() {
   const dispatch = useDispatch();
@@ -119,10 +122,7 @@ function App() {
           <Route path="/home" element={<HomeSections />} />
           <Route path="/mlife" element={<ExploreFeed />} />
           <Route path="/ang-mart" element={<SelectCategoryPage />} />
-          <Route path="/ang-mart/:category" element={<AngMart />} />
           <Route path="/ang-service" element={<SelectServicePage />} />
-          <Route path="/ang-service/:category" element={<AngService />} />
-          <Route path="/jobs/manage/:jobId" element={<JobCandidatesPage />} />
           <Route path="/jobs/my-posts" element={<RecruiterJobsPage />} />
           <Route path="/venue-explore" element={<VenueExplore />} />
           <Route path="/entertainment" element={<SelectEntertainment />} />
@@ -131,19 +131,13 @@ function App() {
             element={<EntertainMentPage />}
           />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/profile/:id" element={<PublicProfile />} />
           <Route path="/mchat" element={<Chat />} />
           <Route path="/friends" element={<Friends />} />
           <Route path="/jobs/feed" element={<JobFeedPage />} />
           <Route path="/transactions" element={<TransactionHistory />} />
           <Route path="/job-profile" element={<JobProfilePage />} />
           <Route path="/post-job" element={<JobPostPage />} />
-          <Route path="/jobs/edit/:jobId" element={<EditJobPage />} />
           <Route path="/matrimony" element={<Matrimony />} />
-          <Route
-            path="/matrimony/profile/:id"
-            element={<MatrimonyProfileDetails />}
-          />
 
           {/* <Route path="/property-feed" element={<Index />} /> */}
           <Route path="/property/:id" element={<PropertyDetails />} />
@@ -155,6 +149,40 @@ function App() {
           <Route path="/withdraw" element={<Withdraw />} />
           {/* <Route path="/history" element={<TransactionHistory />} /> */}
           <Route path="/settings" element={<Settings />} />
+          <Route path="/post/:id" element={<PostDetailsPage />} />
+          <Route path="/profile/:id" element={<PublicProfile />} />
+
+          {/* ==========================
+          2. Marketplace & Services
+      ========================== */}
+          <Route path="/ang-mart/:category" element={<AngMart />} />
+          <Route path="/ang-service/:category" element={<AngService />} />
+
+          {/* ==========================
+          3. Venue / Associates Flow
+      ========================== */}
+          {/* Step 1: Explore Grid (Landing) */}
+          <Route path="/venue-explore" element={<VenueExplore />} />
+
+          {/* Step 2: Listing by Category (e.g. /associates/gym_owner) */}
+          <Route path="/venue-explore/:category" element={<AssociatesList />} />
+
+          {/* Step 3: Single Associate Profile (e.g. /associate/123) */}
+          <Route path="/associate/:id" element={<AssociateProfile />} />
+
+          {/* ==========================
+          4. Jobs Module
+      ========================== */}
+          <Route path="/jobs/manage/:jobId" element={<JobCandidatesPage />} />
+          <Route path="/jobs/edit/:jobId" element={<EditJobPage />} />
+
+          {/* ==========================
+          5. Matrimony
+      ========================== */}
+          <Route
+            path="/matrimony/profile/:id"
+            element={<MatrimonyProfileDetails />}
+          />
         </Route>
 
         <Route path="*" element={<Navigate to="/mlife" replace />} />
