@@ -7,11 +7,17 @@ import type {
 import { rootApiSlice } from "./rootApiSlice";
 import type { BusinessDetails } from "@/config/associate";
 import type { ExplorePost } from "@/types/feed";
+import type { AssociateProfileResponse } from "@/types/associateProfile";
 
 export type AssociateProfile = {
   id: string;
   userId: string;
   category: AssociateCategory;
+  avatarUrl: string;
+  firstName: string;
+  lastName: string;
+  locality: string;
+  rating: string;
   subCategory?: string;
   businessName: string;
   address: string;
@@ -19,11 +25,39 @@ export type AssociateProfile = {
   state: string;
   latitude?: number;
   longitude?: number;
+  isVerified: boolean;
   businessDetails?: BusinessDetails;
   status: "pending" | "approved" | "rejected";
   createdAt: string;
   updatedAt: string;
 };
+
+export interface VenueProfile {
+  id: string;
+  category: string;
+  businessName: string;
+  address: string;
+  city: string;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
+  isVerified?: boolean;
+  rating?: number;
+  user?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatarUrl?: string | null;
+  };
+}
+
+export interface GetAssociatesFilterDto {
+  category?: string;
+  city?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}
 
 export const associateApi = rootApiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -32,6 +66,23 @@ export const associateApi = rootApiSlice.injectEndpoints({
         url: "/associates/me",
         method: "GET",
       }),
+    }),
+
+    getAssociatesByCategory: builder.query<
+      VenueProfile[],
+      GetAssociatesFilterDto
+    >({
+      query: (params) => ({
+        url: "/associates/filter",
+        params,
+      }),
+      providesTags: ["Associates"],
+    }),
+
+    // Get Single Associate Profile (for the next page)
+    getAssociateProfile: builder.query<AssociateProfileResponse, string>({
+      query: (id) => `/associates/${id}/profile`, // Adjust endpoint as per your backend
+      providesTags: ["Associates"],
     }),
 
     getExploreProducts: builder.query<
@@ -107,4 +158,6 @@ export const {
   useGetExploreServicesQuery,
   useGetExploreVideosQuery,
   useRatePostMutation,
+  useGetAssociateProfileQuery,
+  useGetAssociatesByCategoryQuery,
 } = associateApi;

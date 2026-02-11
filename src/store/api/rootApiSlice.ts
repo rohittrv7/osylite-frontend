@@ -110,5 +110,7 @@ export const rootApiSlice = createApi({
     "Wallet",
     "History",
     "BankAccounts",
+    "PostDetail",
+    "Associates",
   ],
 });

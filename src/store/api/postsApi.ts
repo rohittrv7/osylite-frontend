@@ -59,6 +59,13 @@ export const postsApi = rootApiSlice.injectEndpoints({
       providesTags: ["UserPosts"],
     }),
 
+    getPostById: builder.query<ExplorePost, string>({
+      query: (id) => ({
+        url: `/posts/${id}`,
+      }),
+      providesTags: ["Post"],
+    }),
+
     getMyFollowers: builder.query<FollowUser[], void>({
       query: () => "/connections/followers",
       providesTags: ["Followers"],
@@ -225,8 +232,6 @@ export const postsApi = rootApiSlice.injectEndpoints({
       }),
       providesTags: ["PostFeed"],
     }),
-
-    
   }),
 });
 
@@ -252,4 +257,5 @@ export const {
   useIncrementViewMutation,
   useIncrementShareMutation,
   useGetPublicFeedQuery,
+  useGetPostByIdQuery,
 } = postsApi;

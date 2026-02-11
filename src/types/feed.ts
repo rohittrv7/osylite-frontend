@@ -50,6 +50,19 @@ export interface PostStats {
 
 // Main Post (ExplorePost)
 
+export const PostCTA = {
+  BUY_NOW: "Buy Now",
+  BOOKING: "Booking",
+  ENQUIRY: "Enquiry",
+  PARTICIPATE: "Participate",
+  APPLY: "Apply",
+  CHAT: "Chat",
+  CALL: "Call",
+  OFFICE: "Office",
+};
+
+export type PostCTA = (typeof PostCTA)[keyof typeof PostCTA];
+
 export interface ExplorePost {
   id: string;
   title: string;
