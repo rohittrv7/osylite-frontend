@@ -96,12 +96,13 @@ export const PostModal = ({
 
   if (!post) return null;
 
-  // --- DATA PREP ---
-  const mediaList = [post.fileUrl];
-  const currentUrl = mediaList[currentIndex] ?? "";
+  // --- DATA PREP (FIXED TS ERRORS) ---
+  const mediaList = Array.isArray(post.fileUrl) ? post.fileUrl : [post.fileUrl];
+  const currentUrl = (mediaList[currentIndex] as string) || "";
 
   const isVideo =
-    /\.(mp4|webm|mov|m4v)$/i.test(currentUrl) ||
+    (typeof currentUrl === "string" &&
+      /\.(mp4|webm|mov|m4v)$/i.test(currentUrl)) ||
     post.type === "video" ||
     post.type === "reel";
 
@@ -160,12 +161,11 @@ export const PostModal = ({
       <DialogContent className="max-w-[95vw] lg:max-w-6xl w-full h-[95vh] sm:h-[90vh] p-0 border-0 rounded-2xl overflow-hidden bg-modal shadow-2xl shadow-black/50 flex flex-col md:flex-row animate-scale-in">
         <DialogTitle className="sr-only">Post View</DialogTitle>
 
-        {/* --- LEFT: Media Section (Takes remaining space) --- */}
+        {/* --- LEFT: Media Section --- */}
         <div
           className="relative flex-1 bg-black flex items-center justify-center overflow-hidden group min-h-[40vh] md:min-h-full"
           onDoubleClick={handleDoubleClick}
         >
-          {/* Mobile close button */}
           {isMobile && (
             <button
               onClick={onClose}
@@ -212,7 +212,6 @@ export const PostModal = ({
             </>
           )}
 
-          {/* Media container */}
           <div className="relative w-full h-full flex items-center justify-center bg-black">
             {isVideo ? (
               <video
@@ -233,7 +232,6 @@ export const PostModal = ({
               />
             )}
 
-            {/* Double-tap like animation */}
             {showLikeAnimation && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <Heart
@@ -243,7 +241,6 @@ export const PostModal = ({
               </div>
             )}
 
-            {/* Video controls */}
             {isVideo && (
               <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <button
@@ -281,9 +278,8 @@ export const PostModal = ({
           </div>
         </div>
 
-        {/* --- RIGHT: Info & Comments Panel (Fixed Width on Desktop) --- */}
+        {/* --- RIGHT: Info & Comments Panel --- */}
         <div className="w-full md:w-[380px] lg:w-[420px] bg-white dark:bg-zinc-950 flex flex-col h-[50vh] md:h-full border-l border-modal-border">
-          {/* 1. Header (Fixed) */}
           <div className="flex shrink-0 items-center justify-between px-4 pr-16 py-3.5 border-b border-modal-border">
             <div
               className="flex items-center gap-3 cursor-pointer"
@@ -309,7 +305,6 @@ export const PostModal = ({
               </div>
             </div>
 
-            {/* Price Badge in Header for visibility */}
             {post.price && (
               <div className="flex items-center text-primary font-bold bg-primary/10 px-2 py-1 rounded">
                 <IndianRupee className="w-3.5 h-3.5" />
@@ -318,10 +313,8 @@ export const PostModal = ({
             )}
           </div>
 
-          {/* 2. Scrollable Area (Description + Comments) */}
           <ScrollArea className="flex-1 px-4 overflow-y-auto">
             <div className="py-4 space-y-5">
-              {/* --- Post Description Section (Moved Inside ScrollArea) --- */}
               <div className="space-y-2 border-b pb-4">
                 {post.title && (
                   <h3 className="font-bold text-lg leading-tight">
@@ -349,7 +342,6 @@ export const PostModal = ({
                 </div>
               </div>
 
-              {/* --- Comments Section --- */}
               <div className="space-y-4">
                 <h4 className="text-sm font-semibold text-muted-foreground">
                   Comments
@@ -391,9 +383,7 @@ export const PostModal = ({
             </div>
           </ScrollArea>
 
-          {/* 3. Footer (Actions + Input) - Fixed at bottom */}
           <div className="border-t border-modal-border bg-white dark:bg-zinc-950 shrink-0 z-10">
-            {/* Social Actions */}
             <div className="flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-4">
                 <button
@@ -436,7 +426,6 @@ export const PostModal = ({
               </div>
             </div>
 
-            {/* Comment Input & CTA Buttons */}
             <div className="px-4 pb-4 space-y-3">
               <div className="flex items-center gap-3">
                 <Input
@@ -465,7 +454,6 @@ export const PostModal = ({
                 </button>
               </div>
 
-              {/* Action Buttons (CTA) */}
               {post.ctaLabel && post.ctaLabel.length > 0 && (
                 <div className="flex gap-2 pt-1">
                   {post.ctaLabel.map((label) => (

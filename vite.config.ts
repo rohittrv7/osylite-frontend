@@ -16,7 +16,8 @@ export default defineConfig({
       manifest: {
         name: "Channel Management | ANG Growth", // Full Name
         short_name: "ANG Growth", // Home screen name
-        description: "Channel Management Application",
+        description:
+          "Official Channel Management Application for the ANG Growth Ecosystem providing secure management tools.",
         theme_color: "#ffffff",
         background_color: "#ffffff",
         display: "standalone", // Browser UI hata dega (Native app jaisa dikhega)
