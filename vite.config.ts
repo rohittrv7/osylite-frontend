@@ -18,9 +18,11 @@ export default defineConfig({
         short_name: "ANG Growth",
         description:
           "Official Channel Management Application for the ANG Growth Ecosystem providing secure management tools.",
-        theme_color: "#ffffff",
-        background_color: "#ffffff",
-        display: "standalone",
+        display: "standalone", // Ye browser UI ko hata deta hai
+        display_override: ["fullscreen", "minimal-ui"],
+        orientation: "portrait",
+        background_color: "#000000", // Aapki site dark hai toh background dark rakhein
+        theme_color: "#000000",
         start_url: "/",
         scope: "/",
         icons: [
