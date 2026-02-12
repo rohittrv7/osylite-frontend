@@ -65,19 +65,38 @@ export interface Profile {
   updatedAt: string;
 }
 
-// 5. Content Interface
-// Note: Since arrays are empty in your JSON, I used 'any[]'.
-// Replace 'any' with specific interfaces (e.g., Post, Product) when you have their structure.
-export interface Content {
-  reels: any[];
-  videos: any[];
-  posts: any[];
-  products: any[];
-  services: any[];
-}
-
-// 6. Root Response Interface
 export interface AssociateProfileResponse {
-  profile: Profile;
-  content: Content;
+  profile: {
+    id: string;
+    businessName: string;
+    city: string;
+    state: string;
+    address: string;
+    pincode: string;
+    category: string;
+    status: string;
+    rating: string;
+    totalRatings: number;
+    businessDetails: {
+      businessMobile: string;
+      website?: string;
+      openingTime: string;
+      closingTime: string;
+      fssaiLicense?: string;
+    };
+    user: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      fullName: string;
+      email: string;
+      role: string;
+      avatarUrl?: string;
+      isVerified: boolean;
+      bio?: string;
+      memberId: string;
+      membershipType: string;
+      createdAt: string;
+    };
+  };
 }
