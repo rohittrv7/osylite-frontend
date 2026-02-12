@@ -68,7 +68,7 @@ export interface ExplorePost {
   title: string;
   caption: string | null;
 
-  fileUrl: string;
+  fileUrl: string | string[];
   thumbnailUrl: string | null;
   url: string;
 

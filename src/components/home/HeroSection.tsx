@@ -54,12 +54,19 @@ const HeroSection = () => {
                 Login ( Website)
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              <Button
-                variant="outline"
-                className="rounded-full px-6 border-border"
+              <a
+                href="/app-release.apk"
+                download="AngGrowth.apk" // Download hone par ye naam dikhega
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                Download Apps
-              </Button>
+                <Button
+                  variant="outline"
+                  className="rounded-full px-6 border-border"
+                >
+                  Download App
+                </Button>
+              </a>
             </div>
           </div>
 
