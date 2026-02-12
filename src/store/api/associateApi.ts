@@ -81,8 +81,19 @@ export const associateApi = rootApiSlice.injectEndpoints({
 
     // Get Single Associate Profile (for the next page)
     getAssociateProfile: builder.query<AssociateProfileResponse, string>({
-      query: (id) => `/associates/${id}/profile`, // Adjust endpoint as per your backend
-      providesTags: ["Associates"],
+      query: (id) => `/associates/${id}/profile`, // Adjust URL based on your backend prefix
+      providesTags: ["Profile"],
+    }),
+
+    getAssociateContent: builder.query<
+      any[],
+      { id: string; type: "post" | "video" | "reel" }
+    >({
+      query: ({ id, type }) => ({
+        url: `/associates/${id}/content`, // Adjust URL based on your backend prefix
+        params: { type },
+      }),
+      providesTags: ["AssociatePosts"],
     }),
 
     getExploreProducts: builder.query<
@@ -160,4 +171,5 @@ export const {
   useRatePostMutation,
   useGetAssociateProfileQuery,
   useGetAssociatesByCategoryQuery,
+  useGetAssociateContentQuery,
 } = associateApi;

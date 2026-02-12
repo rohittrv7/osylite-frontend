@@ -112,5 +112,6 @@ export const rootApiSlice = createApi({
     "BankAccounts",
     "PostDetail",
     "Associates",
+    "AssociatePosts",
   ],
 });

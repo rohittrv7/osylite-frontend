@@ -152,33 +152,18 @@ function App() {
           <Route path="/post/:id" element={<PostDetailsPage />} />
           <Route path="/profile/:id" element={<PublicProfile />} />
 
-          {/* ==========================
-          2. Marketplace & Services
-      ========================== */}
           <Route path="/ang-mart/:category" element={<AngMart />} />
           <Route path="/ang-service/:category" element={<AngService />} />
 
-          {/* ==========================
-          3. Venue / Associates Flow
-      ========================== */}
-          {/* Step 1: Explore Grid (Landing) */}
           <Route path="/venue-explore" element={<VenueExplore />} />
 
-          {/* Step 2: Listing by Category (e.g. /associates/gym_owner) */}
           <Route path="/venue-explore/:category" element={<AssociatesList />} />
 
-          {/* Step 3: Single Associate Profile (e.g. /associate/123) */}
           <Route path="/associate/:id" element={<AssociateProfile />} />
 
-          {/* ==========================
-          4. Jobs Module
-      ========================== */}
           <Route path="/jobs/manage/:jobId" element={<JobCandidatesPage />} />
           <Route path="/jobs/edit/:jobId" element={<EditJobPage />} />
 
-          {/* ==========================
-          5. Matrimony
-      ========================== */}
           <Route
             path="/matrimony/profile/:id"
             element={<MatrimonyProfileDetails />}
