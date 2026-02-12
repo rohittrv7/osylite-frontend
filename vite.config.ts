@@ -11,32 +11,34 @@ export default defineConfig({
     tailwindcss(),
     // 2. PWA Plugin Configuration
     VitePWA({
-      registerType: "autoUpdate", // App naye update par khud refresh ho jayega
-      includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
+      registerType: "autoUpdate",
+      includeAssets: ["favicon.ico", "apple-touch-icon.png", "logo.png"], // logo.png yahan add karein
       manifest: {
-        name: "Channel Management | ANG Growth", // Full Name
-        short_name: "ANG Growth", // Home screen name
+        name: "Channel Management | ANG Growth",
+        short_name: "ANG Growth",
         description:
           "Official Channel Management Application for the ANG Growth Ecosystem providing secure management tools.",
         theme_color: "#ffffff",
         background_color: "#ffffff",
-        display: "standalone", // Browser UI hata dega (Native app jaisa dikhega)
+        display: "standalone",
+        start_url: "/",
+        scope: "/",
         icons: [
           {
-            src: "/pwa-192x192.png", // Ye images aapko banani hongi (Step 3 dekhein)
-            sizes: "192x192",
+            src: "/logo.png", // Aapne public mein logo.png rakha hai toh wahi use karein
+            sizes: "192x192", // Lekin yaad rahe file ka size 192x192 ya 512x512 ho
             type: "image/png",
           },
           {
-            src: "/pwa-512x512.png",
+            src: "/logo.png",
             sizes: "512x512",
             type: "image/png",
           },
           {
-            src: "/pwa-512x512.png",
+            src: "/logo.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any maskable", // Android icon shape adopt karne ke liye
+            purpose: "any maskable",
           },
         ],
       },
