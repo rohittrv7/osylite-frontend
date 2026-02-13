@@ -1,11 +1,11 @@
-import { Play } from "lucide-react";
+import { Copy, Play } from "lucide-react";
 import { PreviewModal } from "./PreviewModal";
 import { useState } from "react";
 
 export type MediaItem = {
   id: string;
   url: string;
-  fileUrl: string;
+  fileUrl: string[];
   thumbnailUrl: string | null;
   type: "post" | "video" | "reel";
   caption: string | null;
@@ -22,6 +22,100 @@ export type MediaItem = {
   createdAt: string;
 };
 
+// export default function MediaGrid({
+//   items,
+//   isReel = false,
+// }: {
+//   items?: MediaItem[];
+//   isReel?: boolean;
+// }) {
+//   const [preview, setPreview] = useState<{
+//     open: boolean;
+//     url: string;
+//     type: "image" | "video";
+//   }>({
+//     open: false,
+//     url: "",
+//     type: "image",
+//   });
+
+//   const openPreview = (url: string, type: "image" | "video") => {
+//     setPreview({ open: true, url, type });
+//   };
+
+//   const closePreview = () => {
+//     setPreview({ ...preview, open: false });
+//   };
+//   if (!items?.length) {
+//     return (
+//       <div className="py-20 text-center text-muted-foreground text-sm">
+//         No content found
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <>
+//       <div className="grid grid-cols-3 gap-1 md:gap-4">
+//         {items.map((item) => {
+//           const isPending = item.status === "pending";
+//           const isRejected = item.status === "rejected";
+//           const isBlocked = isPending || isRejected;
+
+//           return (
+//             <div
+//               key={item.id}
+//               className={`relative group overflow-hidden rounded-sm bg-muted cursor-pointer ${
+//                 isReel ? "aspect-[9/16]" : "aspect-square"
+//               }`}
+//               onClick={() =>
+//                 openPreview(
+//                   item.fileUrl,
+//                   item.type === "video" ? "video" : "image",
+//                 )
+//               }
+//             >
+//               {item.type === "post" && (
+//                 <img
+//                   src={item.url}
+//                   alt=""
+//                   className={`h-full w-full object-cover ${
+//                     isBlocked ? "opacity-70" : ""
+//                   }`}
+//                 />
+//               )}
+
+//               {(item.type === "video" || item.type === "reel") && (
+//                 <div className="absolute top-2 right-2 text-white drop-shadow-lg z-10">
+//                   <Play size={20} fill="white" />
+//                 </div>
+//               )}
+
+//               {isBlocked && (
+//                 <div
+//                   className={`absolute inset-0 z-20 flex items-center justify-center text-sm font-semibold uppercase tracking-wide ${
+//                     isPending
+//                       ? "bg-yellow-500/70 text-black"
+//                       : "bg-red-600/70 text-white"
+//                   }`}
+//                 >
+//                   {isPending ? "Pending Approval" : "Rejected"}
+//                 </div>
+//               )}
+//             </div>
+//           );
+//         })}
+//       </div>
+//       <PreviewModal
+//         open={preview.open}
+//         url={preview.url}
+//         type={preview.type}
+//         onClose={closePreview}
+//       />
+//     </>
+//   );
+// }
+
 export default function MediaGrid({
   items,
   isReel = false,
@@ -31,21 +125,22 @@ export default function MediaGrid({
 }) {
   const [preview, setPreview] = useState<{
     open: boolean;
-    url: string;
-    type: "image" | "video";
+    urls: string[]; // Changed to urls array
+    type: "post" | "video" | "reel";
   }>({
     open: false,
-    url: "",
-    type: "image",
+    urls: [],
+    type: "post",
   });
 
-  const openPreview = (url: string, type: "image" | "video") => {
-    setPreview({ open: true, url, type });
+  const openPreview = (urls: string[], type: "post" | "video" | "reel") => {
+    setPreview({ open: true, urls, type });
   };
 
   const closePreview = () => {
-    setPreview({ ...preview, open: false });
+    setPreview((prev) => ({ ...prev, open: false }));
   };
+
   if (!items?.length) {
     return (
       <div className="py-20 text-center text-muted-foreground text-sm">
@@ -58,9 +153,8 @@ export default function MediaGrid({
     <>
       <div className="grid grid-cols-3 gap-1 md:gap-4">
         {items.map((item) => {
-          const isPending = item.status === "pending";
-          const isRejected = item.status === "rejected";
-          const isBlocked = isPending || isRejected;
+          const isBlocked =
+            item.status === "pending" || item.status === "rejected";
 
           return (
             <div
@@ -68,47 +162,55 @@ export default function MediaGrid({
               className={`relative group overflow-hidden rounded-sm bg-muted cursor-pointer ${
                 isReel ? "aspect-[9/16]" : "aspect-square"
               }`}
-              onClick={() =>
-                openPreview(
-                  item.fileUrl,
-                  item.type === "video" ? "video" : "image",
-                )
-              }
+              onClick={() => openPreview(item.fileUrl, item.type)}
             >
-              {item.type === "post" && (
-                <img
-                  src={item.url}
-                  alt=""
-                  className={`h-full w-full object-cover ${
-                    isBlocked ? "opacity-70" : ""
-                  }`}
-                />
+              {/* Image / Thumbnail Logic */}
+              <img
+                src={
+                  item.type === "post"
+                    ? item.fileUrl[0]
+                    : item.thumbnailUrl || "/placeholder.png"
+                }
+                alt=""
+                className={`h-full w-full object-cover transition-transform group-hover:scale-105 ${
+                  isBlocked ? "opacity-70" : ""
+                }`}
+              />
+
+              {/* Indicator for Multiple Images */}
+              {item.type === "post" && item.fileUrl.length > 1 && (
+                <div className="absolute top-2 right-2 text-white drop-shadow-lg z-10">
+                  <Copy size={18} className="rotate-90" />
+                </div>
               )}
 
+              {/* Video Play Icon */}
               {(item.type === "video" || item.type === "reel") && (
                 <div className="absolute top-2 right-2 text-white drop-shadow-lg z-10">
                   <Play size={20} fill="white" />
                 </div>
               )}
 
-              {isBlocked && (
+              {/* Status Overlay */}
+              {/* {isBlocked && (
                 <div
-                  className={`absolute inset-0 z-20 flex items-center justify-center text-sm font-semibold uppercase tracking-wide ${
-                    isPending
+                  className={`absolute inset-0 z-20 flex items-center justify-center text-[10px] md:text-sm font-semibold uppercase ${
+                    item.status === "pending"
                       ? "bg-yellow-500/70 text-black"
                       : "bg-red-600/70 text-white"
                   }`}
                 >
-                  {isPending ? "Pending Approval" : "Rejected"}
+                  {item.status === "pending" ? "Pending" : "Rejected"}
                 </div>
-              )}
+              )} */}
             </div>
           );
         })}
       </div>
+
       <PreviewModal
         open={preview.open}
-        url={preview.url}
+        urls={preview.urls}
         type={preview.type}
         onClose={closePreview}
       />

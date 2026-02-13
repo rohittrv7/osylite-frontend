@@ -121,7 +121,7 @@ export interface Lead {
   };
 }
 
-export interface CreatePropertyDto extends Omit<
+export type CreatePropertyDto = Omit<
   Property,
   "id" | "isSaved" | "viewsCount" | "createdAt" | "owner" | "isAvailable"
-> {}
+>;

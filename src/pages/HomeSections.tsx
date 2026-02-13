@@ -56,18 +56,7 @@ export default function HomeSections() {
     return <div>Loading...</div>;
   }
 
-  // const { data: feedData = [] } = useGetExploreQuery();
   const feedData: any[] = [];
-  // const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>(
-  //   {},
-  // );
-
-  // const toggleExpand = (postId: string) => {
-  //   setExpandedPosts((prev) => ({
-  //     ...prev,
-  //     [postId]: !prev[postId],
-  //   }));
-  // };
 
   return (
     <div className="w-full px-4 md:px-10 py-6 space-y-8 bg-background text-foreground">

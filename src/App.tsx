@@ -53,6 +53,7 @@ import WalletHome from "./pages/wallet/WalletHome";
 import PostDetailsPage from "./pages/PostDetailsPage";
 import { AssociatesList } from "./pages/AssociatesList";
 import AssociateProfile from "./pages/AssociateProfile";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
   const dispatch = useDispatch();
@@ -138,6 +139,7 @@ function App() {
           <Route path="/job-profile" element={<JobProfilePage />} />
           <Route path="/post-job" element={<JobPostPage />} />
           <Route path="/matrimony" element={<Matrimony />} />
+          <Route path="/my-profile" element={<EditProfile />} />
 
           {/* <Route path="/property-feed" element={<Index />} /> */}
           <Route path="/property/:id" element={<PropertyDetails />} />

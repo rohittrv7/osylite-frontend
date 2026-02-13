@@ -19,7 +19,6 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
-import { PreviewModal } from "../PreviewModal";
 import { useNavigate } from "react-router-dom";
 import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
 import {
@@ -35,41 +34,33 @@ interface FeedCardProps {
 
 const FeedCard = ({ post }: FeedCardProps) => {
   const navigate = useNavigate();
-  // 1. Changed: Store refs in a map for multiple videos
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
-  // Track which video was last played to resume it
   const lastPlayedVideoUrl = useRef<string | null>(null);
 
-  /** ---------------- Local Optimistic State ---------------- */
   const [liked, setLiked] = useState(post.isLiked);
   const [likesCount, setLikesCount] = useState(post.likesCount);
   const [viewsCount, setViewsCount] = useState(post.viewsCount);
 
-  /** ---------------- RTK Mutations ---------------- */
   const [toggleLike, { isLoading: liking }] = useToggleLikeMutation();
   const [incrementView] = useIncrementViewMutation();
   const [incrementShare] = useIncrementShareMutation();
 
-  /** ---------------- Comment State ---------------- */
   const [commentText, setCommentText] = useState("");
   const [isCommenting, setIsCommenting] = useState(false);
 
-  /** ---------------- Preview ---------------- */
-  const [preview, setPreview] = useState<{
-    open: boolean;
-    url: string;
-    type: "image" | "video";
-  }>({
-    open: false,
-    url: "",
-    type: "image",
-  });
+  /** ---------------- Preview State (Fixed) ---------------- */
+  // const [preview, setPreview] = useState<{
+  //   open: boolean;
+  //   urls: string[]; // Changed from url to urls
+  //   type: "image" | "video";
+  // }>({
+  //   open: false,
+  //   urls: [],
+  //   type: "image",
+  // });
 
-  /** ---------------- Data Normalization ---------------- */
-  // Ensure fileUrls is always an array
   const mediaUrls = Array.isArray(post.fileUrl) ? post.fileUrl : [post.fileUrl];
 
-  /** ---------------- Helpers ---------------- */
   const formatCount = (num: number): string => {
     if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
     if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
@@ -85,7 +76,6 @@ const FeedCard = ({ post }: FeedCardProps) => {
     );
   };
 
-  /** ---------------- Handlers ---------------- */
   const handleLike = async () => {
     if (liking) return;
     setLiked((prev) => !prev);
@@ -119,41 +109,36 @@ const FeedCard = ({ post }: FeedCardProps) => {
     }
   };
 
-  const openPreview = (url: string, type: "image" | "video") => {
-    // Pause all videos
+  /** ---------------- Open Preview (Fixed) ---------------- */
+  const openPreview = (currentUrl: string, type: "post" | "video") => {
     Object.values(videoRefs.current).forEach((video) => video?.pause());
 
-    // Remember which video was clicked so we can maybe resume it (optional logic)
     if (type === "video") {
-      lastPlayedVideoUrl.current = url;
+      lastPlayedVideoUrl.current = currentUrl;
     }
 
     incrementViewOnce();
-    setPreview({ open: true, url, type });
+    // setPreview({ open: true, urls: allUrls, type });
   };
 
-  const closePreview = () => {
-    setPreview((p) => ({ ...p, open: false }));
-
-    // 2. Fixed: Resume logic added back
-    if (
-      lastPlayedVideoUrl.current &&
-      videoRefs.current[lastPlayedVideoUrl.current]
-    ) {
-      videoRefs.current[lastPlayedVideoUrl.current]?.play().catch(() => {});
-    }
-  };
+  // const closePreview = () => {
+  //   setPreview((p) => ({ ...p, open: false }));
+  //   if (
+  //     lastPlayedVideoUrl.current &&
+  //     videoRefs.current[lastPlayedVideoUrl.current]
+  //   ) {
+  //     videoRefs.current[lastPlayedVideoUrl.current]?.play().catch(() => {});
+  //   }
+  // };
 
   const handleCommentSubmit = async () => {
     if (!commentText.trim()) return;
     setIsCommenting(true);
-    // Simulate API call
     await new Promise((r) => setTimeout(r, 500));
     setCommentText("");
     setIsCommenting(false);
   };
 
-  /** ---------------- Render Media Item ---------------- */
   const renderMediaItem = (url: string, index: number) => {
     const isVid = isVideo(url);
 
@@ -168,7 +153,6 @@ const FeedCard = ({ post }: FeedCardProps) => {
               videoRefs.current[url] = el;
             }}
             src={url}
-            // Fix 2: Convert 'null' to 'undefined' using the || operator
             poster={index === 0 ? post.thumbnailUrl || undefined : undefined}
             className="w-full h-full object-cover"
             muted
@@ -185,7 +169,7 @@ const FeedCard = ({ post }: FeedCardProps) => {
     return (
       <div
         className="cursor-pointer w-full aspect-square overflow-hidden bg-muted"
-        onClick={() => openPreview(url, "image")}
+        onClick={() => openPreview(url, "post")}
       >
         <img
           src={url}
@@ -198,8 +182,7 @@ const FeedCard = ({ post }: FeedCardProps) => {
 
   return (
     <>
-      <Card className="mb-4 overflow-hidden border-border/50">
-        {/* HEADER */}
+      <Card className="mb-4 p-0 overflow-hidden border-border/50">
         <CardHeader
           className="p-3 cursor-pointer"
           onClick={() => navigate(`/profile/${post.channel.user.id}`)}
@@ -217,7 +200,6 @@ const FeedCard = ({ post }: FeedCardProps) => {
           </div>
         </CardHeader>
 
-        {/* MEDIA CAROUSEL OR SINGLE ITEM */}
         <div className="w-full">
           {mediaUrls.length > 1 ? (
             <Carousel className="w-full">
@@ -228,11 +210,8 @@ const FeedCard = ({ post }: FeedCardProps) => {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              {/* Navigation Arrows */}
               <CarouselPrevious className="left-2" />
               <CarouselNext className="right-2" />
-
-              {/* Dots Indicator */}
               <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 z-10">
                 {mediaUrls.map((_, idx) => (
                   <div
@@ -243,7 +222,6 @@ const FeedCard = ({ post }: FeedCardProps) => {
               </div>
             </Carousel>
           ) : (
-            // Single Item Render
             mediaUrls.map((url, index) => (
               <div key={`${post.id}-single-${index}`}>
                 {renderMediaItem(url, index)}
@@ -252,9 +230,7 @@ const FeedCard = ({ post }: FeedCardProps) => {
           )}
         </div>
 
-        {/* CONTENT & ACTIONS */}
         <CardContent className="p-3 space-y-3">
-          {/* Title / Caption */}
           {(post.title || post.caption) && (
             <div className="space-y-1">
               {post.title && (
@@ -268,7 +244,6 @@ const FeedCard = ({ post }: FeedCardProps) => {
             </div>
           )}
 
-          {/* ACTION BUTTONS & STATS */}
           <div className="flex items-center justify-between pt-2">
             <div className="flex items-center gap-4 text-muted-foreground">
               <button
@@ -281,12 +256,10 @@ const FeedCard = ({ post }: FeedCardProps) => {
                 <Heart className={cn("w-5 h-5", liked && "fill-current")} />
                 <span>{formatCount(likesCount)}</span>
               </button>
-
               <button className="flex items-center gap-1.5 text-sm hover:text-primary transition-colors">
                 <MessageCircle className="w-5 h-5" />
                 <span>{formatCount(post.commentsCount ?? 0)}</span>
               </button>
-
               <button
                 onClick={handleShare}
                 className="flex items-center gap-1.5 text-sm hover:text-primary transition-colors"
@@ -294,14 +267,12 @@ const FeedCard = ({ post }: FeedCardProps) => {
                 <Share2 className="w-5 h-5" />
               </button>
             </div>
-
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Eye className="w-3.5 h-3.5" />
               <span>{formatCount(viewsCount)} views</span>
             </div>
           </div>
 
-          {/* COMMENT INPUT */}
           <div className="relative flex items-center gap-2 pt-1">
             <Input
               placeholder="Add a comment..."
@@ -326,13 +297,6 @@ const FeedCard = ({ post }: FeedCardProps) => {
           </div>
         </CardContent>
       </Card>
-
-      <PreviewModal
-        open={preview.open}
-        onClose={closePreview}
-        url={preview.url}
-        type={preview.type}
-      />
     </>
   );
 };

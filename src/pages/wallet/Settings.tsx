@@ -19,6 +19,7 @@ const Settings = () => {
       icon: User,
       label: "Profile",
       description: "Manage your account details",
+      path: "/my-profile",
       onClick: () => {},
     },
     {
@@ -99,7 +100,10 @@ const Settings = () => {
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  <ChevronRight
+                    className="w-5 h-5 text-muted-foreground"
+                    onClick={() => navigate(item?.path || "")}
+                  />
                 </div>
               </CardContent>
             </Card>

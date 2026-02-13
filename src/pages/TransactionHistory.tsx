@@ -74,8 +74,7 @@ const TransactionItem = ({ tx }: { tx: Transaction }) => {
         <p
           className={`text-lg font-bold font-display ${isCredit ? "text-success" : "text-destructive"}`}
         >
-          {isCredit ? "+" : "-"}$
-          {tx.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+          {isCredit ? "+" : "-"}${Number(tx?.amount)?.toFixed(2)}
           <span className="text-xs font-medium ml-1 opacity-70">
             {tx.currency}
           </span>

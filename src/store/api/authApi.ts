@@ -1,6 +1,7 @@
 import type { User } from "@/types/user";
 import { rootApiSlice } from "./rootApiSlice";
 import type { AssociateApplyPayload } from "@/types/associate";
+import type { ProfileFormValues } from "@/pages/EditProfile";
 
 interface LoginRequest {
   email: string;
@@ -89,12 +90,21 @@ export const authApi = rootApiSlice.injectEndpoints({
 
     getProfile: builder.query<User, void>({
       query: () => "/users/me",
-      providesTags: ["Profile", "MatrimonyProfile", "MatrimonyFeed", "JobFeed"],
+      providesTags: ["Profile"],
     }),
 
     updateAvatar: builder.mutation<void, { avatarUrl: string | null }>({
       query: (body) => ({
         url: "/users/avatar",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["Profile"],
+    }),
+
+    updateProfile: builder.mutation<void, ProfileFormValues>({
+      query: (body) => ({
+        url: "/users/profile",
         method: "PATCH",
         body,
       }),
@@ -172,4 +182,5 @@ export const {
   useUpdateAvatarMutation,
   useGetTransactionHistoryQuery,
   useApplyAssociateMutation,
+  useUpdateProfileMutation,
 } = authApi;

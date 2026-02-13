@@ -33,6 +33,8 @@ import {
   useUpdatePropertyMutation,
   useGetPropertyByIdQuery,
 } from "@/store/api/propertiesApi";
+import { useLazyGetUploadSignatureQuery } from "@/store/api/cloudinaryApi";
+import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
 import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
 
 type Step = 1 | 2 | 3;
@@ -91,6 +93,10 @@ const PostProperty = () => {
     images: [],
   });
 
+  // --- Real Upload States ---
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+
   const { data: existingProperty, isLoading: isLoadingData } =
     useGetPropertyByIdQuery(id || "", {
       skip: !isEditMode,
@@ -100,6 +106,7 @@ const PostProperty = () => {
     useCreatePropertyMutation();
   const [updateProperty, { isLoading: isUpdating }] =
     useUpdatePropertyMutation();
+  const [getSignatureTrigger] = useLazyGetUploadSignatureQuery();
 
   const isSubmitting = isCreating || isUpdating;
 
@@ -155,19 +162,93 @@ const PostProperty = () => {
     updateFormData({ amenities: newAmenities });
   };
 
-  const handleImageUpload = () => {
-    const demoImages = [
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800",
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800",
-    ];
-    updateFormData({ images: [...formData.images, ...demoImages] });
-    toast.success("Images uploaded successfully!");
+  // --- Real Cloudinary Upload Handler ---
+  const getSignature = async ({ folder }: { folder: string }) => {
+    return await getSignatureTrigger({ folder }).unwrap();
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+    if (!selectedFiles || selectedFiles.length === 0) return;
+
+    const filesArray = Array.from(selectedFiles);
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      const uploadedUrls: string[] = [];
+      for (let i = 0; i < filesArray.length; i++) {
+        const res = await uploadToCloudinary({
+          file: filesArray[i],
+          postType: "post",
+          getSignature,
+          onProgress: (p) => {
+            const totalP = Math.round(
+              ((i + p / 100) / filesArray.length) * 100,
+            );
+            setUploadProgress(totalP);
+          },
+        });
+        uploadedUrls.push(res.secure_url);
+      }
+      updateFormData({ images: [...formData.images, ...uploadedUrls] });
+      toast.success(`${filesArray.length} images uploaded successfully!`);
+    } catch (error) {
+      apiErrorToastHandler(error);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   };
 
   const removeImage = (index: number) => {
     const newImages = formData.images.filter((_, i) => i !== index);
     updateFormData({ images: newImages });
   };
+
+  // const handleSubmit = async () => {
+  //   try {
+  //     const payload = {
+  //       title: formData.title,
+  //       description: formData.description,
+  //       listingType: formData.listingType as any,
+  //       category: formData.category as any,
+  //       city: formData.city,
+  //       locality: formData.locality,
+  //       address: formData.address,
+  //       price: Number(formData.price) || 0,
+  //       isNegotiable: formData.isNegotiable,
+  //       maintenanceCost: formData.maintenanceCost
+  //         ? Number(formData.maintenanceCost)
+  //         : undefined,
+  //       amenities: formData.amenities,
+  //       images: formData.images,
+  //       details: {
+  //         bhk: formData.bhk,
+  //         bathrooms: formData.bathrooms,
+  //         areaSqFt: Number(formData.areaSqFt) || 0,
+  //         furnishing: formData.furnishing,
+  //         floor: formData.floor,
+  //         totalFloors: formData.totalFloors,
+  //         facing: formData.facing,
+  //         constructionStatus: formData.constructionStatus,
+  //         parking: formData.parking,
+  //       },
+  //     };
+
+  //     if (isEditMode && id) {
+  //       await updateProperty({ id, data: payload }).unwrap();
+  //       toast.success("Property updated successfully!");
+  //     } else {
+  //       await createProperty(payload).unwrap();
+  //       toast.success("Property posted successfully!");
+  //     }
+
+  //     navigate("/property");
+  //   } catch (error) {
+  //     apiErrorToastHandler(error);
+  //   }
+  // };
 
   const handleSubmit = async () => {
     try {
@@ -183,29 +264,29 @@ const PostProperty = () => {
         isNegotiable: formData.isNegotiable,
         maintenanceCost: formData.maintenanceCost
           ? Number(formData.maintenanceCost)
-          : undefined, // Send undefined if empty so backend ignores it or sets null
+          : undefined,
         amenities: formData.amenities,
         images: formData.images,
         details: {
-          bhk: formData.bhk,
-          bathrooms: formData.bathrooms,
-          areaSqFt: Number(formData.areaSqFt) || 0, // Convert to Number
+          // Yahan conversion zaroori hai
+          bhk: Number(formData.bhk) || 0,
+          bathrooms: Number(formData.bathrooms) || 0,
+          areaSqFt: Number(formData.areaSqFt) || 0,
           furnishing: formData.furnishing,
-          floor: formData.floor,
-          totalFloors: formData.totalFloors,
+          floor: Number(formData.floor) || 0,
+          totalFloors: Number(formData.totalFloors) || 0,
           facing: formData.facing,
           constructionStatus: formData.constructionStatus,
           parking: formData.parking,
         },
       };
 
+      // Payload type ab CreatePropertyDto se match karega
       if (isEditMode && id) {
-        // @ts-ignore
-        await updateProperty({ id, data: payload }).unwrap();
+        await updateProperty({ id, data: payload as any }).unwrap();
         toast.success("Property updated successfully!");
       } else {
-        // @ts-ignore
-        await createProperty(payload).unwrap();
+        await createProperty(payload as any).unwrap();
         toast.success("Property posted successfully!");
       }
 
@@ -222,7 +303,7 @@ const PostProperty = () => {
       case 2:
         return formData.areaSqFt;
       case 3:
-        return formData.images.length > 0;
+        return formData.images.length > 0 && !isUploading;
       default:
         return false;
     }
@@ -244,7 +325,6 @@ const PostProperty = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
-      {/* Progress Steps */}
       <div className="flex items-center justify-center mb-12">
         {steps.map((s, index) => (
           <div key={s.number} className="flex items-center">
@@ -274,8 +354,7 @@ const PostProperty = () => {
         ))}
       </div>
 
-      <div className="bg-card rounded-xl p-6 md:p-8 property-card-shadow">
-        {/* Step 1: Basic Info */}
+      <div className="bg-card rounded-xl p-6 md:p-8 property-card-shadow border">
         {step === 1 && (
           <div className="space-y-6 animate-fade-in">
             <div>
@@ -350,7 +429,6 @@ const PostProperty = () => {
                     type="number"
                     value={formData.price}
                     onChange={(e) => updateFormData({ price: e.target.value })}
-                    placeholder="Enter price"
                     className="mt-2"
                   />
                 </div>
@@ -363,9 +441,7 @@ const PostProperty = () => {
                         updateFormData({ isNegotiable: checked as boolean })
                       }
                     />
-                    <Label htmlFor="negotiable" className="cursor-pointer">
-                      Price Negotiable
-                    </Label>
+                    <Label htmlFor="negotiable">Price Negotiable</Label>
                   </div>
                 </div>
               </div>
@@ -381,7 +457,6 @@ const PostProperty = () => {
                   onChange={(e) =>
                     updateFormData({ maintenanceCost: e.target.value })
                   }
-                  placeholder="e.g. 2500"
                   className="mt-2"
                 />
               </div>
@@ -431,7 +506,6 @@ const PostProperty = () => {
           </div>
         )}
 
-        {/* Step 2: Details */}
         {step === 2 && (
           <div className="space-y-6 animate-fade-in">
             <div>
@@ -495,7 +569,6 @@ const PostProperty = () => {
                   type="number"
                   value={formData.areaSqFt}
                   onChange={(e) => updateFormData({ areaSqFt: e.target.value })}
-                  placeholder="Enter area in square feet"
                   className="mt-2"
                 />
               </div>
@@ -518,10 +591,7 @@ const PostProperty = () => {
                             className="flex items-center space-x-2"
                           >
                             <RadioGroupItem value={type} id={type} />
-                            <Label
-                              htmlFor={type}
-                              className="cursor-pointer text-sm"
-                            >
+                            <Label htmlFor={type} className="text-sm">
                               {type}
                             </Label>
                           </div>
@@ -540,7 +610,6 @@ const PostProperty = () => {
                         onChange={(e) =>
                           updateFormData({ floor: e.target.value })
                         }
-                        placeholder="e.g., 2"
                         className="mt-2"
                       />
                     </div>
@@ -553,7 +622,6 @@ const PostProperty = () => {
                         onChange={(e) =>
                           updateFormData({ totalFloors: e.target.value })
                         }
-                        placeholder="e.g., 5"
                         className="mt-2"
                       />
                     </div>
@@ -568,7 +636,7 @@ const PostProperty = () => {
                   onValueChange={(value) => updateFormData({ facing: value })}
                 >
                   <SelectTrigger className="mt-2">
-                    <SelectValue placeholder="Select direction" />
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {[
@@ -581,6 +649,38 @@ const PostProperty = () => {
                     ].map((dir) => (
                       <SelectItem key={dir} value={dir}>
                         {dir}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="parking"
+                  checked={formData.parking}
+                  onCheckedChange={(checked) =>
+                    updateFormData({ parking: checked as boolean })
+                  }
+                />
+                <Label htmlFor="parking">Parking Available</Label>
+              </div>
+
+              <div>
+                <Label>Construction Status</Label>
+                <Select
+                  value={formData.constructionStatus}
+                  onValueChange={(v) =>
+                    updateFormData({ constructionStatus: v })
+                  }
+                >
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["Ready to Move", "Under Construction"].map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {s}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -604,7 +704,6 @@ const PostProperty = () => {
           </div>
         )}
 
-        {/* Step 3: Images & Amenities */}
         {step === 3 && (
           <div className="space-y-6 animate-fade-in">
             <div>
@@ -614,31 +713,66 @@ const PostProperty = () => {
               </p>
             </div>
 
-            {/* Image Upload */}
             <div>
               <Label className="mb-3 block">Property Images</Label>
-              <div className="border-2 border-dashed border-muted rounded-xl p-8 text-center">
-                <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-muted-foreground mb-4">
-                  Drag and drop images or click to upload
-                </p>
-                <Button variant="outline" onClick={handleImageUpload}>
-                  Upload Images
-                </Button>
+              <div
+                className={cn(
+                  "border-2 border-dashed rounded-xl p-8 text-center transition-all",
+                  isUploading
+                    ? "bg-muted border-muted"
+                    : "border-muted hover:border-primary/50",
+                )}
+              >
+                <input
+                  type="file"
+                  id="prop-file"
+                  className="hidden"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={isUploading}
+                />
+                {isUploading ? (
+                  <div className="space-y-4">
+                    <Loader2 className="w-12 h-12 mx-auto animate-spin text-primary" />
+                    <div className="space-y-2 max-w-xs mx-auto text-sm">
+                      <p>Uploading... {uploadProgress}%</p>
+                      <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
+                        <div
+                          className="bg-primary h-full transition-all"
+                          style={{ width: `${uploadProgress}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <label htmlFor="prop-file" className="cursor-pointer block">
+                    <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-muted-foreground mb-4 font-medium">
+                      Click to select multiple property images
+                    </p>
+                    <Button
+                      variant="outline"
+                      type="button"
+                      className="pointer-events-none"
+                    >
+                      Select Files
+                    </Button>
+                  </label>
+                )}
               </div>
 
               {formData.images.length > 0 && (
-                <div className="grid grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-4 mt-6">
                   {formData.images.map((img, index) => (
-                    <div key={index} className="relative group">
+                    <div key={index} className="relative group aspect-square">
                       <img
                         src={img}
-                        alt={`Upload ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg"
+                        className="w-full h-full object-cover rounded-lg border shadow-sm"
                       />
                       <button
                         onClick={() => removeImage(index)}
-                        className="absolute top-1 right-1 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute -top-2 -right-2 w-7 h-7 bg-destructive text-white rounded-full flex items-center justify-center shadow-md"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -648,9 +782,10 @@ const PostProperty = () => {
               )}
             </div>
 
-            {/* Amenities */}
             <div>
-              <Label className="mb-3 block">Amenities</Label>
+              <Label className="mb-3 block text-lg font-semibold">
+                Amenities
+              </Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {amenitiesList.map((amenity) => (
                   <div
@@ -659,14 +794,11 @@ const PostProperty = () => {
                       "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
                       formData.amenities.includes(amenity)
                         ? "border-primary bg-primary/5"
-                        : "border-muted hover:border-muted-foreground/50",
+                        : "border-muted",
                     )}
                     onClick={() => handleAmenityToggle(amenity)}
                   >
-                    <Checkbox
-                      checked={formData.amenities.includes(amenity)}
-                      onCheckedChange={() => handleAmenityToggle(amenity)}
-                    />
+                    <Checkbox checked={formData.amenities.includes(amenity)} />
                     <span className="text-sm">{amenity}</span>
                   </div>
                 ))}
@@ -675,15 +807,13 @@ const PostProperty = () => {
           </div>
         )}
 
-        {/* Navigation Buttons */}
-        <div className="flex justify-between mt-8 pt-6 border-t border-border">
+        <div className="flex justify-between mt-8 pt-6 border-t">
           <Button
             variant="outline"
             onClick={() => setStep((step - 1) as Step)}
             disabled={step === 1 || isSubmitting}
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Previous
+            <ArrowLeft className="w-4 h-4 mr-2" /> Previous
           </Button>
 
           {step < 3 ? (
@@ -691,8 +821,7 @@ const PostProperty = () => {
               onClick={() => setStep((step + 1) as Step)}
               disabled={!canProceed()}
             >
-              Next
-              <ArrowRight className="w-4 h-4 ml-2" />
+              Next <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           ) : (
             <Button
@@ -707,14 +836,11 @@ const PostProperty = () => {
               ) : (
                 <>
                   {isEditMode ? (
-                    <>
-                      <Pencil className="w-4 h-4 mr-2" /> Update Property
-                    </>
+                    <Pencil className="w-4 h-4 mr-2" />
                   ) : (
-                    <>
-                      <Check className="w-4 h-4 mr-2" /> Post Property
-                    </>
-                  )}
+                    <Check className="w-4 h-4 mr-2" />
+                  )}{" "}
+                  {isEditMode ? "Update" : "Post"} Property
                 </>
               )}
             </Button>
