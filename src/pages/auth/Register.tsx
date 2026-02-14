@@ -285,14 +285,14 @@ export default function RegisterPage() {
             </Button>
           </p>
           <p className="text-center text-sm text-muted-foreground">
-            Want to becaome Associate?{" "}
+            Want to becaome Seller?{" "}
             <Button
               variant="link"
               className="px-1 cursor-pointer text-blue-400"
               type="button"
               onClick={() => navigate("/associate-register")}
             >
-              Associate
+              Seller
             </Button>
           </p>
         </Form>
