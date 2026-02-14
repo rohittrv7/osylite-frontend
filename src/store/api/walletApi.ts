@@ -10,10 +10,16 @@ import type {
 } from "@/types/wallet";
 
 export interface CreateRechargeRequestDto {
-  amountInINR: number;
   utrNumber: string;
   screenshotUrl: string;
   planId?: string;
+}
+
+export interface PlanStatus {
+  state: "PENDING" | "ACTIVE" | "NO_PLAN";
+  planName?: string;
+  expiryDate?: string;
+  message?: string;
 }
 
 export const walletApi = rootApiSlice.injectEndpoints({
@@ -27,6 +33,14 @@ export const walletApi = rootApiSlice.injectEndpoints({
     // 2. Get Plans
     getPlans: builder.query<Plan[], void>({
       query: () => "/wallet/plans",
+      providesTags: ["Plans"],
+      // Optional: Transform data if backend structure is different
+      transformResponse: (response: Plan[]) => response,
+    }),
+
+    getMyPlanStatus: builder.query<PlanStatus, void>({
+      query: () => "/wallet/my-plan-status",
+      providesTags: ["Wallet"], // Recharge ke baad isse invalidate karna hoga
     }),
 
     // 3. Get History
@@ -37,7 +51,7 @@ export const walletApi = rootApiSlice.injectEndpoints({
 
     // 4. Get Admin QR/UPI
     getAdminQr: builder.query<AdminQrResponse, void>({
-      query: () => "/wallet/admin-qr",
+      query: () => "/admin/payment-config",
     }),
 
     // 5. Submit Recharge Request (File Upload)
@@ -87,4 +101,5 @@ export const {
   useGetBankAccountsQuery,
   useAddBankAccountMutation,
   useRedeemCoinsMutation,
+  useGetMyPlanStatusQuery,
 } = walletApi;

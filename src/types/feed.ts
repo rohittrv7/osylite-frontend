@@ -99,6 +99,45 @@ export interface ExplorePost {
   createdAt: string;
 }
 
+export interface ExploreFeed {
+  id: string;
+  title: string | null;
+  caption: string | null;
+  description: string | null;
+  fileUrl: string[];
+  thumbnailUrl: string | null;
+  price: string | number;
+  location: string | null;
+  type: string;
+  status: string;
+  isAd?: boolean;
+  averageRating: number;
+  totalRatings: number;
+  myRating?: number;
+  // Note: JSON mein ye null aa raha hai
+  channel: {
+    id: string;
+    name: string;
+    handle: string;
+    logoUrl: string | null;
+    user: { id: string };
+  } | null; 
+  // Author fallback ke liye (as per your JSON)
+  author: {
+    id: string;
+    name: string;
+    handle: string;
+    avatar: string | null;
+    isVerified: boolean;
+  };
+  user: User; // Raw user object
+  stats: {
+    likes: number;
+    comments: number;
+    views: number;
+  };
+}
+
 // Pagination Meta
 
 export interface FeedMeta {

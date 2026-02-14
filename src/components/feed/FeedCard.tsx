@@ -48,6 +48,7 @@ const FeedCard = ({ post }: FeedCardProps) => {
   const [commentText, setCommentText] = useState("");
   const [isCommenting, setIsCommenting] = useState(false);
 
+  const [isExpanded, setIsExpanded] = useState(false);
   /** ---------------- Preview State (Fixed) ---------------- */
   // const [preview, setPreview] = useState<{
   //   open: boolean;
@@ -145,7 +146,7 @@ const FeedCard = ({ post }: FeedCardProps) => {
     if (isVid) {
       return (
         <div
-          className="relative cursor-pointer w-full aspect-square bg-black"
+          className="relative w-full aspect-square bg-black"
           onClick={() => openPreview(url, "video")}
         >
           <video
@@ -168,7 +169,7 @@ const FeedCard = ({ post }: FeedCardProps) => {
 
     return (
       <div
-        className="cursor-pointer w-full aspect-square overflow-hidden bg-muted"
+        className="w-full aspect-square overflow-hidden bg-muted"
         onClick={() => openPreview(url, "post")}
       >
         <img
@@ -236,10 +237,28 @@ const FeedCard = ({ post }: FeedCardProps) => {
               {post.title && (
                 <h3 className="font-semibold text-sm">{post.title}</h3>
               )}
+
               {post.caption && (
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {post.caption}
-                </p>
+                <div className="relative">
+                  <p
+                    className={cn(
+                      "text-sm text-muted-foreground transition-all duration-300",
+                      !isExpanded && "line-clamp-2",
+                    )}
+                  >
+                    {post.caption}
+                  </p>
+
+                  {/* Button tabhi dikhayenge jab caption ki length kaafi ho (e.g. 100 chars) */}
+                  {post.caption.length > 100 && (
+                    <button
+                      onClick={() => setIsExpanded(!isExpanded)}
+                      className="text-xs font-bold text-primary hover:underline mt-1 block transition-colors"
+                    >
+                      {isExpanded ? "See Less" : "See More"}
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           )}

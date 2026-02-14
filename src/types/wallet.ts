@@ -11,8 +11,13 @@ export interface WalletBalance {
 export interface Plan {
   id: string;
   name: string;
+  price: number;
+  currency: string;
   coins: number;
-  priceINR: number;
+  monthlyUsageLimit: number | null;
+  features: string[];
+  gstNote: string;
+  colorTheme: string;
   isPopular?: boolean;
 }
 
@@ -51,4 +56,6 @@ export interface RequestRedemptionDto {
 export interface AdminQrResponse {
   upiId: string;
   qrCodeUrl?: string;
+  instruction: string;
+  isActive: boolean;
 }

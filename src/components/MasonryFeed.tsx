@@ -1,8 +1,8 @@
-import type { ExplorePost } from "@/types/feed";
+// import type { ExploreFeed } from "@/types/feed";
 import FeedCard from "./FeedCard";
 
 interface MasonryFeedProps {
-  posts: ExplorePost[];
+  posts: any[];
   viewMode?: "grid" | "list";
 }
 

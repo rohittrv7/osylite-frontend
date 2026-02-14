@@ -1,6 +1,7 @@
-import { Copy, Play } from "lucide-react";
+import { Copy, Play, Eye, Heart } from "lucide-react";
 import { PreviewModal } from "./PreviewModal";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export type MediaItem = {
   id: string;
@@ -22,110 +23,15 @@ export type MediaItem = {
   createdAt: string;
 };
 
-// export default function MediaGrid({
-//   items,
-//   isReel = false,
-// }: {
-//   items?: MediaItem[];
-//   isReel?: boolean;
-// }) {
-//   const [preview, setPreview] = useState<{
-//     open: boolean;
-//     url: string;
-//     type: "image" | "video";
-//   }>({
-//     open: false,
-//     url: "",
-//     type: "image",
-//   });
-
-//   const openPreview = (url: string, type: "image" | "video") => {
-//     setPreview({ open: true, url, type });
-//   };
-
-//   const closePreview = () => {
-//     setPreview({ ...preview, open: false });
-//   };
-//   if (!items?.length) {
-//     return (
-//       <div className="py-20 text-center text-muted-foreground text-sm">
-//         No content found
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <>
-//       <div className="grid grid-cols-3 gap-1 md:gap-4">
-//         {items.map((item) => {
-//           const isPending = item.status === "pending";
-//           const isRejected = item.status === "rejected";
-//           const isBlocked = isPending || isRejected;
-
-//           return (
-//             <div
-//               key={item.id}
-//               className={`relative group overflow-hidden rounded-sm bg-muted cursor-pointer ${
-//                 isReel ? "aspect-[9/16]" : "aspect-square"
-//               }`}
-//               onClick={() =>
-//                 openPreview(
-//                   item.fileUrl,
-//                   item.type === "video" ? "video" : "image",
-//                 )
-//               }
-//             >
-//               {item.type === "post" && (
-//                 <img
-//                   src={item.url}
-//                   alt=""
-//                   className={`h-full w-full object-cover ${
-//                     isBlocked ? "opacity-70" : ""
-//                   }`}
-//                 />
-//               )}
-
-//               {(item.type === "video" || item.type === "reel") && (
-//                 <div className="absolute top-2 right-2 text-white drop-shadow-lg z-10">
-//                   <Play size={20} fill="white" />
-//                 </div>
-//               )}
-
-//               {isBlocked && (
-//                 <div
-//                   className={`absolute inset-0 z-20 flex items-center justify-center text-sm font-semibold uppercase tracking-wide ${
-//                     isPending
-//                       ? "bg-yellow-500/70 text-black"
-//                       : "bg-red-600/70 text-white"
-//                   }`}
-//                 >
-//                   {isPending ? "Pending Approval" : "Rejected"}
-//                 </div>
-//               )}
-//             </div>
-//           );
-//         })}
-//       </div>
-//       <PreviewModal
-//         open={preview.open}
-//         url={preview.url}
-//         type={preview.type}
-//         onClose={closePreview}
-//       />
-//     </>
-//   );
-// }
-
-export default function MediaGrid({
-  items,
-  isReel = false,
-}: {
+interface MediaGridProps {
   items?: MediaItem[];
   isReel?: boolean;
-}) {
+}
+
+export default function MediaGrid({ items, isReel = false }: MediaGridProps) {
   const [preview, setPreview] = useState<{
     open: boolean;
-    urls: string[]; // Changed to urls array
+    urls: string[];
     type: "post" | "video" | "reel";
   }>({
     open: false,
@@ -134,6 +40,8 @@ export default function MediaGrid({
   });
 
   const openPreview = (urls: string[], type: "post" | "video" | "reel") => {
+    // Ensuring URLs exist before opening
+    if (!urls || urls.length === 0) return;
     setPreview({ open: true, urls, type });
   };
 
@@ -143,7 +51,7 @@ export default function MediaGrid({
 
   if (!items?.length) {
     return (
-      <div className="py-20 text-center text-muted-foreground text-sm">
+      <div className="py-20 text-center text-muted-foreground text-sm border border-dashed rounded-lg bg-muted/20">
         No content found
       </div>
     );
@@ -155,59 +63,73 @@ export default function MediaGrid({
         {items.map((item) => {
           const isBlocked =
             item.status === "pending" || item.status === "rejected";
+          const isVideoType = item.type === "video" || item.type === "reel";
 
           return (
             <div
               key={item.id}
-              className={`relative group overflow-hidden rounded-sm bg-muted cursor-pointer ${
+              className={`relative group overflow-hidden rounded-sm bg-muted cursor-pointer ring-offset-background transition-all hover:ring-2 hover:ring-primary/50 ${
                 isReel ? "aspect-[9/16]" : "aspect-square"
               }`}
               onClick={() => openPreview(item.fileUrl, item.type)}
             >
-              {/* Image / Thumbnail Logic */}
+              {/* Image / Video Thumbnail Logic */}
               <img
                 src={
                   item.type === "post"
-                    ? item.fileUrl[0]
-                    : item.thumbnailUrl || "/placeholder.png"
+                    ? item.fileUrl[0] // Pehli image
+                    : item.thumbnailUrl || item.fileUrl[0] // Video thumbnail ya video link ka fallback
                 }
-                alt=""
-                className={`h-full w-full object-cover transition-transform group-hover:scale-105 ${
-                  isBlocked ? "opacity-70" : ""
+                alt={item.caption || "Media content"}
+                className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 ${
+                  isBlocked ? "opacity-60 grayscale-[50%]" : ""
                 }`}
+                loading="lazy"
               />
 
-              {/* Indicator for Multiple Images */}
+              {/* Indicator for Multiple Images (Carousel) */}
               {item.type === "post" && item.fileUrl.length > 1 && (
-                <div className="absolute top-2 right-2 text-white drop-shadow-lg z-10">
-                  <Copy size={18} className="rotate-90" />
+                <div className="absolute top-2 right-2 text-white drop-shadow-md z-10 bg-black/20 p-1 rounded-sm">
+                  <Copy size={16} className="rotate-90" />
                 </div>
               )}
 
-              {/* Video Play Icon */}
-              {(item.type === "video" || item.type === "reel") && (
-                <div className="absolute top-2 right-2 text-white drop-shadow-lg z-10">
-                  <Play size={20} fill="white" />
+              {/* Video/Reel Play Icon Overlay */}
+              {isVideoType && (
+                <div className="absolute top-2 right-2 text-white drop-shadow-md z-10 bg-black/20 p-1 rounded-sm">
+                  <Play size={18} fill="currentColor" />
                 </div>
               )}
 
-              {/* Status Overlay */}
-              {/* {isBlocked && (
+              {/* Stats Hover Overlay (Optional but good for UI) */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white text-xs md:text-sm font-bold">
+                <div className="flex items-center gap-1">
+                  <Heart size={14} fill="white" /> {item.stats.likes}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Eye size={14} /> {item.stats.views}
+                </div>
+              </div>
+
+              {/* Status Label (If you want to show it on grid) */}
+              {isBlocked && (
                 <div
-                  className={`absolute inset-0 z-20 flex items-center justify-center text-[10px] md:text-sm font-semibold uppercase ${
+                  className={cn(
+                    "absolute bottom-0 left-0 right-0 py-1 text-[10px] text-center font-bold text-white uppercase tracking-tighter",
                     item.status === "pending"
-                      ? "bg-yellow-500/70 text-black"
-                      : "bg-red-600/70 text-white"
-                  }`}
+                      ? "bg-yellow-600/80"
+                      : "bg-red-600/80",
+                  )}
                 >
-                  {item.status === "pending" ? "Pending" : "Rejected"}
+                  {item.status}
                 </div>
-              )} */}
+              )}
             </div>
           );
         })}
       </div>
 
+      {/* MODAL INTEGRATION: Make sure PreviewModal props match exactly */}
       <PreviewModal
         open={preview.open}
         urls={preview.urls}

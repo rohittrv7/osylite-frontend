@@ -6,7 +6,7 @@ import type {
 } from "@/types/associate";
 import { rootApiSlice } from "./rootApiSlice";
 import type { BusinessDetails } from "@/config/associate";
-import type { ExplorePost } from "@/types/feed";
+import type { ExploreFeed, ExplorePost } from "@/types/feed";
 import type { AssociateProfileResponse } from "@/types/associateProfile";
 
 export type AssociateProfile = {
@@ -97,7 +97,7 @@ export const associateApi = rootApiSlice.injectEndpoints({
     }),
 
     getExploreProducts: builder.query<
-      ExplorePost[],
+      ExploreFeed[],
       ProductExploreFilters | undefined
     >({
       query: (filters) => ({
