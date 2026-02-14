@@ -56,7 +56,7 @@ const HeroSection = () => {
               </Button>
               <a
                 href="/app-release.apk"
-                download="AngGrowth.apk" // Download hone par ye naam dikhega
+                download="Osylite.apk" // Download hone par ye naam dikhega
                 target="_blank"
                 rel="noopener noreferrer"
               >
