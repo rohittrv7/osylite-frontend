@@ -95,9 +95,12 @@ export function PreviewModal({ open, onClose, urls, type }: PreviewModalProps) {
         ) : (
           <div className="flex justify-center">
             <video
+              key={urls[0]} // URL change hone par video reset karne ke liye
               src={urls[0]}
               controls
               autoPlay
+              muted={false} // Force sound on
+              playsInline
               className="max-w-full max-h-[85vh] rounded-lg shadow-2xl"
             />
           </div>
