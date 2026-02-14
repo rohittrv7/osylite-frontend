@@ -1,3 +1,5 @@
+import type { VenueProfile } from "@/store/api/associateApi";
+
 export type ContentType = "post" | "reel" | "video";
 // Common Types
 
@@ -29,16 +31,25 @@ export interface Channel {
 export interface Author {
   id: string;
   name: string;
-  handle: string;
-  avatar: string | null;
+  type: string; // "Associate" etc.
+  image: string | null;
   isVerified: boolean;
+  category: string; // "grocery_shop_owner"
+  subCategory: string | null;
+  city: string;
+  address: string;
+  businessDetails: BusinessDetails;
+}
+
+export interface BusinessDetails {
+  brand: string;
+  unitNo: string;
+  gstNumber: string;
+  typeOfProduct: "both" | "product" | "service"; // adjust if more types exist
+  businessMobile: string;
 }
 
 // Owner
-
-export interface Owner {
-  id: string;
-}
 
 // Stats
 
@@ -89,11 +100,12 @@ export interface ExplorePost {
   isLiked: boolean;
   location: string | null;
   description: string | null;
+  associateProfile: VenueProfile;
   isRated: boolean;
   myRating: number;
   channel: Channel;
   author: Author;
-  owner: Owner;
+  user: User;
   stats: PostStats;
   isAd: boolean;
   createdAt: string;
@@ -121,7 +133,7 @@ export interface ExploreFeed {
     handle: string;
     logoUrl: string | null;
     user: { id: string };
-  } | null; 
+  } | null;
   // Author fallback ke liye (as per your JSON)
   author: {
     id: string;

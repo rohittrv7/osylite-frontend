@@ -302,19 +302,19 @@ export const PostDetailsPage = () => {
             onClick={() => navigate(`/profile/${post.channel.user.id}`)}
           >
             <Avatar className="w-11 h-11 ring-2 ring-primary/20">
-              <AvatarImage src={post.channel.logoUrl || ""} />
+              <AvatarImage src={post?.user.avatarUrl || ""} />
               <AvatarFallback className="bg-primary text-primary-foreground font-display text-sm">
-                {post.channel.name[0]}
+                {post.user.firstName.charAt(1)}
               </AvatarFallback>
             </Avatar>
             <div>
               <p className="font-semibold text-sm group-hover:text-primary transition-colors">
-                {post.channel.name}
+                {post.author.name}
               </p>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="flex items-center gap-0.5">
                   <MapPin className="w-3 h-3" />
-                  {post.location || "Location"}
+                  {post.author.city || "Location"}
                 </span>
                 <span className="mx-1">•</span>
                 <span className="flex items-center gap-0.5 font-medium text-foreground">
