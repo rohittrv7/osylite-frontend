@@ -33,7 +33,7 @@ const sections = [
     title: "Ang Services",
     image:
       "https://images.pexels.com/photos/845451/pexels-photo-845451.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    path: "/ang-services",
+    path: "/ang-service",
   },
   {
     title: "Venue Explore",

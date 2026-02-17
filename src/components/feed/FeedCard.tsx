@@ -183,9 +183,9 @@ const FeedCard = ({ post }: FeedCardProps) => {
 
   return (
     <>
-      <Card className="mb-4 p-0 overflow-hidden border-border/50">
+      <Card className="mb-4 p-0 gap-0 overflow-hidden border-border/50">
         <CardHeader
-          className="p-3 cursor-pointer"
+          className="p-3 m-0 cursor-pointer"
           onClick={() => navigate(`/profile/${post.channel.user.id}`)}
         >
           <div className="flex items-center gap-3">
