@@ -293,7 +293,6 @@ export const PostDetailsPage = () => {
       </div>
 
       {/* --- RIGHT: DETAILS & COMMENTS --- */}
-      {/* 🔥 FIX: Ensure this container acts as a flex column with restricted height */}
       <div className="w-full md:w-[420px] lg:w-[460px] bg-card flex flex-col h-[55vh] md:h-full md:border-l border-border">
         {/* 1. Header (Fixed Height) */}
         <div className="p-5 border-b border-border flex items-center justify-between shrink-0 animate-fade-in bg-card z-10">
@@ -304,23 +303,29 @@ export const PostDetailsPage = () => {
             <Avatar className="w-11 h-11 ring-2 ring-primary/20">
               <AvatarImage src={post?.user.avatarUrl || ""} />
               <AvatarFallback className="bg-primary text-primary-foreground font-display text-sm">
-                {post.user.firstName.charAt(1)}
+                {post.user.firstName.charAt(0)}
               </AvatarFallback>
             </Avatar>
             <div>
               <p className="font-semibold text-sm group-hover:text-primary transition-colors">
-                {post.author.name}
+                {post.isSponsored ? post.author.name : post.user.firstName}
               </p>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="flex items-center gap-0.5">
-                  <MapPin className="w-3 h-3" />
-                  {post.author.city || "Location"}
-                </span>
-                <span className="mx-1">•</span>
-                <span className="flex items-center gap-0.5 font-medium text-foreground">
-                  <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
-                  {averageRating > 0 ? averageRating.toFixed(1) : "New"}
-                </span>
+                {post.isSponsored && (
+                  <span className="flex items-center gap-0.5">
+                    <MapPin className="w-3 h-3" />
+                    {post.author.city || "Location"}
+                  </span>
+                )}
+                {post.isSponsored && (
+                  <>
+                    <span className="mx-1">•</span>
+                    <span className="flex items-center gap-0.5 font-medium text-foreground">
+                      <Star className="w-3 h-3 fill-yellow-500 text-yellow-500" />
+                      {averageRating > 0 ? averageRating.toFixed(1) : "New"}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -332,12 +337,14 @@ export const PostDetailsPage = () => {
           <div className="space-y-3 animate-slide-up">
             <div className="flex items-start justify-between gap-3">
               <h1 className="text-xl font-display font-bold leading-tight">
-                {post.title}
+                {post.title ?? post.caption}
               </h1>
-              <div className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1.5 rounded-lg font-bold text-lg whitespace-nowrap shrink-0">
-                <IndianRupee className="w-4 h-4" />
-                {Number(post.price).toLocaleString("en-IN")}
-              </div>
+              {post.isSponsored && (
+                <div className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1.5 rounded-lg font-bold text-lg whitespace-nowrap shrink-0">
+                  <IndianRupee className="w-4 h-4" />
+                  {Number(post.price).toLocaleString("en-IN")}
+                </div>
+              )}
             </div>
 
             {/* Description */}
@@ -364,36 +371,38 @@ export const PostDetailsPage = () => {
                 Posted {formatTimeAgo(post.createdAt)}
               </span>
 
-              <Popover open={ratingOpen} onOpenChange={setRatingOpen}>
-                <PopoverTrigger asChild>
-                  <button className="text-xs font-medium text-primary hover:underline">
-                    Rate this
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-3" align="end">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        className="focus:outline-none hover:scale-110 active:scale-95 transition-transform"
-                        onMouseEnter={() => setHoverRating(star)}
-                        onMouseLeave={() => setHoverRating(0)}
-                        onClick={() => handleRate(star)}
-                        disabled={isRating}
-                      >
-                        <Star
-                          className={cn(
-                            "w-6 h-6 transition-colors",
-                            star <= (hoverRating || userRating)
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-muted-foreground/30",
-                          )}
-                        />
-                      </button>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+              {post.isSponsored && (
+                <Popover open={ratingOpen} onOpenChange={setRatingOpen}>
+                  <PopoverTrigger asChild>
+                    <button className="text-xs font-medium text-primary hover:underline">
+                      Rate this
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-3" align="end">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          className="focus:outline-none hover:scale-110 active:scale-95 transition-transform"
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          onClick={() => handleRate(star)}
+                          disabled={isRating}
+                        >
+                          <Star
+                            className={cn(
+                              "w-6 h-6 transition-colors",
+                              star <= (hoverRating || userRating)
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-muted-foreground/30",
+                            )}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
             </div>
           </div>
 

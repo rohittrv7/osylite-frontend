@@ -9,14 +9,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { MediaGrid } from "./ang-mart/MediaGrid";
 import { toast } from "sonner";
 import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
 import { useNavigate } from "react-router-dom";
 import { useRatePostMutation } from "@/store/api/associateApi";
+import { MediaGrid } from "../ang-mart/MediaGrid";
+import type { FeedPost } from "@/types/feed";
 
 interface FeedCardProps {
-  post: any;
+  post: FeedPost;
   viewMode?: "grid" | "list";
 }
 
@@ -29,18 +30,17 @@ const FeedCard = ({ post, viewMode = "grid" }: FeedCardProps) => {
   const [hoverRating, setHoverRating] = useState(0);
   const [ratePost, { isLoading: isRating }] = useRatePostMutation();
 
-  // Data Normalization (Channel null ho sakta hai)
-  const displayName = post.channel?.name ?? post.author?.name ?? "Unknown User";
-  const displayHandle = post.channel?.handle ?? post.author?.handle ?? "@user";
-  const displayAvatar = post.channel?.logoUrl ?? post.author?.avatar ?? "";
-  const profileUserId = post.channel?.user?.id ?? post.author?.id;
+  const displayName = post.author?.name ?? "Unknown User";
+  const displayHandle = post.author?.handle ?? "@user";
+  const displayAvatar = post.author?.avatar ?? "";
+  const profileUserId = post.author?.id;
 
   const mediaList: string[] = post.fileUrl ?? [];
   if (mediaList.length === 0 && post.thumbnailUrl) {
     mediaList.push(post.thumbnailUrl);
   }
 
-  const userRating = post.myRating || 0;
+  const userRating = post?.myRatingVal || 0;
 
   const handleMediaClick = (_url: string, index: number) => {
     navigate(`/post/${post.id}`, { state: { initialIndex: index } });
@@ -84,9 +84,9 @@ const FeedCard = ({ post, viewMode = "grid" }: FeedCardProps) => {
   return (
     <Card
       className={cn(
-        "overflow-hidden border-0 shadow-md hover:shadow-lg transition-shadow duration-300 group bg-card",
+        "overflow-hidden border-0 gap-0 shadow-md hover:shadow-lg transition-shadow duration-300 group bg-card",
         viewMode === "list" && "flex flex-row",
-        post.isAd && "ring-1 ring-primary/20",
+        post.isSponsored && "ring-1 ring-primary/20",
       )}
     >
       <CardHeader className="px-3 py-2">
@@ -125,7 +125,7 @@ const FeedCard = ({ post, viewMode = "grid" }: FeedCardProps) => {
             viewMode === "list" ? "w-40 sm:w-48 shrink-0" : "w-full",
           )}
         >
-          {post.isAd && (
+          {post.isSponsored && (
             <Badge className="absolute top-3 left-3 z-10">Sponsored</Badge>
           )}
           <MediaGrid
@@ -142,60 +142,67 @@ const FeedCard = ({ post, viewMode = "grid" }: FeedCardProps) => {
         <CardContent className="p-3 pt-2 flex flex-col gap-2.5">
           <div>
             <div className="flex justify-between items-start">
-              <h2 className="flex font-bold gap-1 items-center text-primary text-lg">
-                <IndianRupee className="w-4 h-4" />
-                {Number(post.price).toLocaleString() || 0}
-              </h2>
+              {post.isSponsored && (
+                <h2 className="flex font-bold gap-1 items-center text-primary text-lg">
+                  <IndianRupee className="w-4 h-4" />
+                  {Number(post.price).toLocaleString() || 0}
+                </h2>
+              )}
 
-              <Popover open={ratingOpen} onOpenChange={setRatingOpen}>
-                <PopoverTrigger asChild>
-                  <button className="outline-none hover:opacity-80 transition-opacity">
-                    {renderDisplayRating(post.averageRating, post.totalRatings)}
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent
-                  className="w-auto p-3"
-                  // align="end text-foreground"
-                >
-                  <div className="flex flex-col items-center gap-2">
-                    <span className="text-xs font-medium">
-                      {userRating > 0 ? "Your rating" : "Rate this post"}
-                    </span>
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          type="button"
-                          className="focus:outline-none transition-transform hover:scale-110"
-                          onMouseEnter={() => setHoverRating(star)}
-                          onMouseLeave={() => setHoverRating(0)}
-                          onClick={() => handleRate(star)}
-                          disabled={isRating}
-                        >
-                          <Star
-                            className={cn(
-                              "w-6 h-6",
-                              (hoverRating || userRating) >= star
-                                ? "fill-yellow-400 text-yellow-400"
-                                : "text-muted-foreground/30",
-                            )}
-                          />
-                        </button>
-                      ))}
+              {post.isSponsored && (
+                <Popover open={ratingOpen} onOpenChange={setRatingOpen}>
+                  <PopoverTrigger asChild>
+                    <button className="outline-none hover:opacity-80 transition-opacity">
+                      {renderDisplayRating(
+                        post.averageRating,
+                        post.totalRatings,
+                      )}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    className="w-auto p-3"
+                    // align="end text-foreground"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="text-xs font-medium">
+                        {userRating > 0 ? "Your rating" : "Rate this post"}
+                      </span>
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            className="focus:outline-none transition-transform hover:scale-110"
+                            onMouseEnter={() => setHoverRating(star)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            onClick={() => handleRate(star)}
+                            disabled={isRating}
+                          >
+                            <Star
+                              className={cn(
+                                "w-6 h-6",
+                                (userRating || hoverRating) >= star
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-muted-foreground/30",
+                              )}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                      {isRating && (
+                        <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
+                      )}
                     </div>
-                    {isRating && (
-                      <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
-                    )}
-                  </div>
-                </PopoverContent>
-              </Popover>
+                  </PopoverContent>
+                </Popover>
+              )}
             </div>
 
             <h4
               className="font-medium text-sm leading-snug line-clamp-2 mt-1 cursor-pointer hover:text-primary"
               onClick={() => navigate(`/post/${post.id}`)}
             >
-              {post.title ?? post.caption ?? "No Title"}
+              {post.title ?? post.caption ?? ""}
             </h4>
 
             {post.location && (

@@ -1,14 +1,23 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
+
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+
 import CreateMenu from "@/components/CreateMenu";
-import MasonryFeed from "@/components/MasonryFeed";
 import FriendSuggestion from "@/components/friend/FriendSuggestion";
 import ReelCarousel from "@/components/ReelCarousel";
-import { useGetEntertainmentReelsQuery } from "@/store/api/postsApi";
 import SponsorAdsCarousel from "@/components/SponsorAdsCarousel";
+import { FeedSkeleton } from "@/components/feed/FeedSkeleton";
+
+import {
+  useGetEntertainmentReelsQuery,
+  useGetMixFeedQuery,
+} from "@/store/api/postsApi";
+import MasonryFeed from "@/components/homeSection/MasonryFeed";
 
 const sections = [
   {
@@ -51,101 +60,132 @@ const sections = [
 
 export default function HomeSections() {
   const navigate = useNavigate();
-  const { data: ReelVideoes, isLoading } = useGetEntertainmentReelsQuery();
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const [page, setPage] = useState(1);
+  const [seed, setSeed] = useState<string | undefined>(undefined);
 
-  const feedData: any[] = [];
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  const { data: ReelVideoes } = useGetEntertainmentReelsQuery();
+
+  const {
+    data: feedData,
+    isLoading,
+    isFetching,
+  } = useGetMixFeedQuery({
+    page,
+    limit: 10,
+    seed,
+  });
+
+  // Jab pehla page load ho, seed ko save karein
+  useEffect(() => {
+    if (page === 1 && feedData?.meta?.seed) {
+      setSeed(feedData.meta.seed);
+    }
+  }, [feedData, page]);
+
+  // Infinite Scroll Trigger function
+  const handleLoadMore = useCallback(() => {
+    const hasMore = feedData?.meta ? page < feedData.meta.lastPage : false;
+    if (hasMore && !isFetching) {
+      setPage((prev) => prev + 1);
+    }
+  }, [feedData, isFetching, page]);
+
+  // Observer Logic
+  useEffect(() => {
+    if (isFetching) return;
+
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          handleLoadMore();
+        }
+      },
+      { threshold: 0.1, rootMargin: "100px" },
+    );
+
+    if (loadMoreRef.current) observerRef.current.observe(loadMoreRef.current);
+
+    return () => observerRef.current?.disconnect();
+  }, [handleLoadMore, isFetching]);
+
+  if (isLoading && page === 1) return <FeedSkeleton />;
 
   return (
     <div className="w-full px-4 md:px-10 py-6 space-y-8 bg-background text-foreground">
-      {/* Banner - gradient works in both modes */}
-
-      {/* Search */}
+      {/* Search & Create */}
       <div className="max-w-3xl flex gap-5 items-center justify-center mx-auto">
         <Input
           placeholder="Search services, people, jobs, products..."
-          className="h-12 rounded-full px-6 bg-background border-input focus-visible:ring-ring"
+          className="h-12 rounded-full px-6 bg-background border-input"
         />
         <CreateMenu />
       </div>
 
-      <div
-        className="
-          grid 
-          grid-cols-1 
-          sm:grid-cols-2 
-          md:grid-cols-3 
-          lg:grid-cols-6 
-          gap-4
-        "
-      >
+      {/* Categories Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         {sections.map((item) => (
           <Card
             key={item.title}
-            className="overflow-hidden cursor-pointer hover:shadow-md transition-all border-border bg-card rounded-lg m-0 p-0"
+            className="overflow-hidden cursor-pointer gap-0 p-0 hover:shadow-md border-border transition-all rounded-lg group"
             onClick={() => navigate(item.path)}
           >
-            {/* Title - tight padding, no bottom margin */}
-            <div className="bg-red-600 dark:bg-red-700 text-white text-center py-2 font-semibold text-sm m-0 border-b border-red-800/30">
+            <div className="bg-red-600 dark:bg-red-700 text-white text-center py-2 font-semibold text-xs border-b border-red-800/30">
               {item.title}
             </div>
-
-            {/* Image area - no extra space */}
-            <CardContent className="p-0 m-0">
-              <div className="relative w-full aspect-[4/3]">
-                {" "}
-                {/* 4:3 ya 3:4 ratio – adjust kar sakte ho */}
-                {/* Skeleton - pehle se dikhega */}
-                <Skeleton className="absolute inset-0 w-full h-full bg-muted animate-pulse" />
-                {/* Image - load hone pe fade in, skeleton cover karega */}
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="
-            absolute inset-0 w-full h-full
-            object-cover transition-transform duration-300
-            hover:scale-105
-            opacity-0 data-[loaded=true]:opacity-100 transition-opacity duration-400
-            m-0 p-0 block
-          "
-                  loading="lazy"
-                  draggable={false}
-                  data-loaded="false"
-                  onLoad={(e) => {
-                    e.currentTarget.dataset.loaded = "true";
-                  }}
-                  onError={(e) => {
-                    e.currentTarget.src =
-                      "https://via.placeholder.com/400x300?text=Image+Not+Found";
-                    e.currentTarget.dataset.loaded = "true";
-                  }}
-                />
-              </div>
+            <CardContent className="p-0 relative aspect-[4/3]">
+              <Skeleton className="absolute inset-0 w-full h-full bg-muted" />
+              <img
+                src={item.image}
+                alt={item.title}
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-0 data-[loaded=true]:opacity-100"
+                onLoad={(e) => (e.currentTarget.dataset.loaded = "true")}
+              />
             </CardContent>
           </Card>
         ))}
       </div>
 
       <ReelCarousel stories={ReelVideoes} />
-
       <FriendSuggestion />
       <SponsorAdsCarousel />
 
-      {/* Feed */}
+      {/* Mixed Feed Section */}
       <div className="mx-auto">
-        <div>
-          <MasonryFeed posts={feedData} />
-        </div>
-        <div className="text-center py-6">
-          <Button
-            variant="ghost"
-            className="text-primary hover:text-primary/80 hover:bg-primary/5"
-            onClick={() => navigate("/mlife")}
-          >
-            See More →
-          </Button>
+        <h2 className="text-xl font-bold mb-6 px-2">Discover Feed</h2>
+
+        {/* Masonry Layout */}
+        <MasonryFeed posts={feedData?.data || []} />
+
+        {/* Infinite Scroll Loader */}
+        <div ref={loadMoreRef} className="py-10 flex flex-col items-center">
+          {isFetching && (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <span>Fetching more posts...</span>
+            </div>
+          )}
+
+          {feedData?.meta && page >= feedData.meta.lastPage && (
+            <div className="text-center space-y-2">
+              <p className="text-muted-foreground text-sm font-medium italic">
+                You've reached the end of the feed! 🎉
+              </p>
+              <Button
+                variant="link"
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                  setPage(1);
+                }}
+              >
+                Back to Top
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

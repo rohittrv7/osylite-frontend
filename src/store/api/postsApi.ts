@@ -10,7 +10,11 @@ import type {
 } from "@/types/post";
 import type { FollowUser } from "@/components/FollowList";
 import type { ReelResponse } from "@/types/reel";
-import type { ExplorePost } from "@/types/feed";
+import type {
+  ExplorePost,
+  GetMixFeedArgs,
+  MixFeedResponse,
+} from "@/types/feed";
 
 export interface CreateCommentDto {
   postId: string;
@@ -168,6 +172,33 @@ export const postsApi = rootApiSlice.injectEndpoints({
       },
     }),
 
+    getMixFeed: builder.query<MixFeedResponse, GetMixFeedArgs>({
+      query: ({ page, limit = 10, seed }) => ({
+        url: "/posts/feed/mix",
+        params: {
+          page,
+          limit,
+          seed,
+        },
+      }),
+
+      serializeQueryArgs: ({ endpointName }) => {
+        return `${endpointName}`;
+      },
+
+      merge: (currentCache, newData, { arg }) => {
+        if (arg.page === 1) {
+          return newData;
+        }
+        currentCache.data.push(...newData.data);
+        currentCache.meta = newData.meta;
+      },
+
+      forceRefetch({ currentArg, previousArg }) {
+        return currentArg?.page !== previousArg?.page;
+      },
+    }),
+
     transferCoins: builder.mutation<
       void,
       { receiverId: string; amount: number; note?: string }
@@ -258,4 +289,5 @@ export const {
   useIncrementShareMutation,
   useGetPublicFeedQuery,
   useGetPostByIdQuery,
+  useGetMixFeedQuery,
 } = postsApi;

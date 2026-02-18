@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 interface MediaGridProps {
   mediaUrls: string[];
-  type: "image" | "video" | "reel" | "post";
+  type: "video" | "reel" | "post";
   onMediaClick: (url: string, index: number) => void;
   // compact?: boolean;
 }
@@ -12,7 +12,6 @@ export const MediaGrid = ({
   mediaUrls,
   type,
   onMediaClick,
-
 }: MediaGridProps) => {
   const count = mediaUrls.length;
 

@@ -24,7 +24,11 @@ import { clearAuth } from "@/store/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-const Header = () => {
+interface HeaderProps {
+  isExpanded: boolean;
+}
+
+const Header = ({ isExpanded }: HeaderProps) => {
   const { theme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
   const user = useSelector(selectAuthUser);
@@ -48,8 +52,10 @@ const Header = () => {
 
   return (
     <header
-      className="h-16 fixed top-0 left-0 right-0 md:left-64 z-40
-      bg-background border-b border-border flex items-center justify-between px-4"
+      className={`h-16 fixed top-0 right-0 z-40
+      bg-background border-b border-border flex items-center justify-between px-4
+      transition-all duration-300 ease-in-out
+      ${isExpanded ? "left-0 md:left-64" : "left-0 md:left-20"}`}
     >
       <div></div>
 

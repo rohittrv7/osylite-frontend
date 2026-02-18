@@ -89,7 +89,7 @@ export interface ExplorePost {
 
   isEnquiryPost: boolean;
   ctaLabel: string[];
-
+  isSponsored: boolean;
   likesCount: number;
   commentsCount: number;
   viewsCount: number;
@@ -165,4 +165,71 @@ export interface FeedMeta {
 export interface FeedResponse {
   data: ExplorePost[];
   meta: FeedMeta;
+}
+
+export interface FeedAuthor {
+  id: string;
+  name: string;
+  avatar: string | null;
+  type: "associate" | "channel" | "user";
+  isVerified: boolean;
+  username?: string; // Associate ke liye
+  handle?: string; // Channel ke liye
+}
+
+export interface FeedPost {
+  id: string;
+  title: string | null;
+  caption: string | null;
+  description: string | null;
+  fileUrl: string[];
+  thumbnailUrl: string | null;
+  location: string | null;
+  latitude: string | null;
+  longitude: string | null;
+  type: "post" | "video" | "reel";
+  status: string;
+  averageRating: number;
+  totalRatings: number;
+  visibility: string;
+  audience: string;
+  displayArea: string | null;
+  earningMod: "free" | "paid_viewer";
+  price: string;
+  category: string | null;
+  categoryDetails: Record<string, any> | null;
+  isEnquiryPost: boolean;
+  ctaLabel: string[];
+  likesCount: number;
+  myRatingVal: number;
+  commentsCount: number;
+  sharesCount: number;
+  viewsCount: number;
+  isPaidContent: boolean;
+  userId: string;
+  channelId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  isSponsored: boolean;
+  sponsoredLabel: string | null;
+  author: FeedAuthor;
+}
+
+export interface FeedMeta {
+  total: number;
+  page: number;
+  limit: number;
+  lastPage: number;
+  seed: string;
+}
+
+export interface MixFeedResponse {
+  data: FeedPost[];
+  meta: FeedMeta;
+}
+
+export interface GetMixFeedArgs {
+  page: number;
+  limit?: number;
+  seed?: string;
 }
