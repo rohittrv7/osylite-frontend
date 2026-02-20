@@ -54,6 +54,11 @@ import PostDetailsPage from "./pages/PostDetailsPage";
 import { AssociatesList } from "./pages/AssociatesList";
 import AssociateProfile from "./pages/AssociateProfile";
 import EditProfile from "./pages/EditProfile";
+import Track from "./pages/courier/Track";
+import CalculatorPage from "./pages/courier/Calculator";
+import BranchesPage from "./pages/courier/Branches";
+import ComplaintsPage from "./pages/courier/Complaints";
+import ReceiptPage from "./pages/courier/Receipt";
 
 function App() {
   const dispatch = useDispatch();
@@ -131,6 +136,11 @@ function App() {
             path="/entertainment/:category"
             element={<EntertainMentPage />}
           />
+          <Route path="/track" element={<Track />} />
+          <Route path="/calculator" element={<CalculatorPage />} />
+          <Route path="/branches" element={<BranchesPage />} />
+          <Route path="/complaints" element={<ComplaintsPage />} />
+          <Route path="/receipt" element={<ReceiptPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/mchat" element={<Chat />} />
           <Route path="/friends" element={<Friends />} />

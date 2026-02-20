@@ -8,6 +8,7 @@ import JobFeedPage from "@/pages/JobFeedPage";
 import { SERVICE_CATEGORY, type ServiceCategory } from "@/types/content";
 import MatrimonyFeedPage from "./MatrimonyFeedPage";
 import Index from "./property/Index";
+import Courier from "./courier/Courier";
 
 export default function AngService() {
   const location = useLocation();
@@ -20,6 +21,7 @@ export default function AngService() {
   const isJobSearch = category === SERVICE_CATEGORY.SEARCH_JOB;
   const isMatrimonySearch = category === SERVICE_CATEGORY.MATRIMONY;
   const isProperty = category === SERVICE_CATEGORY.PROPERTY;
+  const isCourier = category === SERVICE_CATEGORY.BOOK_COURIER;
 
   const filters: ExploreFilters | typeof skipToken =
     category && !isJobSearch
@@ -35,6 +37,8 @@ export default function AngService() {
   if (isMatrimonySearch) {
     return <MatrimonyFeedPage />;
   }
+
+  if (isCourier) return <Courier />;
 
   if (isProperty) {
     return <Index />;
