@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Form } from "@/components/ui/form"; // Added Form Wrapper
 import { CategorySelector } from "./CategorySelector";
 import { CommonFields } from "./section/CommonFields";
 import { MedicalFields } from "./section/MedicalFields";
@@ -17,6 +18,7 @@ import { FoodFields } from "./section/FoodFields";
 import { BankFields } from "./section/BankFields";
 import { CreatorFields } from "./section/CreatorFields";
 import { DeliveryFields } from "./section/DeliveryFields";
+import { CourierFields } from "./section/CourierFields";
 import {
   AssociateCategory,
   CATEGORY_LABELS,
@@ -56,7 +58,7 @@ export function AssociateRegistrationForm() {
       lastName: "",
       email: "",
       password: "",
-      confirmPassword: "", // Present for validation UI only
+      confirmPassword: "",
       businessName: "",
       address: "",
       city: "",
@@ -64,6 +66,15 @@ export function AssociateRegistrationForm() {
       pincode: "",
       businessMobile: "",
       website: "",
+      // Courier Default Values
+      officeEmail: "",
+      workingDays: "",
+      validFrom: "",
+      taluk: "",
+      region: "",
+      division: "",
+      hoName: "",
+      subDivision: "",
     },
     mode: "onChange",
   });
@@ -73,20 +84,17 @@ export function AssociateRegistrationForm() {
     handleSubmit,
     formState: { isSubmitting, errors },
   } = form;
+
   const selectedCategory = watch("category");
 
   const onSubmit = async (data: AssociateFormSchema) => {
     try {
-      // 1. Generate Unique Username
-      // Example: rohitkumar + random numbers
       const baseName = `${data.firstName}${data.lastName}`
         .toLowerCase()
         .replace(/\s+/g, "");
       const randomSuffix = Math.floor(1000 + Math.random() * 9000);
       const uniqueUsername = `${baseName}${randomSuffix}`;
 
-      // 2. Prepare Payload - Remove confirmPassword using destructuring
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword: _, ...restData } = data;
 
       const payload = {
@@ -119,6 +127,9 @@ export function AssociateRegistrationForm() {
     selectedCategory && CREATOR_CATEGORIES.includes(selectedCategory);
   const showDelivery =
     selectedCategory && DELIVERY_CATEGORIES.includes(selectedCategory);
+
+  // Strict comparison to avoid TS error
+  const showCourier = selectedCategory === AssociateCategory.COURIER_BOOK;
 
   if (profileIsLoading) {
     return (
@@ -156,74 +167,73 @@ export function AssociateRegistrationForm() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Category Selection Card */}
-          <Card className="border-2 border-dashed border-primary/20 bg-card shadow-sm hover:shadow-md transition-shadow">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg flex items-center gap-2">
-                1. Choose Category
-              </CardTitle>
-              <CardDescription>
-                Select the category that best describes your business
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <CategorySelector
-                value={selectedCategory}
-                onChange={(v) =>
-                  form.setValue("category", v, { shouldValidate: true })
-                }
-                error={errors.category}
-              />
-              {selectedCategory && (
-                <div className="mt-4 flex justify-center animate-in fade-in zoom-in duration-300">
-                  <span className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1 text-sm font-medium text-primary ring-1 ring-inset ring-primary/20">
-                    Selected: {CATEGORY_LABELS[selectedCategory]}
-                  </span>
+        {/* FIX: Form Wrapper Added here */}
+        <Form {...form}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <Card className="border-2 border-dashed border-primary/20 bg-card shadow-sm hover:shadow-md transition-shadow">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  1. Choose Category
+                </CardTitle>
+                <CardDescription>
+                  Select the category that best describes your business
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <CategorySelector
+                  value={selectedCategory}
+                  onChange={(v) =>
+                    form.setValue("category", v, { shouldValidate: true })
+                  }
+                  error={errors.category}
+                />
+                {selectedCategory && (
+                  <div className="mt-4 flex justify-center animate-in fade-in zoom-in duration-300">
+                    <span className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1 text-sm font-medium text-primary ring-1 ring-inset ring-primary/20">
+                      Selected: {CATEGORY_LABELS[selectedCategory]}
+                    </span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {selectedCategory && (
+              <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+                <CommonFields form={form} />
+
+                {showMedical && <MedicalFields form={form} />}
+                {showEducation && <EducationFields form={form} />}
+                {showTrade && <TradeFields form={form} />}
+                {showFood && <FoodFields form={form} />}
+                {showBank && <BankFields form={form} />}
+                {showCreator && <CreatorFields form={form} />}
+                {showDelivery && <DeliveryFields form={form} />}
+                {showCourier && <CourierFields form={form} />}
+
+                <div className="flex flex-col gap-4 pt-6 border-t mt-8">
+                  <Button
+                    type="submit"
+                    size="lg"
+                    disabled={isSubmitting}
+                    className="w-full text-lg font-semibold shadow-lg transition-transform active:scale-[0.98]"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Creating Account...
+                      </>
+                    ) : (
+                      <>Submit Application</>
+                    )}
+                  </Button>
+                  <p className="text-xs text-center text-muted-foreground">
+                    By clicking submit, you agree to our Terms and Conditions.
+                  </p>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Dynamic Form Sections */}
-          {selectedCategory && (
-            <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
-              {/* Common Fields (Personal + Business) */}
-              <CommonFields form={form} />
-
-              {/* Conditional Fields */}
-              {showMedical && <MedicalFields form={form} />}
-              {showEducation && <EducationFields form={form} />}
-              {showTrade && <TradeFields form={form} />}
-              {showFood && <FoodFields form={form} />}
-              {showBank && <BankFields form={form} />}
-              {showCreator && <CreatorFields form={form} />}
-              {showDelivery && <DeliveryFields form={form} />}
-
-              {/* Submit Button */}
-              <div className="flex flex-col gap-4 pt-6 border-t mt-8">
-                <Button
-                  type="submit"
-                  size="lg"
-                  disabled={isSubmitting}
-                  className="w-full text-lg font-semibold shadow-lg transition-transform active:scale-[0.98]"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Creating Account...
-                    </>
-                  ) : (
-                    <>Submit Application</>
-                  )}
-                </Button>
-                <p className="text-xs text-center text-muted-foreground">
-                  By clicking submit, you agree to our Terms and Conditions.
-                </p>
               </div>
-            </div>
-          )}
-        </form>
+            )}
+          </form>
+        </Form>
       </div>
     </div>
   );

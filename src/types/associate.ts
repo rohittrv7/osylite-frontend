@@ -129,6 +129,8 @@ export const AssociateCategory = {
   // --- Financial ---
   BANK_BM_OTHERS: "bank_bm_others",
 
+  COURIER_BOOK: "Book Courier",
+
   // --- Others ---
   OTHERS: "others",
 } as const;
@@ -178,6 +180,7 @@ export const CATEGORY_LABELS: Record<AssociateCategory, string> = {
   [AssociateCategory.COACHING_CENTRE_OWNER]: "Coaching Centre Owner",
   [AssociateCategory.TRAINING_INSTITUTE_OWNER]: "Training Institute Owner",
   [AssociateCategory.GYM_OWNER]: "Gym Owner",
+  [AssociateCategory.COURIER_BOOK]: "Book Courier",
   [AssociateCategory.PARK_DIRECTOR]: "Park Director",
   [AssociateCategory.CINEMA_HALL_OWNER]: "Cinema Hall Owner",
   [AssociateCategory.GARDEN]: "Garden",
@@ -275,6 +278,7 @@ export const CATEGORY_GROUPS = {
     AssociateCategory.DISTRIBUTOR,
     AssociateCategory.CNF,
     AssociateCategory.TRADING,
+    AssociateCategory.COURIER_BOOK,
   ],
   Manufacturing: [AssociateCategory.FACTORY_OWNER],
   "Food & Hospitality": [

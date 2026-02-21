@@ -64,6 +64,11 @@ const venues = [
     category: AssociateCategory.RESTAURANT_OWNER,
     img: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
   },
+  {
+    title: "Courier",
+    category: AssociateCategory.COURIER_BOOK,
+    img: "https://plus.unsplash.com/premium_photo-1665203442280-1118daf3de38",
+  },
 ];
 
 export default function VenueExplore() {
@@ -91,7 +96,7 @@ export default function VenueExplore() {
         {venues.map((venue) => (
           <Card
             key={venue.title}
-            className="group overflow-hidden rounded-2xl shadow-sm transition hover:shadow-lg cursor-pointer"
+            className="group  overflow-hidden rounded-2xl shadow-sm transition hover:shadow-lg cursor-pointer"
             onClick={() => navigate(`/venue-explore/${venue.category}`)}
           >
             <div className="relative h-40 w-full overflow-hidden">

@@ -8,7 +8,6 @@ import {
   FileText,
   ArrowRight,
   Truck,
-  Building2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,12 +97,9 @@ export default function Courier() {
               <Card className="shadow-2xl border-2">
                 <CardContent className="p-6">
                   <Tabs defaultValue="track" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 mb-6">
+                    <TabsList>
                       <TabsTrigger value="track" className="gap-2">
                         <Truck className="w-4 h-4" /> Track
-                      </TabsTrigger>
-                      <TabsTrigger value="locate" className="gap-2">
-                        <Building2 className="w-4 h-4" /> Locate
                       </TabsTrigger>
                     </TabsList>
 
@@ -131,26 +127,6 @@ export default function Courier() {
                         *Enter your 13-digit tracking number to see real-time
                         updates.
                       </p>
-                    </TabsContent>
-
-                    <TabsContent value="locate" className="space-y-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-bold uppercase opacity-70">
-                          Search by Pincode
-                        </label>
-                        <div className="flex gap-2">
-                          <Input
-                            placeholder="Enter 6 digit Pincode"
-                            className="h-12 border-2"
-                          />
-                          <Button
-                            variant="secondary"
-                            className="h-12 px-6 font-bold"
-                          >
-                            FIND
-                          </Button>
-                        </div>
-                      </div>
                     </TabsContent>
                   </Tabs>
                 </CardContent>
