@@ -14,8 +14,8 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "logo.png"], // logo.png yahan add karein
       manifest: {
-        name: "Channel Management | ANG Growth",
-        short_name: "ANG Growth",
+        name: "Osylite",
+        short_name: "Osylite",
         description:
           "Official Channel Management Application for the ANG Growth Ecosystem providing secure management tools.",
         display: "standalone", // Ye browser UI ko hata deta hai

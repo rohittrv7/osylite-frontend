@@ -55,7 +55,7 @@ const HeroSection = () => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <a
-                href="/app-release.apk"
+                href="/base.apk"
                 download="Osylite.apk" // Download hone par ye naam dikhega
                 target="_blank"
                 rel="noopener noreferrer"

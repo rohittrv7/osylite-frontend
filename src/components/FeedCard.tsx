@@ -84,8 +84,8 @@ const FeedCard = ({ post, viewMode = "grid" }: FeedCardProps) => {
   return (
     <Card
       className={cn(
-        "overflow-hidden border-0 shadow-md hover:shadow-lg transition-shadow duration-300 group bg-card",
-        viewMode === "list" && "flex flex-row",
+        "overflow-hidden border-0 shadow-md hover:shadow-lg transition-shadow duration-300 group bg-card h-fit", // h-fit added taaki content ke hisab se height adjust ho
+        viewMode === "list" && "flex flex-col sm:flex-row", // Mobile friendly list view
         post.isAd && "ring-1 ring-primary/20",
       )}
     >
@@ -122,7 +122,7 @@ const FeedCard = ({ post, viewMode = "grid" }: FeedCardProps) => {
         <div
           className={cn(
             "relative overflow-hidden",
-            viewMode === "list" ? "w-40 sm:w-48 shrink-0" : "w-full",
+            viewMode === "list" ? "w-full sm:w-64 shrink-0" : "w-full",
           )}
         >
           {post.isAd && (

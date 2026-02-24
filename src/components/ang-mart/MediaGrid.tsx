@@ -1,11 +1,10 @@
-import { Play, Layers } from "lucide-react"; // Layers icon for multi-image indicator
+import { Play, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface MediaGridProps {
   mediaUrls: string[];
   type: "video" | "reel" | "post";
   onMediaClick: (url: string, index: number) => void;
-  // compact?: boolean;
 }
 
 export const MediaGrid = ({
@@ -18,7 +17,6 @@ export const MediaGrid = ({
   if (count === 0) return null;
 
   const renderMedia = (url: string, index: number, className?: string) => {
-    // Robust extension check + prop type fallback
     const isVideo =
       url?.match(/\.(mp4|webm|mov)$/i) || type === "video" || type === "reel";
 
@@ -26,7 +24,7 @@ export const MediaGrid = ({
       <div
         key={index}
         className={cn(
-          "relative w-full h-full cursor-pointer overflow-hidden bg-muted group",
+          "relative w-full cursor-pointer overflow-hidden bg-muted group",
           className,
         )}
         onClick={(e) => {
@@ -38,12 +36,11 @@ export const MediaGrid = ({
           <div className="relative w-full h-full bg-black flex items-center justify-center">
             <video
               src={url}
-              className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+              className="w-full h-auto max-h-[70vh] object-contain opacity-90 group-hover:opacity-100 transition-opacity"
               muted
               playsInline
-              // Optionally loop in feed or just show thumbnail
             />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors">
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10">
               <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
                 <Play className="w-5 h-5 text-white fill-white ml-0.5" />
               </div>
@@ -53,7 +50,9 @@ export const MediaGrid = ({
           <img
             src={url}
             alt={`Media ${index}`}
-            className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+            // h-auto ensures the image takes its natural height
+            // max-h restricts extremely long images from breaking the UI
+            className="w-full h-auto max-h-[75vh] object-contain transition-transform duration-700 hover:scale-105"
             loading="lazy"
           />
         )}
@@ -61,66 +60,48 @@ export const MediaGrid = ({
     );
   };
 
-  // --- Layout Logic ---
+  // --- Flexible Layout Logic ---
 
-  // 1. Single Media
+  // 1. Single Media (Purely Natural Height)
   if (count === 1) {
     return (
-      <div className="aspect-[4/3] w-full border-b border-border/20">
+      <div className="w-full border-b border-border/20">
         {renderMedia(mediaUrls[0], 0)}
       </div>
     );
   }
 
-  // 2. Two Media (Split Vertically)
-  if (count === 2) {
-    return (
-      <div className="grid grid-cols-2 gap-0.5 aspect-[4/3] w-full border-b border-border/20">
-        {renderMedia(mediaUrls[0], 0)}
-        {renderMedia(mediaUrls[1], 1)}
-        {/* Multi-photo indicator icon */}
-        <div className="absolute top-3 right-3 bg-black/50 p-1.5 rounded-full backdrop-blur-sm pointer-events-none">
-          <Layers className="w-4 h-4 text-white" />
-        </div>
-      </div>
-    );
-  }
-
-  // 3. Three Media
-  if (count === 3) {
-    return (
-      <div className="grid grid-cols-2 gap-0.5 aspect-[4/3] w-full border-b border-border/20 relative">
-        <div className="row-span-2 h-full">
-          {renderMedia(mediaUrls[0], 0, "h-full")}
-        </div>
-        <div className="grid grid-rows-2 gap-0.5 h-full">
-          {renderMedia(mediaUrls[1], 1, "h-full")}
-          {renderMedia(mediaUrls[2], 2, "h-full")}
-        </div>
-        <div className="absolute top-3 right-3 bg-black/50 p-1.5 rounded-full backdrop-blur-sm pointer-events-none">
-          <Layers className="w-4 h-4 text-white" />
-        </div>
-      </div>
-    );
-  }
-
-  // 4. Four or More Media
+  // 2. Multi-image (Keeping them consistent but slightly more flexible)
+  // Grid layouts for multiple images usually work better with a base aspect ratio
+  // to avoid a "messy" look, but we'll use a taller default.
   return (
-    <div className="grid grid-cols-2 grid-rows-2 gap-0.5 aspect-square w-full border-b border-border/20 relative">
-      {renderMedia(mediaUrls[0], 0)}
-      {renderMedia(mediaUrls[1], 1)}
-      {renderMedia(mediaUrls[2], 2)}
-
-      <div className="relative h-full">
-        {renderMedia(mediaUrls[3], 3, "h-full")}
-        {count > 4 && (
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center cursor-pointer pointer-events-none backdrop-blur-[2px]">
-            <span className="text-white text-xl font-bold tracking-widest">
-              +{count - 4}
-            </span>
-          </div>
+    <div className="relative w-full border-b border-border/20">
+      <div
+        className={cn(
+          "grid gap-0.5 w-full",
+          count === 2 ? "grid-cols-2" : "grid-cols-2 grid-rows-2",
         )}
+      >
+        {/* Render only up to 4 images in grid */}
+        {mediaUrls.slice(0, 4).map((url, idx) => (
+          <div key={idx} className="relative overflow-hidden aspect-[3/4]">
+            {/* Note: In grid mode, we use aspect ratio so they align perfectly 
+                 but we use 3/4 (Portrait) which covers most phone photos nicely */}
+            {renderMedia(url, idx, "h-full w-full object-cover")}
+
+            {/* Overlay for +Count */}
+            {idx === 3 && count > 4 && (
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center pointer-events-none backdrop-blur-[2px]">
+                <span className="text-white text-xl font-bold">
+                  +{count - 4}
+                </span>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
+
+      {/* Multi-photo indicator icon */}
       <div className="absolute top-3 right-3 bg-black/50 p-1.5 rounded-full backdrop-blur-sm pointer-events-none">
         <Layers className="w-4 h-4 text-white" />
       </div>

@@ -31,7 +31,7 @@ export const uploadToCloudinary = async ({
   formData.append("timestamp", timestamp.toString());
   formData.append("signature", signature);
   formData.append("folder", folder);
-  formData.append("eager", "w_400,h_300,c_pad");
+  // formData.append("eager", "w_400,h_300,c_pad");
 
   const uploadRes = await axios.post(
     `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,

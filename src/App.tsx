@@ -59,6 +59,7 @@ import CalculatorPage from "./pages/courier/Calculator";
 import BranchesPage from "./pages/courier/Branches";
 import ComplaintsPage from "./pages/courier/Complaints";
 import ReceiptPage from "./pages/courier/Receipt";
+import MyBookingsPage from "./pages/MyBookingsPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -161,6 +162,8 @@ function App() {
           <Route path="/withdraw" element={<Withdraw />} />
           {/* <Route path="/history" element={<TransactionHistory />} /> */}
           <Route path="/settings" element={<Settings />} />
+          <Route path="/my-bookings" element={<MyBookingsPage />} />
+
           <Route path="/post/:id" element={<PostDetailsPage />} />
           <Route path="/profile/:id" element={<PublicProfile />} />
 

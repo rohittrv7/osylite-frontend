@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-// Removed ScrollArea to use native flex scroll for better reliability
 import { Button } from "@/components/ui/button";
 import {
   Heart,
@@ -23,6 +22,8 @@ import {
   Users,
   Building,
   FileText,
+  UploadCloud,
+  CheckCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -41,6 +42,20 @@ import {
 } from "@/components/ui/popover";
 import { PostCTA } from "@/types/feed";
 import { useRatePostMutation } from "@/store/api/associateApi";
+
+// --- New Imports for Booking & Upload ---
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { useCreateBookingMutation } from "@/store/api/bookingApi";
+import { useGetAdminQrQuery } from "@/store/api/walletApi";
+import { Badge } from "@/components/ui/badge";
+import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
+import { useLazyGetUploadSignatureQuery } from "@/store/api/cloudinaryApi";
 
 // --- Helper Functions ---
 const formatTimeAgo = (dateString: string): string => {
@@ -67,7 +82,6 @@ const MediaCarousel = ({
   className,
 }: MediaCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  //   const videoRef = useRef<HTMLVideoElement>(null);
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -78,9 +92,6 @@ const MediaCarousel = ({
     e.stopPropagation();
     currentIndex < mediaList.length - 1 && setCurrentIndex((i) => i + 1);
   };
-
-  // const currentUrl = mediaList[currentIndex];
-  // const isVideo = /\.(mp4|webm|mov|m4v)$/i.test(currentUrl);
 
   return (
     <div
@@ -179,17 +190,34 @@ export const PostDetailsPage = () => {
   const [toggleLike] = useToggleLikeMutation();
   const [ratePost, { isLoading: isRating }] = useRatePostMutation();
 
+  // Booking Hooks
+  const { data: payConfig, isLoading: loadingPayConfig } = useGetAdminQrQuery();
+  const [createBooking, { isLoading: isBookingLoading }] =
+    useCreateBookingMutation();
+  const [getSignatureTrigger] = useLazyGetUploadSignatureQuery();
+
   // --- STATES ---
   const [commentText, setCommentText] = useState("");
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLikeAnimation, setShowLikeAnimation] = useState(false);
-
   const [ratingOpen, setRatingOpen] = useState(false);
   const [hoverRating, setHoverRating] = useState(0);
 
+  // Booking States
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [screenshotUrl, setScreenshotUrl] = useState("");
+
   const isMobile = useIsMobile();
+  const finalAmount = Number(post?.price) || 0;
+
+  const dynamicQrUrl = useMemo(() => {
+    if (!payConfig?.upiId || finalAmount <= 0) return payConfig?.qrCodeUrl;
+    const upiLink = `upi://pay?pa=${payConfig.upiId}&pn=ParcelX&am=${finalAmount}`;
+    return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiLink)}`;
+  }, [payConfig, finalAmount]);
 
   useEffect(() => {
     if (post) {
@@ -206,7 +234,12 @@ export const PostDetailsPage = () => {
     );
   }
 
-  if (!post) return <div className="p-10 text-center">Post not found</div>;
+  if (!post)
+    return (
+      <div className="p-10 text-center text-foreground font-medium">
+        Post not found
+      </div>
+    );
 
   const mediaList: string[] = Array.isArray(post.fileUrl)
     ? post.fileUrl
@@ -219,6 +252,7 @@ export const PostDetailsPage = () => {
   const userRating = post.myRating || 0;
   const averageRating = Number(post.averageRating || 0);
 
+  // --- HANDLERS ---
   const handleLike = async () => {
     const previousLiked = isLiked;
     const newLiked = !isLiked;
@@ -267,13 +301,67 @@ export const PostDetailsPage = () => {
     }
   };
 
+  // Cloudinary Secure Upload Logic
+  const getSignature = async ({ folder }: { folder: string }) => {
+    return await getSignatureTrigger({ folder }).unwrap();
+  };
+
+  const handleScreenshotUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+
+      const uploadRes = await uploadToCloudinary({
+        file: file,
+        postType: "payment_proofs",
+        getSignature,
+      });
+
+      if (!uploadRes?.secure_url) throw new Error("Upload failed");
+
+      setScreenshotUrl(uploadRes.secure_url);
+      toast.success("Payment screenshot uploaded successfully!");
+    } catch (err) {
+      apiErrorToastHandler(err);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const confirmBooking = async () => {
+    try {
+      const isPaid = Number(post.price) > 0;
+
+      if (isPaid && !screenshotUrl) {
+        toast.error("Please upload the payment screenshot first");
+        return;
+      }
+
+      const res = await createBooking({
+        postId: post.id,
+        paymentScreenshotUrl: screenshotUrl || undefined,
+      }).unwrap();
+
+      toast.success("Booking submitted successfully!");
+      if (res.invoiceUrl) window.open(res.invoiceUrl, "_blank");
+      setBookingModalOpen(false);
+      setScreenshotUrl("");
+    } catch (err) {
+      apiErrorToastHandler(err);
+    }
+  };
+
   return (
     <div className="h-[91dvh] w-full flex flex-col md:flex-row bg-background overflow-hidden">
       {/* --- LEFT: MEDIA (Carousel) --- */}
-      <div className="relative flex-1 bg-secondary flex items-center justify-center min-h-[45vh] md:min-h-0 md:h-full">
+      <div className="relative flex-1 bg-secondary flex items-center justify-center min-h-[45vh] md:min-h-0 md:h-full border-b md:border-b-0">
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 z-20 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-card transition-colors"
+          className="absolute top-4 left-4 z-20 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-card transition-colors border border-border"
         >
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
@@ -287,33 +375,33 @@ export const PostDetailsPage = () => {
 
         {showLikeAnimation && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
-            <Heart className="w-24 h-24 text-red-500 fill-red-500 animate-heart-pop drop-shadow-2xl" />
+            <Heart className="w-24 h-24 text-destructive fill-destructive animate-heart-pop drop-shadow-2xl" />
           </div>
         )}
       </div>
 
       {/* --- RIGHT: DETAILS & COMMENTS --- */}
       <div className="w-full md:w-[420px] lg:w-[460px] bg-card flex flex-col h-[55vh] md:h-full md:border-l border-border">
-        {/* 1. Header (Fixed Height) */}
-        <div className="p-5 border-b border-border flex items-center justify-between shrink-0 animate-fade-in bg-card z-10">
+        {/* 1. Header */}
+        <div className="p-5 border-b border-border flex items-center justify-between shrink-0 bg-card z-10">
           <div
             className="flex items-center gap-3 cursor-pointer group"
-            onClick={() => navigate(`/profile/${post.channel.user.id}`)}
+            onClick={() => navigate(`/profile/${post.user.id}`)}
           >
-            <Avatar className="w-11 h-11 ring-2 ring-primary/20">
+            <Avatar className="w-11 h-11 ring-2 ring-primary/20 transition-transform group-hover:scale-105">
               <AvatarImage src={post?.user.avatarUrl || ""} />
-              <AvatarFallback className="bg-primary text-primary-foreground font-display text-sm">
+              <AvatarFallback className="bg-primary text-primary-foreground font-display text-sm font-bold uppercase">
                 {post.user.firstName.charAt(0)}
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-semibold text-sm group-hover:text-primary transition-colors">
+              <p className="font-semibold text-sm group-hover:text-primary transition-colors text-foreground">
                 {post.isSponsored ? post.author.name : post.user.firstName}
               </p>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 {post.isSponsored && (
                   <span className="flex items-center gap-0.5">
-                    <MapPin className="w-3 h-3" />
+                    <MapPin className="w-3 h-3 text-primary" />
                     {post.author.city || "Location"}
                   </span>
                 )}
@@ -331,23 +419,21 @@ export const PostDetailsPage = () => {
           </div>
         </div>
 
-        {/* 2. Scrollable Middle Section (Description + Comments) */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-5 scrollbar-thin scrollbar-thumb-secondary scrollbar-track-transparent">
-          {/* Title & Price */}
+        {/* 2. Middle Section */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-5 custom-scrollbar bg-card/50">
           <div className="space-y-3 animate-slide-up">
             <div className="flex items-start justify-between gap-3">
-              <h1 className="text-xl font-display font-bold leading-tight">
+              <h1 className="text-xl font-display font-bold leading-tight text-foreground tracking-tight">
                 {post.title ?? post.caption}
               </h1>
-              {post.isSponsored && (
-                <div className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1.5 rounded-lg font-bold text-lg whitespace-nowrap shrink-0">
+              {finalAmount > 0 && (
+                <div className="flex items-center gap-0.5 bg-primary/10 text-primary px-3 py-1.5 rounded-lg font-black text-lg whitespace-nowrap shrink-0 border border-primary/20">
                   <IndianRupee className="w-4 h-4" />
-                  {Number(post.price).toLocaleString("en-IN")}
+                  {finalAmount.toLocaleString("en-IN")}
                 </div>
               )}
             </div>
 
-            {/* Description */}
             <p
               className={cn(
                 "text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap",
@@ -359,31 +445,32 @@ export const PostDetailsPage = () => {
             {post.description && post.description.length > 100 && (
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="text-xs text-primary font-semibold hover:underline"
+                className="text-xs text-primary font-bold hover:underline"
               >
                 {isExpanded ? "Show less" : "Read more"}
               </button>
             )}
 
-            {/* Rating Popover (Moved here or keep in header, user preference) */}
             <div className="flex items-center justify-between pt-1">
-              <span className="text-xs text-muted-foreground">
+              <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
                 Posted {formatTimeAgo(post.createdAt)}
               </span>
-
               {post.isSponsored && (
                 <Popover open={ratingOpen} onOpenChange={setRatingOpen}>
                   <PopoverTrigger asChild>
-                    <button className="text-xs font-medium text-primary hover:underline">
-                      Rate this
+                    <button className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                      <Star className="w-3 h-3 fill-primary" /> Rate this
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-3" align="end">
-                    <div className="flex gap-1">
+                  <PopoverContent
+                    className="w-auto p-3 bg-popover border-border shadow-xl rounded-xl"
+                    align="end"
+                  >
+                    <div className="flex gap-1.5">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
                           key={star}
-                          className="focus:outline-none hover:scale-110 active:scale-95 transition-transform"
+                          className="focus:outline-none hover:scale-125 active:scale-95 transition-transform"
                           onMouseEnter={() => setHoverRating(star)}
                           onMouseLeave={() => setHoverRating(0)}
                           onClick={() => handleRate(star)}
@@ -391,7 +478,7 @@ export const PostDetailsPage = () => {
                         >
                           <Star
                             className={cn(
-                              "w-6 h-6 transition-colors",
+                              "w-7 h-7 transition-colors",
                               star <= (hoverRating || userRating)
                                 ? "fill-yellow-400 text-yellow-400"
                                 : "text-muted-foreground/30",
@@ -409,7 +496,7 @@ export const PostDetailsPage = () => {
           <div className="h-px bg-border" />
 
           {/* Social Stats Row */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-5">
               <button
                 onClick={handleLike}
@@ -419,25 +506,25 @@ export const PostDetailsPage = () => {
                   className={cn(
                     "w-6 h-6 transition-all group-active:scale-75",
                     isLiked
-                      ? "fill-red-500 text-red-500"
+                      ? "fill-destructive text-destructive"
                       : "text-muted-foreground group-hover:text-foreground",
                   )}
                 />
                 <span
                   className={cn(
-                    "text-sm font-medium",
-                    isLiked ? "text-red-500" : "text-muted-foreground",
+                    "text-sm font-bold",
+                    isLiked ? "text-destructive" : "text-muted-foreground",
                   )}
                 >
                   {likesCount}
                 </span>
               </button>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <MessageCircle className="w-6 h-6" />
-                <span className="text-sm font-medium">{comments.length}</span>
+              <div className="flex items-center gap-2 text-muted-foreground group">
+                <MessageCircle className="w-6 h-6 transition-transform group-hover:scale-110" />
+                <span className="text-sm font-bold">{comments.length}</span>
               </div>
             </div>
-            <button className="text-muted-foreground hover:text-foreground transition-colors">
+            <button className="text-muted-foreground hover:text-foreground transition-all hover:scale-110">
               <Share2 className="w-6 h-6" />
             </button>
           </div>
@@ -446,12 +533,15 @@ export const PostDetailsPage = () => {
 
           {/* Comments List */}
           <div className="space-y-4 pb-2">
-            <h3 className="font-display font-semibold text-base">
-              Comments ({comments.length})
+            <h3 className="font-display font-bold text-base text-foreground flex items-center gap-2">
+              Comments{" "}
+              <Badge variant="secondary" className="px-1.5 h-5 text-[10px]">
+                {comments.length}
+              </Badge>
             </h3>
             {comments.length === 0 ? (
-              <div className="py-8 text-center text-muted-foreground text-sm bg-secondary/20 rounded-lg border border-dashed">
-                No comments yet. Be the first!
+              <div className="py-10 text-center text-muted-foreground text-sm bg-muted/20 rounded-xl border border-dashed border-border/60">
+                No comments yet. Start the conversation!
               </div>
             ) : (
               comments.map((comment, idx) => (
@@ -460,18 +550,18 @@ export const PostDetailsPage = () => {
                   className="flex gap-3 animate-slide-up"
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
-                  <Avatar className="w-8 h-8 shrink-0">
+                  <Avatar className="w-8 h-8 shrink-0 border border-border/40">
                     <AvatarImage src={comment.user.avatarUrl} />
-                    <AvatarFallback className="bg-secondary text-secondary-foreground text-xs font-semibold">
+                    <AvatarFallback className="bg-secondary text-secondary-foreground text-[10px] font-black">
                       {comment.user.firstName[0]}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1 bg-secondary/50 rounded-xl px-3 py-2.5">
+                  <div className="flex-1 bg-muted/40 rounded-2xl px-4 py-3 border border-border/10">
                     <div className="flex justify-between items-baseline mb-1">
-                      <span className="text-xs font-bold mr-1.5">
+                      <span className="text-xs font-bold text-foreground">
                         {comment.user.firstName}
                       </span>
-                      <span className="text-[10px] text-muted-foreground">
+                      <span className="text-[10px] text-muted-foreground font-medium">
                         {formatTimeAgo(comment.createdAt)}
                       </span>
                     </div>
@@ -485,13 +575,12 @@ export const PostDetailsPage = () => {
           </div>
         </div>
 
-        {/* 3. Footer (Fixed Height) */}
-        <div className="border-t border-border p-4 bg-card shrink-0 space-y-3 z-20 shadow-[0_-5px_10px_rgba(0,0,0,0.02)]">
-          {/* Comment Input */}
+        {/* 3. Footer */}
+        <div className="border-t border-border p-4 bg-card shrink-0 space-y-3 z-20 shadow-[0_-8px_16px_rgba(0,0,0,0.03)]">
           <div className="flex gap-2 items-center">
             <Input
               placeholder="Add a comment..."
-              className="flex-1 bg-secondary/50 border-none focus-visible:ring-primary/30 rounded-full px-4 h-10"
+              className="flex-1 bg-muted/50 border-border focus-visible:ring-primary/30 rounded-full px-5 h-11 text-sm"
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleComment()}
@@ -500,63 +589,46 @@ export const PostDetailsPage = () => {
               size="icon"
               onClick={handleComment}
               disabled={!commentText.trim() || isPosting}
-              className="rounded-full w-10 h-10 shrink-0 shadow-sm"
+              className="rounded-full w-11 h-11 shrink-0 shadow-lg transition-transform active:scale-95"
             >
               {isPosting ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                <Send className="w-4 h-4 ml-0.5" />
+                <Send className="w-5 h-5 ml-0.5" />
               )}
             </Button>
           </div>
 
           {/* CTA Buttons */}
           {post?.ctaLabel && post.ctaLabel.length > 0 && (
-            <div className="flex gap-2 pt-1">
-              {post.ctaLabel.map((label) => {
+            <div className="flex gap-2.5 pt-1">
+              {post.ctaLabel.map((label: any) => {
                 let Icon = MessageCircle;
-                switch (label) {
-                  case PostCTA.BUY_NOW:
-                    Icon = ShoppingBag;
-                    break;
-                  case PostCTA.BOOKING:
-                    Icon = Calendar;
-                    break;
-                  case PostCTA.ENQUIRY:
-                    Icon = Info;
-                    break;
-                  case PostCTA.CALL:
-                    Icon = Phone;
-                    break;
-                  case PostCTA.PARTICIPATE:
-                    Icon = Users;
-                    break;
-                  case PostCTA.OFFICE:
-                    Icon = Building;
-                    break;
-                  case PostCTA.APPLY:
-                    Icon = FileText;
-                    break;
-                  default:
-                    Icon = MessageCircle;
-                    break;
-                }
+                if (label === PostCTA.BUY_NOW) Icon = ShoppingBag;
+                else if (label === PostCTA.BOOKING) Icon = Calendar;
+                else if (label === PostCTA.ENQUIRY) Icon = Info;
+                else if (label === PostCTA.CALL) Icon = Phone;
+                else if (label === PostCTA.PARTICIPATE) Icon = Users;
+                else if (label === PostCTA.OFFICE) Icon = Building;
+                else if (label === PostCTA.APPLY) Icon = FileText;
 
                 return (
                   <Button
                     key={label}
                     onClick={() => {
-                      if (label === PostCTA.CALL) {
-                        window.location.href = `tel:${post.channel.user.id}`;
+                      if (label === PostCTA.BOOKING) {
+                        setBookingModalOpen(true);
+                      } else if (label === PostCTA.CALL) {
+                        window.location.href = `tel:${"9876543210"}`;
                       } else {
-                        navigate(`/mchat?userId=${post.channel.user.id}`);
+                        navigate(`/mchat?userId=${post.user.id}`);
                       }
                     }}
                     className={cn(
-                      "flex-1 h-11 cursor-pointer rounded-xl font-semibold text-sm gap-2 shadow-sm transition-transform active:scale-[0.98]",
+                      "flex-1 h-12 cursor-pointer rounded-2xl font-bold text-sm gap-2 shadow-md transition-all active:scale-[0.98] tracking-tight",
                       label === "Chat"
-                        ? "variant-outline border-primary/20 text-primary hover:bg-primary/5"
-                        : "shadow-primary/20",
+                        ? "border-primary/30 text-primary hover:bg-primary/5 shadow-none"
+                        : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/20",
                     )}
                     variant={label === "Chat" ? "outline" : "default"}
                   >
@@ -569,6 +641,112 @@ export const PostDetailsPage = () => {
           )}
         </div>
       </div>
+
+      {/* --- BOOKING DIALOG --- */}
+      <Dialog open={bookingModalOpen} onOpenChange={setBookingModalOpen}>
+        <DialogContent className="max-w-md rounded-[2rem] bg-card border-border shadow-2xl p-0 overflow-hidden">
+          <div className="p-6">
+            <DialogHeader className="mb-4">
+              <DialogTitle className="text-xl font-black italic uppercase tracking-tighter text-foreground flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 text-primary" /> Confirm Booking
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground font-medium">
+                {finalAmount > 0
+                  ? `This is a paid service of ₹${finalAmount.toLocaleString("en-IN")}. Please pay via UPI and upload proof.`
+                  : "This is a free service. Confirm below to complete your booking."}
+              </DialogDescription>
+            </DialogHeader>
+
+            {finalAmount > 0 && (
+              <div className="space-y-5 py-2 animate-in fade-in zoom-in duration-500">
+                {loadingPayConfig ? (
+                  <div className="h-56 flex items-center justify-center bg-muted/30 rounded-3xl border border-dashed">
+                    <Loader2 className="w-10 h-10 animate-spin text-primary opacity-50" />
+                  </div>
+                ) : payConfig ? (
+                  <div className="bg-primary/5 p-5 rounded-[2rem] border-2 border-dashed border-primary/20 text-center shadow-inner">
+                    <p className="text-[10px] font-black text-primary mb-4 uppercase tracking-[0.2em]">
+                      Scan to pay ₹{finalAmount}
+                    </p>
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-30 group-hover:opacity-50 transition-opacity" />
+                      <img
+                        src={dynamicQrUrl}
+                        alt="Payment QR"
+                        className="relative w-52 h-52 mx-auto p-2 rounded-2xl bg-white shadow-xl mb-4 border-2 border-background"
+                      />
+                    </div>
+                    <div className="bg-background/80 backdrop-blur-sm px-4 py-2.5 rounded-2xl inline-flex items-center gap-3 border border-border shadow-sm">
+                      <span className="text-[11px] font-black font-mono text-foreground uppercase tracking-wider">
+                        UPI: {payConfig.upiId}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-5 text-center text-destructive text-sm bg-destructive/10 rounded-2xl border border-destructive/20 font-bold uppercase tracking-tight">
+                    Payment configuration error.
+                  </div>
+                )}
+
+                <div className="space-y-2.5">
+                  <label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest px-1">
+                    Proof of Payment (Screenshot)
+                  </label>
+                  <div className="relative border-2 border-dashed rounded-[1.5rem] p-5 flex flex-col items-center justify-center gap-2 hover:bg-muted/40 transition-all border-border bg-muted/10 group cursor-pointer">
+                    {screenshotUrl ? (
+                      <div className="flex items-center gap-2 text-green-600 font-black text-xs animate-in zoom-in uppercase tracking-tighter">
+                        <CheckCircle className="w-5 h-5 fill-green-500 text-white" />{" "}
+                        Receipt Linked
+                      </div>
+                    ) : (
+                      <>
+                        <UploadCloud className="w-7 h-7 text-muted-foreground group-hover:text-primary transition-colors" />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="absolute inset-0 opacity-0 cursor-pointer"
+                          onChange={handleScreenshotUpload}
+                        />
+                        <span className="text-[11px] text-muted-foreground font-black uppercase tracking-tighter">
+                          {isUploading
+                            ? "Uploading to Cloud..."
+                            : "Tap to upload screenshot"}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-0 border-t border-border">
+            <Button
+              variant="ghost"
+              className="flex-1 rounded-none h-14 font-black uppercase text-xs tracking-widest text-muted-foreground hover:bg-muted/50 border-r"
+              onClick={() => setBookingModalOpen(false)}
+            >
+              Dismiss
+            </Button>
+            <Button
+              className="flex-1 rounded-none h-14 font-black uppercase text-xs tracking-widest bg-primary text-primary-foreground hover:bg-primary/90"
+              disabled={
+                isBookingLoading ||
+                isUploading ||
+                (finalAmount > 0 && !payConfig) ||
+                (finalAmount > 0 && !screenshotUrl)
+              }
+              onClick={confirmBooking}
+            >
+              {isBookingLoading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                "Finalize Booking"
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
