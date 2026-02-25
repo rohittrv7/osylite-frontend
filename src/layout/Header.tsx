@@ -13,7 +13,9 @@ import {
   LogOut,
   Moon,
   Plus,
+  ShoppingBag,
   Sun,
+  Truck,
   Wallet,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -109,6 +111,29 @@ const Header = ({ isExpanded }: HeaderProps) => {
                 Create Channel
               </DropdownMenuItem>
             )}
+
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => navigate("/cart")}
+            >
+              <ShoppingBag className="mr-2 h-4 w-4" />
+              Go to Cart
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => navigate("/my-orders")}
+            >
+              <ShoppingBag className="mr-2 h-4 w-4" />
+              My Order
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => navigate("/my-bookings")}
+            >
+              <Truck className="mr-2 h-4 w-4" />
+              My Booking
+            </DropdownMenuItem>
 
             <DropdownMenuItem className="cursor-pointer">
               <Lock className="mr-2 h-4 w-4" />

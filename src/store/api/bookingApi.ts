@@ -54,7 +54,30 @@ export const bookingApi = rootApiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Bookings"],
     }),
+
+    // builder endpoints mein add karein
+    createOrder: builder.mutation<
+      any,
+      {
+        items: any[];
+        address: string;
+        city: string;
+        pincode: string;
+        paymentScreenshotUrl?: string;
+      }
+    >({
+      query: (body) => ({
+        url: "/bookings/order/create", // Backend endpoint for multi-item orders
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Bookings"],
+    }),
   }),
 });
 
-export const { useCreateBookingMutation, useGetMyBookingsQuery } = bookingApi;
+export const {
+  useCreateBookingMutation,
+  useGetMyBookingsQuery,
+  useCreateOrderMutation,
+} = bookingApi;

@@ -60,6 +60,9 @@ import BranchesPage from "./pages/courier/Branches";
 import ComplaintsPage from "./pages/courier/Complaints";
 import ReceiptPage from "./pages/courier/Receipt";
 import MyBookingsPage from "./pages/MyBookingsPage";
+import CartPage from "./pages/CartPage";
+import MyOrdersPage from "./pages/MyOrdersPage";
+import OrderDetailsPage from "./pages/OrderDetailsPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -137,6 +140,9 @@ function App() {
             path="/entertainment/:category"
             element={<EntertainMentPage />}
           />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/my-orders" element={<MyOrdersPage />} />
+          <Route path="/order-details/:id" element={<OrderDetailsPage />} />
           <Route path="/track" element={<Track />} />
           <Route path="/calculator" element={<CalculatorPage />} />
           <Route path="/branches" element={<BranchesPage />} />

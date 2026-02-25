@@ -54,7 +54,6 @@ import {
   Briefcase,
   MapPin,
   Handshake,
-  Truck,
 } from "lucide-react";
 
 export const baseSidebarConfig: SidebarItem[] = [
@@ -120,13 +119,6 @@ export const baseSidebarConfig: SidebarItem[] = [
     icon: Handshake,
     type: "link",
     path: "/friends",
-  },
-  {
-    id: "booking",
-    label: "My Booking",
-    icon: Truck,
-    type: "link",
-    path: "/my-bookings",
   },
   {
     id: "profile",
