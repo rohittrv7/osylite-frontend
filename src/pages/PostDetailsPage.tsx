@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -22,8 +22,7 @@ import {
   Users,
   Building,
   FileText,
-  UploadCloud,
-  CheckCircle,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -43,7 +42,7 @@ import {
 import { PostCTA } from "@/types/feed";
 import { useRatePostMutation } from "@/store/api/associateApi";
 
-// --- New Imports for Booking & Upload ---
+// --- Imports for Booking ---
 import {
   Dialog,
   DialogContent,
@@ -52,10 +51,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useCreateBookingMutation } from "@/store/api/bookingApi";
-import { useGetAdminQrQuery } from "@/store/api/walletApi";
 import { Badge } from "@/components/ui/badge";
-import { uploadToCloudinary } from "@/lib/uploadToCloudinary";
-import { useLazyGetUploadSignatureQuery } from "@/store/api/cloudinaryApi";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/store/slices/cartSlice";
 
@@ -193,11 +189,9 @@ export const PostDetailsPage = () => {
   const [toggleLike] = useToggleLikeMutation();
   const [ratePost, { isLoading: isRating }] = useRatePostMutation();
 
-  // Booking Hooks
-  const { data: payConfig, isLoading: loadingPayConfig } = useGetAdminQrQuery();
+  // Booking Hook
   const [createBooking, { isLoading: isBookingLoading }] =
     useCreateBookingMutation();
-  const [getSignatureTrigger] = useLazyGetUploadSignatureQuery();
 
   // --- STATES ---
   const [commentText, setCommentText] = useState("");
@@ -210,17 +204,9 @@ export const PostDetailsPage = () => {
 
   // Booking States
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [screenshotUrl, setScreenshotUrl] = useState("");
 
   const isMobile = useIsMobile();
   const finalAmount = Number(post?.price) || 0;
-
-  const dynamicQrUrl = useMemo(() => {
-    if (!payConfig?.upiId || finalAmount <= 0) return payConfig?.qrCodeUrl;
-    const upiLink = `upi://pay?pa=${payConfig.upiId}&pn=ParcelX&am=${finalAmount}`;
-    return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(upiLink)}`;
-  }, [payConfig, finalAmount]);
 
   useEffect(() => {
     if (post) {
@@ -304,61 +290,20 @@ export const PostDetailsPage = () => {
     }
   };
 
-  // Cloudinary Secure Upload Logic
-  const getSignature = async ({ folder }: { folder: string }) => {
-    return await getSignatureTrigger({ folder }).unwrap();
-  };
-
-  const handleScreenshotUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      setIsUploading(true);
-
-      const uploadRes = await uploadToCloudinary({
-        file: file,
-        postType: "payment_proofs",
-        getSignature,
-      });
-
-      if (!uploadRes?.secure_url) throw new Error("Upload failed");
-
-      setScreenshotUrl(uploadRes.secure_url);
-      toast.success("Payment screenshot uploaded successfully!");
-    } catch (err) {
-      apiErrorToastHandler(err);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
   const confirmBooking = async () => {
     try {
-      const isPaid = Number(post.price) > 0;
-
-      if (isPaid && !screenshotUrl) {
-        toast.error("Please upload the payment screenshot first");
-        return;
-      }
-
-      const res = await createBooking({
+      await createBooking({
         postId: post.id,
-        paymentScreenshotUrl: screenshotUrl || undefined,
       }).unwrap();
 
-      toast.success("Booking submitted successfully!");
-      if (res.invoiceUrl) window.open(res.invoiceUrl, "_blank");
+      toast.success("Booking successful! Rupees deducted from wallet.");
       setBookingModalOpen(false);
-      setScreenshotUrl("");
+      navigate("/my-bookings");
     } catch (err) {
       apiErrorToastHandler(err);
     }
   };
 
-  // 🛒 NEW: Buy Now / Add to Cart Logic
   const handleBuyNow = () => {
     const cartItem = {
       id: post.id,
@@ -375,7 +320,7 @@ export const PostDetailsPage = () => {
 
   return (
     <div className="h-[91dvh] w-full flex flex-col md:flex-row bg-background overflow-y-auto md:overflow-hidden scrollbar-hide">
-      {/* --- LEFT: MEDIA (Carousel) --- */}
+      {/* --- LEFT: MEDIA --- */}
       <div className="relative w-full md:flex-1 bg-secondary flex items-center justify-center aspect-square sm:aspect-video md:aspect-auto md:h-full border-b md:border-b-0">
         <button
           onClick={() => navigate(-1)}
@@ -400,7 +345,7 @@ export const PostDetailsPage = () => {
 
       {/* --- RIGHT: DETAILS & COMMENTS --- */}
       <div className="w-full md:w-[400px] lg:w-[460px] bg-card flex flex-col min-h-0 md:h-full md:border-l border-border">
-        {/* 1. Header */}
+        {/* Header */}
         <div className="p-4 sm:p-5 border-b border-border flex items-center justify-between shrink-0 bg-card z-10 sticky top-0 md:static">
           <div
             className="flex items-center gap-3 cursor-pointer group"
@@ -437,7 +382,7 @@ export const PostDetailsPage = () => {
           </div>
         </div>
 
-        {/* 2. Middle Section */}
+        {/* Middle Section */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 sm:space-y-5 custom-scrollbar bg-card/50">
           <div className="space-y-3 animate-slide-up">
             <div className="flex items-start justify-between gap-3">
@@ -445,8 +390,8 @@ export const PostDetailsPage = () => {
                 {post.title ?? post.caption}
               </h1>
               {finalAmount > 0 && (
-                <div className="flex items-center gap-0.5 bg-primary/10 text-primary px-2.5 py-1.5 rounded-lg font-black text-base sm:text-lg whitespace-nowrap shrink-0 border border-primary/20">
-                  <IndianRupee className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <div className="flex items-center gap-0.5 bg-primary/10 text-primary px-2.5 py-1.5 rounded-lg font-black text-base sm:text-lg whitespace-nowrap shrink-0 border border-primary/20 italic">
+                  <IndianRupee className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-0.5" />
                   {finalAmount.toLocaleString("en-IN")}
                 </div>
               )}
@@ -598,7 +543,7 @@ export const PostDetailsPage = () => {
           </div>
         </div>
 
-        {/* 3. Footer */}
+        {/* Footer */}
         <div className="border-t border-border p-3 sm:p-4 bg-card shrink-0 space-y-3 z-20 shadow-[0_-8px_16px_rgba(0,0,0,0.03)] sticky bottom-0 md:static">
           <div className="flex gap-2 items-center">
             <Input
@@ -667,108 +612,71 @@ export const PostDetailsPage = () => {
         </div>
       </div>
 
-      {/* --- BOOKING DIALOG --- */}
+      {/* --- RUPEE DEDUCTION CONFIRMATION DIALOG --- */}
       <Dialog open={bookingModalOpen} onOpenChange={setBookingModalOpen}>
-        <DialogContent className="max-w-[95vw] sm:max-w-md rounded-[1.5rem] sm:rounded-[2rem] bg-card border-border shadow-2xl p-0 overflow-hidden">
-          <div className="p-4 sm:p-6 max-h-[85vh] overflow-y-auto custom-scrollbar">
-            <DialogHeader className="mb-4 text-left">
-              <DialogTitle className="text-lg sm:text-xl font-black italic uppercase tracking-tighter text-foreground flex items-center gap-2">
-                <ShoppingBag className="w-5 h-5 text-primary" /> Confirm Booking
-              </DialogTitle>
-              <DialogDescription className="text-[13px] sm:text-sm text-muted-foreground font-medium">
-                {finalAmount > 0
-                  ? `This is a paid service of ₹${finalAmount.toLocaleString("en-IN")}. Please pay via UPI and upload proof.`
-                  : "This is a free service. Confirm below to complete your booking."}
-              </DialogDescription>
-            </DialogHeader>
+        <DialogContent className="max-w-[90vw] sm:max-w-md rounded-[2rem] border-none p-0 overflow-hidden bg-card shadow-2xl">
+          <div className="p-8 text-center space-y-6">
+            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto animate-pulse">
+              <IndianRupee size={40} className="text-primary" />
+            </div>
 
-            {finalAmount > 0 && (
-              <div className="space-y-4 sm:space-y-5 py-2 animate-in fade-in zoom-in duration-500">
-                {loadingPayConfig ? (
-                  <div className="h-40 sm:h-56 flex items-center justify-center bg-muted/30 rounded-2xl sm:rounded-3xl border border-dashed">
-                    <Loader2 className="w-8 h-8 sm:w-10 sm:h-10 animate-spin text-primary opacity-50" />
-                  </div>
-                ) : payConfig ? (
-                  <div className="bg-primary/5 p-4 sm:p-5 rounded-[1.5rem] sm:rounded-[2rem] border-2 border-dashed border-primary/20 text-center shadow-inner">
-                    <p className="text-[9px] font-black text-primary mb-3 sm:mb-4 uppercase tracking-[0.2em]">
-                      Scan to pay ₹{finalAmount}
-                    </p>
-                    <div className="relative group mx-auto w-fit">
-                      <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-30" />
-                      <img
-                        src={dynamicQrUrl}
-                        alt="Payment QR"
-                        className="relative w-40 h-40 sm:w-52 sm:h-52 mx-auto p-2 rounded-xl sm:rounded-2xl bg-white shadow-xl mb-3 sm:mb-4 border-2 border-background"
-                      />
-                    </div>
-                    <div className="bg-background/80 backdrop-blur-sm px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl inline-flex items-center gap-2 sm:gap-3 border border-border shadow-sm max-w-full">
-                      <span className="text-[10px] sm:text-[11px] font-black font-mono text-foreground uppercase tracking-wider truncate">
-                        UPI: {payConfig.upiId}
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-4 text-center text-destructive text-xs sm:text-sm bg-destructive/10 rounded-xl border border-destructive/20 font-bold uppercase tracking-tight">
-                    Payment configuration error.
-                  </div>
-                )}
+            <div className="space-y-2">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter text-center">
+                  Confirm Booking
+                </DialogTitle>
+                <DialogDescription className="text-center text-sm font-medium text-muted-foreground pt-2">
+                  Booking this service will automatically deduct the amount from
+                  your wallet balance.
+                </DialogDescription>
+              </DialogHeader>
+            </div>
 
-                <div className="space-y-2">
-                  <label className="text-[9px] sm:text-[10px] font-black uppercase text-muted-foreground tracking-widest px-1">
-                    Proof of Payment (Screenshot)
-                  </label>
-                  <div className="relative border-2 border-dashed rounded-[1rem] sm:rounded-[1.5rem] p-4 sm:p-5 flex flex-col items-center justify-center gap-2 hover:bg-muted/40 transition-all border-border bg-muted/10 group cursor-pointer">
-                    {screenshotUrl ? (
-                      <div className="flex items-center gap-2 text-green-600 font-black text-[10px] sm:text-xs animate-in zoom-in uppercase tracking-tighter text-center">
-                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 fill-green-500 text-white" />{" "}
-                        Receipt Linked
-                      </div>
-                    ) : (
-                      <>
-                        <UploadCloud className="w-6 h-6 sm:w-7 sm:h-7 text-muted-foreground group-hover:text-primary transition-colors" />
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="absolute inset-0 opacity-0 cursor-pointer"
-                          onChange={handleScreenshotUpload}
-                        />
-                        <span className="text-[10px] sm:text-[11px] text-muted-foreground font-black uppercase tracking-tighter text-center">
-                          {isUploading
-                            ? "Uploading to Cloud..."
-                            : "Tap to upload screenshot"}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
+            <div className="bg-muted/50 p-6 rounded-[1.5rem] border border-border space-y-4">
+              <div className="flex justify-between items-center text-sm font-bold uppercase tracking-widest">
+                <span className="text-muted-foreground">Service Cost</span>
+                <span className="text-primary flex items-center gap-0.5 text-lg italic font-black">
+                  <IndianRupee size={18} />{" "}
+                  {finalAmount.toLocaleString("en-IN")}
+                </span>
               </div>
-            )}
-          </div>
+              <div className="h-px bg-border border-dashed" />
+              <div className="flex items-start gap-3 text-left">
+                <AlertTriangle
+                  size={18}
+                  className="text-orange-500 shrink-0 mt-0.5"
+                />
+                <p className="text-[11px] font-medium leading-relaxed text-muted-foreground">
+                  By clicking finalize, you agree to deduct{" "}
+                  <span className="text-foreground font-bold italic">
+                    ₹{finalAmount}
+                  </span>{" "}
+                  from your wallet balance. This action cannot be undone once
+                  confirmed.
+                </p>
+              </div>
+            </div>
 
-          <div className="flex gap-0 border-t border-border sticky bottom-0 bg-card">
-            <Button
-              variant="ghost"
-              className="flex-1 rounded-none h-12 sm:h-14 font-black uppercase text-[10px] sm:text-xs tracking-widest text-muted-foreground hover:bg-muted/50 border-r"
-              onClick={() => setBookingModalOpen(false)}
-            >
-              Dismiss
-            </Button>
-            <Button
-              className="flex-1 rounded-none h-12 sm:h-14 font-black uppercase text-[10px] sm:text-xs tracking-widest bg-primary text-primary-foreground hover:bg-primary/90"
-              disabled={
-                isBookingLoading ||
-                isUploading ||
-                (finalAmount > 0 && !payConfig) ||
-                (finalAmount > 0 && !screenshotUrl)
-              }
-              onClick={confirmBooking}
-            >
-              {isBookingLoading ? (
-                <Loader2 className="animate-spin w-4 h-4" />
-              ) : (
-                "Finalize"
-              )}
-            </Button>
+            <div className="flex flex-col gap-3">
+              <Button
+                onClick={confirmBooking}
+                disabled={isBookingLoading}
+                className="w-full h-14 rounded-2xl font-black italic uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl shadow-primary/30 transition-all active:scale-95"
+              >
+                {isBookingLoading ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  "Finalize & Pay"
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setBookingModalOpen(false)}
+                className="font-bold uppercase text-[10px] tracking-[0.2em] text-muted-foreground"
+              >
+                Cancel
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

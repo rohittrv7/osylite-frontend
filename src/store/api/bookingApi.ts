@@ -38,46 +38,20 @@ export interface UserBooking {
 
 export const bookingApi = rootApiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getMyBookings: builder.query<UserBooking[], void>({
+    getMyBookings: builder.query<any[], void>({
       query: () => "/bookings/my-bookings",
       providesTags: ["Bookings"],
     }),
-
-    createBooking: builder.mutation<
-      any,
-      { postId: string; paymentScreenshotUrl?: string }
-    >({
+    createBooking: builder.mutation<any, { postId: string }>({
       query: (body) => ({
         url: "/bookings/create",
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Bookings"],
-    }),
-
-    // builder endpoints mein add karein
-    createOrder: builder.mutation<
-      any,
-      {
-        items: any[];
-        address: string;
-        city: string;
-        pincode: string;
-        paymentScreenshotUrl?: string;
-      }
-    >({
-      query: (body) => ({
-        url: "/bookings/order/create", // Backend endpoint for multi-item orders
-        method: "POST",
-        body,
-      }),
+      // Invalidates User to refresh AngCoin balance after deduction
       invalidatesTags: ["Bookings"],
     }),
   }),
 });
 
-export const {
-  useCreateBookingMutation,
-  useGetMyBookingsQuery,
-  useCreateOrderMutation,
-} = bookingApi;
+export const { useCreateBookingMutation, useGetMyBookingsQuery } = bookingApi;
