@@ -8,6 +8,7 @@ import { rootApiSlice } from "./rootApiSlice";
 import type { BusinessDetails } from "@/config/associate";
 import type { ExploreFeed, ExplorePost } from "@/types/feed";
 import type { AssociateProfileResponse } from "@/types/associateProfile";
+import type { AdminQrResponse } from "@/types/wallet";
 
 export type AssociateProfile = {
   id: string;
@@ -116,6 +117,10 @@ export const associateApi = rootApiSlice.injectEndpoints({
           : [{ type: "ExploreProducts", id: "LIST" }],
     }),
 
+    getAssociateQr: builder.query<AdminQrResponse, void>({
+      query: () => "/associates/payment-details",
+    }),
+
     getExploreServices: builder.query<
       ExplorePost[],
       ServiceExploreFilters | undefined
@@ -172,4 +177,5 @@ export const {
   useGetAssociateProfileQuery,
   useGetAssociatesByCategoryQuery,
   useGetAssociateContentQuery,
+  useGetAssociateQrQuery,
 } = associateApi;

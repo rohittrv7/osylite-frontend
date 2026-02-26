@@ -63,6 +63,7 @@ import MyBookingsPage from "./pages/MyBookingsPage";
 import CartPage from "./pages/CartPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
+import CheckoutPage from "./components/Checkout";
 
 function App() {
   const dispatch = useDispatch();
@@ -140,6 +141,7 @@ function App() {
             path="/entertainment/:category"
             element={<EntertainMentPage />}
           />
+          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/my-orders" element={<MyOrdersPage />} />
           <Route path="/order-details/:id" element={<OrderDetailsPage />} />
