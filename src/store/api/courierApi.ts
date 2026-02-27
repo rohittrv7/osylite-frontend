@@ -31,8 +31,27 @@ export const courierApi = rootApiSlice.injectEndpoints({
     getAssociateById: builder.query<any, string>({
       query: (id) => `/associates/${id}`, // Aapka backend path
     }),
+
+    calculateShipping: builder.mutation<
+      any,
+      {
+        fromPincode: string;
+        toPincode: string;
+        weightGm: number;
+        serviceType?: string;
+      }
+    >({
+      query: (body) => ({
+        url: "/shipping/calculate",
+        method: "POST", // Agar NestJS @Get use kar raha hai body ke sath, toh usey @Post karein ya params bhejien
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useGetNearbyCouriersQuery, useGetAssociateByIdQuery } =
-  courierApi;
+export const {
+  useGetNearbyCouriersQuery,
+  useGetAssociateByIdQuery,
+  useCalculateShippingMutation,
+} = courierApi;
