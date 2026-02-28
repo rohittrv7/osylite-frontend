@@ -1,16 +1,14 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Search,
-  Package,
   MapPin,
   Calculator,
   FileText,
   ArrowRight,
-  Truck,
+  MessageSquare,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -18,9 +16,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const services = [
+  {
+    icon: Check,
+    title: "Book Courier",
+    desc: "Book your courier",
+    link: "/booking-courier",
+    color: "bg-red-500",
+  },
   {
     icon: Search,
     title: "Track Consignment",
@@ -49,88 +53,31 @@ const services = [
     link: "/receipt",
     color: "bg-purple-500",
   },
-  // {
-  //   icon: MessageSquare,
-  //   title: "Register Complaint",
-  //   desc: "File a grievance regarding delays, damage, or service issues.",
-  //   link: "/complaints",
-  //   color: "bg-red-500",
-  // },
   {
-    icon: Package,
-    title: "Track Complaints",
-    desc: "Monitor the resolution status of your previously filed complaints.",
+    icon: MessageSquare,
+    title: "Complaint",
+    desc: "File a grievance regarding delays, damage, or service issues.",
     link: "/complaints",
-    color: "bg-slate-700",
+    color: "bg-red-500",
   },
 ];
 
 export default function Courier() {
-  const [trackingId, setTrackingId] = useState("");
-  const navigate = useNavigate();
-
-  const handleTrack = () => {
-    if (trackingId.trim()) {
-      navigate(`/track?id=${encodeURIComponent(trackingId.trim())}`);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-transparent pb-10">
       {/* --- HERO SECTION --- */}
-      <section className="relative bg-primary/5 border-b py-8 lg:py-16">
+      <section className="relative bg-primary/5 border-b py-4 lg:py-10">
         <div className="container px-4 mx-auto max-w-6xl">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             {/* Left Side: Branding */}
-            <div className="flex-1 text-center lg:text-left space-y-4">
-              <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-foreground italic uppercase">
+            <div className="flex-1 text-center lg:text-left space-y-2">
+              <h1 className="text-3xl lg:text-5xl font-black tracking-tighter text-foreground italic uppercase">
                 ANG <span className="text-primary">Courier</span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-md mx-auto lg:mx-0">
                 Fast, reliable, and secure logistics solutions for all your
                 personal and business needs.
               </p>
-            </div>
-
-            {/* Right Side: Quick Actions Tabs */}
-            <div className="w-full max-w-lg">
-              <Card className="shadow-2xl border-2">
-                <CardContent className="p-6">
-                  <Tabs defaultValue="track" className="w-full">
-                    <TabsList>
-                      <TabsTrigger value="track" className="gap-2">
-                        <Truck className="w-4 h-4" /> Track
-                      </TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="track" className="space-y-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-bold uppercase opacity-70">
-                          Consignment Number
-                        </label>
-                        <div className="flex gap-2">
-                          <Input
-                            placeholder="Example: AG123456789IN"
-                            value={trackingId}
-                            onChange={(e) => setTrackingId(e.target.value)}
-                            className="h-12 border-2 focus-visible:ring-primary"
-                          />
-                          <Button
-                            onClick={handleTrack}
-                            className="h-12 px-8 font-bold"
-                          >
-                            SEARCH
-                          </Button>
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground italic">
-                        *Enter your 13-digit tracking number to see real-time
-                        updates.
-                      </p>
-                    </TabsContent>
-                  </Tabs>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </div>

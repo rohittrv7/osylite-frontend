@@ -54,7 +54,6 @@ import PostDetailsPage from "./pages/PostDetailsPage";
 import { AssociatesList } from "./pages/AssociatesList";
 import AssociateProfile from "./pages/AssociateProfile";
 import EditProfile from "./pages/EditProfile";
-import Track from "./pages/courier/Track";
 import CalculatorPage from "./pages/courier/Calculator";
 import BranchesPage from "./pages/courier/Branches";
 import ComplaintsPage from "./pages/courier/Complaints";
@@ -64,6 +63,8 @@ import CartPage from "./pages/CartPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
 import OrderDetailsPage from "./pages/OrderDetailsPage";
 import CheckoutPage from "./components/Checkout";
+import PublicTracking from "./pages/courier/TrackOrder";
+import ShipmentBooking from "./pages/courier/ShipmentBooking";
 
 function App() {
   const dispatch = useDispatch();
@@ -145,7 +146,7 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/my-orders" element={<MyOrdersPage />} />
           <Route path="/order-details/:id" element={<OrderDetailsPage />} />
-          <Route path="/track" element={<Track />} />
+          <Route path="/track" element={<PublicTracking />} />
           <Route path="/calculator" element={<CalculatorPage />} />
           <Route path="/branches" element={<BranchesPage />} />
           <Route path="/complaints" element={<ComplaintsPage />} />
@@ -159,6 +160,7 @@ function App() {
           <Route path="/post-job" element={<JobPostPage />} />
           <Route path="/matrimony" element={<Matrimony />} />
           <Route path="/my-profile" element={<EditProfile />} />
+          <Route path="/booking-courier" element={<ShipmentBooking />} />
 
           {/* <Route path="/property-feed" element={<Index />} /> */}
           <Route path="/property/:id" element={<PropertyDetails />} />
