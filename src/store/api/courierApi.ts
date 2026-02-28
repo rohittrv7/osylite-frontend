@@ -19,6 +19,13 @@ export interface SearchCourierParams {
   officeName?: string;
 }
 
+export interface ReceiptResponse {
+  awbNumber: string;
+  downloadUrl: string;
+  sender: string;
+  receiver: string;
+}
+
 export const courierApi = rootApiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getNearbyCouriers: builder.query<CourierBranch[], SearchCourierParams>({
@@ -47,6 +54,11 @@ export const courierApi = rootApiSlice.injectEndpoints({
         body,
       }),
     }),
+
+    downloadReceipt: builder.query<ReceiptResponse, string>({
+      query: (awb) => `/shipping/download-receipt/${awb}`,
+      providesTags: ["Operations"],
+    }),
   }),
 });
 
@@ -54,4 +66,5 @@ export const {
   useGetNearbyCouriersQuery,
   useGetAssociateByIdQuery,
   useCalculateShippingMutation,
+  useLazyDownloadReceiptQuery,
 } = courierApi;

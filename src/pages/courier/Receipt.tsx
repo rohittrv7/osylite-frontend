@@ -2,289 +2,176 @@ import { useState } from "react";
 import {
   Search,
   Download,
-  Share2,
-  QrCode,
   Receipt,
   Package,
   MapPin,
-  IndianRupee,
   Printer,
+  Loader2,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-
-const mockReceipt = {
-  receiptNo: "ANG-2026-00451289",
-  date: "18 Feb 2026, 03:42 PM",
-  service: "Speed Post",
-  consignment: "EE123456789IN",
-  sender: {
-    name: "Rajesh Kumar",
-    address: "42, MG Road, Sector 15, Noida, UP - 201301",
-    phone: "+91 98765 43210",
-  },
-  receiver: {
-    name: "Priya Sharma",
-    address: "B-12, Koramangala 4th Block, Bengaluru, KA - 560034",
-    phone: "+91 87654 32109",
-  },
-  weight: "1.2 kg",
-  dimensions: "25 × 18 × 10 cm",
-  charges: {
-    base: 85,
-    speedSurcharge: 40,
-    insurance: 20,
-    gst: 26.1,
-    total: 171.1,
-  },
-  payment: "UPI (PhonePe)",
-  status: "Booked",
-};
+import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
+import { toast } from "sonner";
+import { useLazyDownloadReceiptQuery } from "@/store/api/courierApi";
+import { cn } from "@/lib/utils";
 
 export default function ReceiptPage() {
-  const [receiptId, setReceiptId] = useState("");
-  const [showReceipt, setShowReceipt] = useState(false);
+  const [awbInput, setAwbInput] = useState("");
+  
+  // 🔹 RTK Query Lazy Trigger
+  const [triggerFetch, { data: receipt, isFetching, isError }] = useLazyDownloadReceiptQuery();
 
-  const handleSearch = () => {
-    if (receiptId.trim()) setShowReceipt(true);
+  const handleSearch = async () => {
+    if (!awbInput.trim()) return toast.error("Please enter an AWB number");
+    try {
+      await triggerFetch(awbInput).unwrap();
+    } catch (err) {
+      apiErrorToastHandler(err);
+    }
+  };
+
+  const handleDownload = () => {
+    if (receipt?.downloadUrl) {
+      window.open(receipt.downloadUrl, "_blank"); // 🔹 Open real Cloudinary/S3 PDF
+    }
   };
 
   return (
-    <div className="container py-10 max-w-3xl">
+    <div className="container py-10 max-w-3xl mx-auto px-4 animate-in fade-in duration-700">
       {/* Page Header */}
       <div className="text-center mb-8">
-        <div className="w-14 h-14 rounded-xl bg-accent/20 flex items-center justify-center mx-auto mb-3">
-          <Receipt className="w-7 h-7 text-accent" />
+        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 border-2 border-primary/20 shadow-xl">
+          <Receipt className="w-8 h-8 text-primary" />
         </div>
-        <h1 className="text-3xl font-display font-bold text-foreground">
-          e-Receipt
+        <h1 className="text-4xl font-black italic uppercase tracking-tighter text-white">
+          e-<span className="text-primary">Receipt</span>
         </h1>
-        <p className="text-muted-foreground mt-1">
-          Download or share your digital transaction receipt
+        <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mt-2 opacity-70">
+          Access your digital shipment records
         </p>
       </div>
 
-      {/* Search */}
-      <div className="flex gap-2 max-w-md mx-auto mb-10">
+      {/* Search Bar */}
+      <div className="flex gap-2 max-w-md mx-auto mb-12 p-2 bg-card border-2 border-border/50 rounded-2xl shadow-2xl">
         <Input
-          placeholder="Enter Receipt or Consignment No."
-          value={receiptId}
-          onChange={(e) => setReceiptId(e.target.value)}
+          placeholder="Enter AWB Number (e.g. ANG69458515)"
+          value={awbInput}
+          onChange={(e) => setAwbInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          className="h-12"
+          className="h-12 border-none bg-transparent font-mono text-white focus-visible:ring-0"
         />
         <Button
           onClick={handleSearch}
-          className="h-12 px-6 gradient-hero text-primary-foreground"
+          disabled={isFetching}
+          className="h-12 px-8 rounded-xl font-black uppercase italic tracking-widest bg-primary hover:bg-primary/90 text-primary-foreground"
         >
-          <Search className="w-4 h-4 mr-2" /> Find
+          {isFetching ? <Loader2 className="animate-spin" /> : <Search className="w-5 h-5" />}
         </Button>
       </div>
 
-      {/* Receipt Card */}
-      {showReceipt && (
-        <Card className="border-2 border-dashed border-primary/30 shadow-elevated animate-fade-in">
-          {/* Receipt Header */}
-          <CardHeader className="bg-secondary text-primary-foreground rounded-t-lg pb-4">
+      {/* 🧾 Professional Receipt Visual */}
+      {receipt && (
+        <Card className="border-2 border-primary/30 shadow-2xl animate-in zoom-in-95 bg-card overflow-hidden rounded-[2rem]">
+          <CardHeader className="bg-primary/5 border-b border-primary/10 pb-6 pt-8">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg gradient-hero flex items-center justify-center">
-                  <Package className="w-5 h-5 text-primary-foreground" />
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                  <Package className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg text-primary-foreground">
-                    ANG Post
+                  <CardTitle className="text-xl font-black italic uppercase text-white tracking-tight">
+                    ANG <span className="text-primary">Logistics</span>
                   </CardTitle>
-                  <p className="text-xs text-secondary-foreground/70">
-                    Department of Posts
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">
+                    Department of Operations
                   </p>
                 </div>
               </div>
-              <span className="text-xs bg-success/20 text-success px-3 py-1 rounded-full font-semibold border border-success/30">
-                {mockReceipt.status}
-              </span>
+              <Badge className="bg-green-500/10 text-green-500 border-green-500/20 font-black italic uppercase text-[10px] px-4 py-1">
+                Verified Receipt
+              </Badge>
             </div>
           </CardHeader>
 
-          <CardContent className="p-6 space-y-5">
-            {/* Receipt Meta */}
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-muted-foreground text-xs">
-                  Receipt No.
-                </span>
-                <p className="font-semibold text-foreground">
-                  {mockReceipt.receiptNo}
-                </p>
+          <CardContent className="p-8 space-y-8">
+            <div className="grid grid-cols-2 gap-8">
+              <div className="space-y-1">
+                <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Tracking ID</span>
+                <p className="text-2xl font-black text-white font-mono tracking-tighter">{receipt.awbNumber}</p>
               </div>
-              <div className="text-right">
-                <span className="text-muted-foreground text-xs">
-                  Date & Time
-                </span>
-                <p className="font-semibold text-foreground">
-                  {mockReceipt.date}
-                </p>
-              </div>
-              <div>
-                <span className="text-muted-foreground text-xs">
-                  Consignment No.
-                </span>
-                <p className="font-semibold text-primary">
-                  {mockReceipt.consignment}
-                </p>
-              </div>
-              <div className="text-right">
-                <span className="text-muted-foreground text-xs">Service</span>
-                <p className="font-semibold text-foreground">
-                  {mockReceipt.service}
-                </p>
+              <div className="text-right space-y-1">
+                <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Print Status</span>
+                <p className="font-bold text-primary italic uppercase">Digital Copy Ready</p>
               </div>
             </div>
 
-            <Separator className="border-dashed" />
+            <Separator className="border-dashed opacity-20" />
 
-            {/* Sender / Receiver */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-muted/50 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <MapPin className="w-4 h-4 text-primary" />
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Sender
-                  </span>
+            {/* Address Summary */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="bg-muted/10 rounded-2xl p-5 border border-border/50">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 bg-primary/10 rounded-lg"><MapPin className="w-4 h-4 text-primary" /></div>
+                  <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Sender</span>
                 </div>
-                <p className="font-semibold text-foreground text-sm">
-                  {mockReceipt.sender.name}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {mockReceipt.sender.address}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {mockReceipt.sender.phone}
-                </p>
+                <p className="font-black italic text-white uppercase">{receipt.sender}</p>
               </div>
-              <div className="bg-muted/50 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <MapPin className="w-4 h-4 text-info" />
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Receiver
-                  </span>
+              <div className="bg-muted/10 rounded-2xl p-5 border border-border/50">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 bg-green-500/10 rounded-lg"><MapPin className="w-4 h-4 text-green-500" /></div>
+                  <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Receiver</span>
                 </div>
-                <p className="font-semibold text-foreground text-sm">
-                  {mockReceipt.receiver.name}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {mockReceipt.receiver.address}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {mockReceipt.receiver.phone}
-                </p>
+                <p className="font-black italic text-white uppercase">{receipt.receiver}</p>
               </div>
             </div>
 
-            <Separator className="border-dashed" />
-
-            {/* Parcel Details */}
-            <div className="flex items-center gap-6 text-sm">
-              <div>
-                <span className="text-muted-foreground text-xs">Weight</span>
-                <p className="font-semibold text-foreground">
-                  {mockReceipt.weight}
-                </p>
-              </div>
-              <div>
-                <span className="text-muted-foreground text-xs">
-                  Dimensions
-                </span>
-                <p className="font-semibold text-foreground">
-                  {mockReceipt.dimensions}
-                </p>
-              </div>
-              <div>
-                <span className="text-muted-foreground text-xs">Payment</span>
-                <p className="font-semibold text-foreground">
-                  {mockReceipt.payment}
-                </p>
-              </div>
+            <div className="bg-primary/5 p-6 rounded-2xl border-2 border-dashed border-primary/20 flex items-center justify-between">
+               <div>
+                  <p className="text-[10px] font-black uppercase text-primary tracking-widest">Document Format</p>
+                  <p className="text-sm font-bold text-white uppercase">A4 Shipping Label (PDF)</p>
+               </div>
+               <ExternalLink className="text-primary w-5 h-5 opacity-50" />
             </div>
 
-            <Separator className="border-dashed" />
-
-            {/* Charges Breakdown */}
-            <div>
-              <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                <IndianRupee className="w-4 h-4" /> Charges Breakdown
-              </h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Base Postage</span>
-                  <span className="text-foreground">
-                    ₹{mockReceipt.charges.base.toFixed(2)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    Speed Post Surcharge
-                  </span>
-                  <span className="text-foreground">
-                    ₹{mockReceipt.charges.speedSurcharge.toFixed(2)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Insurance</span>
-                  <span className="text-foreground">
-                    ₹{mockReceipt.charges.insurance.toFixed(2)}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">GST (18%)</span>
-                  <span className="text-foreground">
-                    ₹{mockReceipt.charges.gst.toFixed(2)}
-                  </span>
-                </div>
-                <Separator />
-                <div className="flex justify-between font-bold text-base">
-                  <span className="text-foreground">Total</span>
-                  <span className="text-primary">
-                    ₹{mockReceipt.charges.total.toFixed(2)}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <Separator className="border-dashed" />
-
-            {/* QR Code */}
-            <div className="flex items-center justify-center py-4">
-              <div className="text-center">
-                <div className="w-32 h-32 bg-muted rounded-lg flex items-center justify-center mx-auto border-2 border-dashed border-border">
-                  <QrCode className="w-20 h-20 text-muted-foreground/60" />
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Scan at any ANG Post branch
-                </p>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button className="flex-1 gradient-hero text-primary-foreground h-12">
-                <Download className="w-4 h-4 mr-2" /> Download PDF
-              </Button>
-              <Button variant="outline" className="flex-1 h-12">
-                <Printer className="w-4 h-4 mr-2" /> Print
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1 h-12 border-success text-success hover:bg-success/10"
+            {/* Final Actions */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Button 
+                onClick={handleDownload}
+                className="flex-1 h-14 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest shadow-xl shadow-primary/20 transition-all active:scale-95 gap-2"
               >
-                <Share2 className="w-4 h-4 mr-2" /> Share via WhatsApp
+                <Download size={20} /> Download PDF
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => window.print()}
+                className="flex-1 h-14 rounded-2xl border-2 font-black uppercase tracking-widest gap-2 hover:bg-primary/5 transition-all"
+              >
+                <Printer size={20} /> Print Label
               </Button>
             </div>
+
+            <p className="text-[9px] text-center text-muted-foreground font-medium uppercase tracking-[0.2em] opacity-50 mt-4">
+                © 2026 ANG Network Operations Team
+            </p>
           </CardContent>
         </Card>
       )}
+
+      {/* Error / Empty State */}
+      {!receipt && !isFetching && awbInput && isError && (
+        <div className="text-center py-20 opacity-50">
+            <Receipt size={48} className="mx-auto mb-4 text-muted-foreground" />
+            <p className="font-black italic uppercase text-xs tracking-widest">No matching records found</p>
+        </div>
+      )}
     </div>
   );
+}
+
+// 🔹 Badge Helper (Agar aapka component library provide nahi karta toh)
+function Badge({ children, className }: { children: React.ReactNode; className?: string }) {
+    return <span className={cn("rounded-md font-semibold tracking-tight", className)}>{children}</span>;
 }
