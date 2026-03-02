@@ -9,6 +9,7 @@ import { SERVICE_CATEGORY, type ServiceCategory } from "@/types/content";
 import MatrimonyFeedPage from "./MatrimonyFeedPage";
 import Index from "./property/Index";
 import Courier from "./courier/Courier";
+import WalletHome from "./wallet/WalletHome";
 
 export default function AngService() {
   const location = useLocation();
@@ -22,6 +23,7 @@ export default function AngService() {
   const isMatrimonySearch = category === SERVICE_CATEGORY.MATRIMONY;
   const isProperty = category === SERVICE_CATEGORY.PROPERTY;
   const isCourier = category === SERVICE_CATEGORY.BOOK_COURIER;
+  const isAngToken = category === SERVICE_CATEGORY.ANG_TOKEN;
 
   const filters: ExploreFilters | typeof skipToken =
     category && !isJobSearch
@@ -42,6 +44,10 @@ export default function AngService() {
 
   if (isProperty) {
     return <Index />;
+  }
+
+  if (isAngToken) {
+    return <WalletHome />;
   }
 
   return (

@@ -1,289 +1,288 @@
 import { useState } from "react";
 import {
-  MessageSquare,
-  Upload,
-  Phone,
-  ChevronDown,
-  ChevronRight,
+  LifeBuoy,
+  Clock,
   CheckCircle2,
+  AlertCircle,
+  MessageSquare,
+  Loader2,
+  Calendar,
+  ChevronDown,
+  ExternalLink,
+  Tag,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
+import { useGetMyAllComplaintsQuery } from "@/store/api/shipingApi"; // API endpoint name check karein
 
-interface Complaint {
-  id: string;
-  date: string;
-  subject: string;
-  status: "Resolved" | "Pending" | "Under Review";
-  thread: { sender: string; message: string; date: string }[];
-}
-
-const mockComplaints: Complaint[] = [
-  {
-    id: "CMP-2026-001",
-    date: "15 Feb 2026",
-    subject: "Parcel delayed beyond expected date",
-    status: "Under Review",
-    thread: [
-      {
-        sender: "You",
-        message:
-          "My parcel EM123456789IN has not arrived even after 5 days. Expected delivery was 10 Feb.",
-        date: "15 Feb",
-      },
-      {
-        sender: "Support",
-        message:
-          "We are investigating the delay. Your parcel is at Jaipur sorting hub. We will update you within 24 hours.",
-        date: "16 Feb",
-      },
-    ],
+// 🔹 Status Config with Color-Coded Badges
+const statusConfig: Record<
+  string,
+  { color: string; bg: string; text: string; icon: any; step: number }
+> = {
+  OPEN: {
+    color: "bg-red-500",
+    bg: "bg-red-100",
+    text: "text-red-700",
+    icon: AlertCircle,
+    step: 1,
   },
-  {
-    id: "CMP-2026-002",
-    date: "10 Feb 2026",
-    subject: "Damaged goods received",
-    status: "Resolved",
-    thread: [
-      {
-        sender: "You",
-        message:
-          "The parcel arrived in damaged condition. Contents were broken.",
-        date: "10 Feb",
-      },
-      {
-        sender: "Support",
-        message:
-          "We apologize for the inconvenience. A refund has been processed to your account.",
-        date: "12 Feb",
-      },
-    ],
+  IN_PROGRESS: {
+    color: "bg-blue-500",
+    bg: "bg-blue-100",
+    text: "text-blue-700",
+    icon: Clock,
+    step: 2,
   },
-  {
-    id: "CMP-2026-003",
-    date: "05 Feb 2026",
-    subject: "Staff behavior complaint",
-    status: "Pending",
-    thread: [
-      {
-        sender: "You",
-        message: "Rude behavior by counter staff at Connaught Place branch.",
-        date: "05 Feb",
-      },
-    ],
+  RESOLVED: {
+    color: "bg-green-500",
+    bg: "bg-green-100",
+    text: "text-green-700",
+    icon: CheckCircle2,
+    step: 3,
   },
-];
-
-const statusColors: Record<string, string> = {
-  Resolved: "bg-success text-success-foreground",
-  Pending: "bg-warning text-warning-foreground",
-  "Under Review": "bg-info text-info-foreground",
 };
 
-export default function ComplaintsPage() {
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(false);
+export default function MyTicketsPage() {
+  const { data: tickets = [], isLoading } = useGetMyAllComplaintsQuery();
+  const [expandedTicket, setExpandedTicket] = useState<string | null>(null);
+
+  if (isLoading) {
+    return (
+      <div className="h-[80vh] flex items-center justify-center">
+        <Loader2 className="animate-spin text-primary w-10 h-10" />
+      </div>
+    );
+  }
 
   return (
-    <div className="container py-12">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-10 animate-fade-in">
-          <h1 className="text-3xl font-display font-bold text-foreground mb-2">
-            Helpdesk & Grievance
+    <div className="container py-6 md:py-10 max-w-4xl mx-auto space-y-6 md:space-y-8 animate-in fade-in duration-700 px-4">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b pb-6 gap-4">
+        <div className="space-y-1">
+          <h1 className="text-3xl md:text-4xl font-black italic uppercase tracking-tighter text-[#333]">
+            Support <span className="text-primary">Tickets</span>
           </h1>
-          <p className="text-muted-foreground">
-            File a complaint or check existing complaint status
+          <p className="text-muted-foreground font-medium text-xs md:text-sm">
+            Track your reported issues and vertical resolution timeline.
           </p>
         </div>
-
-        {/* FAB */}
-        <a
-          href="tel:18001234567"
-          className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full gradient-hero flex items-center justify-center shadow-elevated hover:scale-105 transition-transform"
+        <Badge
+          variant="secondary"
+          className="px-4 py-1.5 rounded-md font-bold shadow-sm"
         >
-          <Phone className="w-6 h-6 text-primary-foreground" />
-        </a>
-
-        <Tabs defaultValue="file" className="animate-fade-in">
-          <TabsList className="w-full grid grid-cols-2 mb-8">
-            <TabsTrigger value="file">File Complaint</TabsTrigger>
-            <TabsTrigger value="history">My Complaints</TabsTrigger>
-          </TabsList>
-
-          {/* File Complaint */}
-          <TabsContent value="file">
-            {submitted ? (
-              <div className="text-center py-16 animate-fade-in">
-                <CheckCircle2 className="w-16 h-16 text-success mx-auto mb-4" />
-                <h3 className="font-display text-xl font-bold text-foreground mb-2">
-                  Complaint Registered!
-                </h3>
-                <p className="text-muted-foreground mb-1">
-                  Your Complaint ID: <strong>CMP-2026-004</strong>
-                </p>
-                <p className="text-sm text-muted-foreground mb-6">
-                  You will receive updates via email and SMS.
-                </p>
-                <Button onClick={() => setSubmitted(false)} variant="outline">
-                  File Another Complaint
-                </Button>
-              </div>
-            ) : (
-              <div className="bg-card border border-border rounded-lg p-6 shadow-card">
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-xs text-muted-foreground">
-                      Category
-                    </Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select issue type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="missing">Missing Parcel</SelectItem>
-                        <SelectItem value="delay">Delivery Delay</SelectItem>
-                        <SelectItem value="damaged">Damaged Goods</SelectItem>
-                        <SelectItem value="staff">Staff Behavior</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-xs text-muted-foreground">
-                        Your Name
-                      </Label>
-                      <Input placeholder="Full Name" />
-                    </div>
-                    <div>
-                      <Label className="text-xs text-muted-foreground">
-                        Consignment No. (optional)
-                      </Label>
-                      <Input placeholder="EM123456789IN" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label className="text-xs text-muted-foreground">
-                      Email
-                    </Label>
-                    <Input type="email" placeholder="your@email.com" />
-                  </div>
-
-                  <div>
-                    <Label className="text-xs text-muted-foreground">
-                      Describe your issue
-                    </Label>
-                    <Textarea
-                      placeholder="Please provide detailed description of your complaint..."
-                      rows={4}
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="text-xs text-muted-foreground">
-                      Attach Image (optional)
-                    </Label>
-                    <div className="border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-primary/30 transition-colors">
-                      <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">
-                        Click to upload or drag & drop
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        PNG, JPG up to 5MB
-                      </p>
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={() => setSubmitted(true)}
-                    className="w-full h-12 gradient-hero text-primary-foreground hover:opacity-90"
-                  >
-                    <MessageSquare className="w-4 h-4 mr-2" /> Submit Complaint
-                  </Button>
-                </div>
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Complaints History */}
-          <TabsContent value="history">
-            <div className="space-y-4">
-              {mockComplaints.map((c) => (
-                <div
-                  key={c.id}
-                  className="bg-card border border-border rounded-lg shadow-card overflow-hidden animate-fade-in"
-                >
-                  <button
-                    onClick={() =>
-                      setExpandedId(expandedId === c.id ? null : c.id)
-                    }
-                    className="w-full flex items-center justify-between p-4 text-left hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-mono text-xs text-muted-foreground">
-                          {c.id}
-                        </span>
-                        <Badge
-                          className={`text-[10px] ${statusColors[c.status]}`}
-                        >
-                          {c.status}
-                        </Badge>
-                      </div>
-                      <p className="font-semibold text-sm text-foreground">
-                        {c.subject}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{c.date}</p>
-                    </div>
-                    {expandedId === c.id ? (
-                      <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                    ) : (
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                    )}
-                  </button>
-
-                  {expandedId === c.id && (
-                    <div className="border-t border-border p-4 bg-muted/30 space-y-3">
-                      {c.thread.map((t, i) => (
-                        <div
-                          key={i}
-                          className={`flex gap-3 ${t.sender === "Support" ? "" : "flex-row-reverse"}`}
-                        >
-                          <div
-                            className={`max-w-[80%] rounded-lg p-3 text-sm ${
-                              t.sender === "Support"
-                                ? "bg-card border border-border text-foreground"
-                                : "bg-primary text-primary-foreground"
-                            }`}
-                          >
-                            <p className="text-xs font-medium mb-1">
-                              {t.sender} • {t.date}
-                            </p>
-                            <p>{t.message}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
+          Total Tickets: {tickets.length}
+        </Badge>
       </div>
+
+      {/* Tickets List */}
+      <div className="grid gap-4">
+        {tickets.length === 0 ? (
+          <EmptyTicketsState />
+        ) : (
+          tickets.map((ticket: any) => {
+            const config = statusConfig[ticket.status] || statusConfig.OPEN;
+            const StatusIcon = config.icon;
+            const isExpanded = expandedTicket === ticket.id;
+
+            return (
+              <Card
+                key={ticket.id}
+                className={cn(
+                  "border-2 rounded-md overflow-hidden transition-all duration-300 bg-card cursor-pointer",
+                  isExpanded
+                    ? "border-primary ring-4 ring-primary/5 shadow-2xl"
+                    : "hover:border-primary/30 border-border/50 shadow-sm",
+                )}
+                onClick={() => setExpandedTicket(isExpanded ? null : ticket.id)}
+              >
+                {/* 🔹 TICKET ROW - Mobile Optimized */}
+                <div className="p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={cn(
+                        "p-2.5 rounded-xl border shrink-0",
+                        config.bg,
+                        config.text,
+                      )}
+                    >
+                      <StatusIcon size={20} />
+                    </div>
+                    <div className="space-y-0.5 min-w-0">
+                      <p className="text-sm md:text-base font-black text-[#333] tracking-tight truncate">
+                        {ticket.complaintNumber}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge
+                          variant="outline"
+                          className="text-[9px] uppercase font-bold tracking-widest bg-muted/30"
+                        >
+                          {ticket.issueType.replace("_", " ")}
+                        </Badge>
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-1 whitespace-nowrap">
+                          <Calendar size={12} />{" "}
+                          {new Date(ticket.createdAt).toLocaleDateString(
+                            "en-GB",
+                            { day: "2-digit", month: "short", year: "numeric" },
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between md:justify-end gap-4 md:gap-6 border-t md:border-t-0 pt-3 md:pt-0">
+                    <div className="text-left md:text-right min-w-0">
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tighter">
+                        Tracking ID
+                      </p>
+                      <p className="text-xs font-mono font-bold text-blue-600 hover:underline flex items-center gap-1">
+                        {ticket.shipment?.awbNumber} <ExternalLink size={10} />
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge
+                        className={cn(
+                          "px-3 md:px-4 py-1 rounded-md font-black text-[10px] uppercase whitespace-nowrap",
+                          config.bg,
+                          config.text,
+                        )}
+                      >
+                        {ticket.status.replace("_", " ")}
+                      </Badge>
+                      <ChevronDown
+                        className={cn(
+                          "w-5 h-5 text-muted-foreground transition-transform duration-300 shrink-0",
+                          isExpanded && "rotate-180",
+                        )}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 🔹 EXPANDED VIEW: TIMELINE */}
+                {isExpanded && (
+                  <div className="border-t bg-muted/20 animate-in slide-in-from-top-2 duration-500">
+                    <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+                      {/* Timeline Section */}
+                      <div className="space-y-6">
+                        <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                          <Tag size={12} /> Resolution Timeline
+                        </h4>
+                        <div className="relative space-y-8 before:absolute before:left-[9px] before:top-2 before:bottom-2 before:w-0.5 before:bg-border/60 ml-2">
+                          <TimelineStep
+                            title="Complaint Filed"
+                            date={ticket.createdAt}
+                            active={true}
+                            desc="Issue logged in our support database."
+                          />
+                          <TimelineStep
+                            title="Investigation Started"
+                            date={
+                              ticket.status !== "OPEN" ? ticket.updatedAt : null
+                            }
+                            active={config.step >= 2}
+                            desc="Operations team is verifying shipment logs."
+                          />
+                          <TimelineStep
+                            title="Resolved"
+                            date={
+                              ticket.status === "RESOLVED"
+                                ? ticket.updatedAt
+                                : null
+                            }
+                            active={config.step === 3}
+                            desc="Resolution provided and ticket closed."
+                          />
+                        </div>
+                      </div>
+
+                      {/* Details Section */}
+                      <div className="space-y-4">
+                        <div className="p-5 rounded-2xl bg-card border-2 border-dashed shadow-inner">
+                          <p className="text-[10px] font-black uppercase text-muted-foreground mb-2 flex items-center gap-2">
+                            <MessageSquare size={12} /> User Description
+                          </p>
+                          <p className="text-sm text-[#555] leading-relaxed italic">
+                            "{ticket.description}"
+                          </p>
+                        </div>
+
+                        {/* 🔹 ADMIN REMARK BOX */}
+                        {ticket.adminRemark && (
+                          <div className="p-5 rounded-2xl bg-primary/5 border-2 border-primary/20 animate-in zoom-in-95">
+                            <div className="flex items-center gap-2 mb-2 text-primary">
+                              <MessageSquare size={16} />
+                              <p className="text-[10px] font-black uppercase tracking-widest">
+                                Official Response
+                              </p>
+                            </div>
+                            <p className="text-sm font-bold text-foreground leading-snug">
+                              {ticket.adminRemark}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </Card>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
+// 🔹 Timeline Step Component
+function TimelineStep({ title, date, active, desc }: any) {
+  return (
+    <div
+      className={cn(
+        "relative pl-8 transition-all duration-500",
+        !active && "opacity-30 grayscale",
+      )}
+    >
+      <div
+        className={cn(
+          "absolute left-0 top-1.5 w-5 h-5 rounded-md border-4 bg-background z-10 shadow-sm",
+          active ? "border-primary scale-110" : "border-muted",
+        )}
+      />
+      <div className="space-y-0.5">
+        <p className="text-xs font-black uppercase italic tracking-tight text-foreground">
+          {title}
+        </p>
+        <p className="text-[9px] font-bold text-muted-foreground">
+          {date
+            ? new Date(date).toLocaleString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : "Pending Support Action"}
+        </p>
+        <p className="text-[10px] md:text-[11px] mt-1 font-medium leading-tight opacity-80">
+          {desc}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// 🔹 Empty State UI
+function EmptyTicketsState() {
+  return (
+    <div className="py-20 md:py-32 text-center border-4 border-dashed rounded-md border-border/50 bg-muted/5 animate-pulse">
+      <LifeBuoy className="w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-20" />
+      <p className="text-lg md:text-xl font-black uppercase italic tracking-[0.2em] text-muted-foreground opacity-40">
+        No Support History
+      </p>
+      <p className="text-[10px] uppercase font-bold text-muted-foreground mt-2">
+        Tickets you raise will appear here
+      </p>
     </div>
   );
 }

@@ -53,12 +53,29 @@ export const operationsApi = rootApiSlice.injectEndpoints({
     }),
 
     // 4. File Complaint
+    // fileComplaint: builder.mutation<
+    //   any,
+    //   { shipmentId: string; issueType: string; description: string }
+    // >({
+    //   query: (body) => ({ url: "/shipping/complaints", method: "POST", body }),
+    //   invalidatesTags: ["Complaints"],
+    // }),
+
     fileComplaint: builder.mutation<
       any,
       { shipmentId: string; issueType: string; description: string }
     >({
-      query: (body) => ({ url: "/shipping/complaints", method: "POST", body }),
+      query: (body) => ({
+        url: "/shipping/complaints",
+        method: "POST",
+        body,
+      }),
       invalidatesTags: ["Complaints"],
+    }),
+
+    getMyAllComplaints: builder.query<any[], void>({
+      query: () => "/shipping/my-complaints",
+      providesTags: ["Complaints"],
     }),
   }),
 });
@@ -69,4 +86,5 @@ export const {
   useLazyTrackAwbQuery,
   useUpdateShipmentStatusMutation,
   useFileComplaintMutation,
+  useGetMyAllComplaintsQuery,
 } = operationsApi;

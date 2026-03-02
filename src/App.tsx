@@ -56,7 +56,6 @@ import AssociateProfile from "./pages/AssociateProfile";
 import EditProfile from "./pages/EditProfile";
 import CalculatorPage from "./pages/courier/Calculator";
 import BranchesPage from "./pages/courier/Branches";
-import ComplaintsPage from "./pages/courier/Complaints";
 import ReceiptPage from "./pages/courier/Receipt";
 import MyBookingsPage from "./pages/MyBookingsPage";
 import CartPage from "./pages/CartPage";
@@ -65,6 +64,7 @@ import OrderDetailsPage from "./pages/OrderDetailsPage";
 import CheckoutPage from "./components/Checkout";
 import PublicTracking from "./pages/courier/TrackOrder";
 import ShipmentBooking from "./pages/courier/ShipmentBooking";
+import MyTicketsPage from "./pages/courier/Complaints";
 
 function App() {
   const dispatch = useDispatch();
@@ -149,7 +149,7 @@ function App() {
           <Route path="/track" element={<PublicTracking />} />
           <Route path="/calculator" element={<CalculatorPage />} />
           <Route path="/branches" element={<BranchesPage />} />
-          <Route path="/complaints" element={<ComplaintsPage />} />
+          <Route path="/complaints" element={<MyTicketsPage />} />
           <Route path="/receipt" element={<ReceiptPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/mchat" element={<Chat />} />
