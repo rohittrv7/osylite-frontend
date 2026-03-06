@@ -8,20 +8,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Loader2, Coins, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import type { RootState } from "@/store";
-import { useBuyProductMutation } from "@/store/api/ordersApi";
+import { useBuyProductMutation } from "@/store/api/ordersApi"; // 🔹 Using Bulk Mutation
 import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { items } = useSelector((state: RootState) => state.cart);
-  const [buyProduct, { isLoading }] = useBuyProductMutation();
+
+  // 🔹 Updated mutation hook
+  const [placeOrder, { isLoading }] = useBuyProductMutation();
 
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [pincode, setPincode] = useState("");
-  const [state, setState] = useState("Bihar"); // Bound with UI now
+  const [state, setState] = useState("Bihar");
 
   const totalAmount = items.reduce(
     (acc, item) => acc + item.price * item.quantity,
@@ -29,26 +32,28 @@ export default function CheckoutPage() {
   );
 
   const handlePlaceOrder = async () => {
+    // 1. Validation
     if (!address || !city || !pincode || !state)
       return toast.error("Please fill complete address details");
     if (items.length === 0) return toast.error("Cart is empty");
 
     try {
-      const addressJson = {
-        houseNo: address,
-        city: city,
-        pincode: pincode,
-        state: state,
-      };
-
-      // Backend expects single productId as per your PlaceOrderDto
-      for (const item of items) {
-        await buyProduct({
+      // 2. 🔹 Prepare the payload exactly as you requested
+      const payload = {
+        items: items.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
-          address: addressJson,
-        }).unwrap();
-      }
+        })),
+        address: {
+          houseNo: address,
+          city: city,
+          state: state,
+          pincode: pincode,
+        },
+      };
+
+      // 3. 🔹 Single API Call for all items
+      await placeOrder(payload).unwrap();
 
       toast.success("Order Placed Successfully!");
       dispatch(clearCart());
@@ -69,7 +74,7 @@ export default function CheckoutPage() {
         <div className="lg:col-span-7 space-y-6">
           <Card className="border-2 rounded-2xl shadow-sm overflow-hidden">
             <CardHeader className="border-b bg-muted/20 py-4">
-              <CardTitle className="text-lg flex items-center gap-2">
+              <CardTitle className="text-lg flex items-center gap-2 font-bold italic uppercase">
                 <MapPin className="text-primary w-5 h-5" /> Delivery Address
               </CardTitle>
             </CardHeader>
@@ -79,10 +84,10 @@ export default function CheckoutPage() {
                   Full Street Address / House No.
                 </label>
                 <Input
-                  placeholder="House No, Street, Landmark..."
+                  placeholder="Flat 101, Shanti Enclave..."
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="h-11"
+                  className="h-12 border-2 rounded-xl"
                 />
               </div>
 
@@ -95,7 +100,7 @@ export default function CheckoutPage() {
                     placeholder="Patna"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="h-11"
+                    className="h-12 border-2 rounded-xl"
                   />
                 </div>
                 <div className="space-y-2">
@@ -106,7 +111,7 @@ export default function CheckoutPage() {
                     placeholder="Bihar"
                     value={state}
                     onChange={(e) => setState(e.target.value)}
-                    className="h-11"
+                    className="h-12 border-2 rounded-xl"
                   />
                 </div>
                 <div className="space-y-2">
@@ -114,24 +119,26 @@ export default function CheckoutPage() {
                     Pincode
                   </label>
                   <Input
-                    placeholder="800001"
+                    placeholder="800002"
                     value={pincode}
+                    maxLength={6}
                     onChange={(e) => setPincode(e.target.value)}
-                    className="h-11"
+                    className="h-12 border-2 rounded-xl font-mono"
                   />
                 </div>
               </div>
             </CardContent>
           </Card>
 
+          {/* Payment Method Card */}
           <Card className="border-2 rounded-2xl shadow-md border-primary/20 bg-primary/5 overflow-hidden">
             <CardHeader className="bg-primary/10 border-b border-primary/10 py-4">
-              <CardTitle className="text-lg flex items-center gap-2 text-primary">
+              <CardTitle className="text-lg flex items-center gap-2 text-primary font-bold italic uppercase">
                 <Coins className="w-5 h-5" /> Payment Method
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="flex items-center justify-between p-4 bg-background rounded-xl border-2 border-primary shadow-sm relative overflow-hidden group">
+              <div className="flex items-center justify-between p-5 bg-background rounded-xl border-2 border-primary shadow-sm relative overflow-hidden group">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
                     <Coins className="text-primary w-6 h-6" />
@@ -141,7 +148,7 @@ export default function CheckoutPage() {
                       Pay with ANG Coins
                     </h4>
                     <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-                      Instant & Secure Payment
+                      Instant & Secure Transaction
                     </p>
                   </div>
                 </div>
@@ -153,66 +160,79 @@ export default function CheckoutPage() {
 
         {/* Right Side: Order Summary */}
         <div className="lg:col-span-5">
-          <Card className="border-2 rounded-[2.5rem] bg-card shadow-2xl overflow-hidden sticky top-24 border-border/50">
+          <Card className="border-2 rounded-[2rem] bg-card shadow-2xl overflow-hidden sticky top-24 border-border/50">
             <div className="p-6 sm:p-8 space-y-6">
-              <h3 className="font-black italic uppercase tracking-tighter text-xl border-b pb-4 text-foreground">
-                Items Summary
+              <h3 className="font-black italic uppercase tracking-tighter text-2xl border-b pb-4 text-foreground">
+                Items <span className="text-primary">Summary</span>
               </h3>
-              <div className="space-y-4 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+
+              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="flex justify-between items-center text-sm group"
+                    className="flex justify-between items-center group"
                   >
-                    <div className="flex gap-3 items-center">
-                      <div className="w-12 h-12 rounded-xl overflow-hidden border bg-muted">
+                    <div className="flex gap-4 items-center">
+                      <div className="w-14 h-14 rounded-xl overflow-hidden border-2 bg-muted shrink-0 shadow-sm">
                         <img
                           src={item.image}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          alt={item.title}
                         />
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-bold line-clamp-1 max-w-[140px] uppercase text-xs">
+                        <span className="font-black uppercase text-xs tracking-tight line-clamp-1 max-w-[160px]">
                           {item.title}
                         </span>
-                        <span className="text-[10px] font-black text-muted-foreground uppercase">
-                          Qty: {item.quantity}
-                        </span>
+                        <Badge
+                          variant="secondary"
+                          className="w-fit text-[9px] font-black px-2 mt-1"
+                        >
+                          QTY: {item.quantity}
+                        </Badge>
                       </div>
                     </div>
-                    <span className="font-black italic text-primary">
-                      ₹{(item.price * item.quantity).toLocaleString()}
-                    </span>
+                    <div className="text-right">
+                      <p className="font-black italic text-primary text-sm">
+                        ₹{(item.price * item.quantity).toLocaleString()}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>
 
               <Separator className="border-dashed" />
 
-              <div className="flex justify-between items-center text-lg font-black italic text-foreground pt-2">
-                <span className="uppercase tracking-tighter">
-                  Total Payable
-                </span>
-                <span className="text-primary text-2xl">
-                  ₹{totalAmount.toLocaleString("en-IN")}
-                </span>
+              <div className="space-y-2">
+                <div className="flex justify-between text-muted-foreground text-xs uppercase font-bold tracking-widest">
+                  <span>Subtotal</span>
+                  <span>₹{totalAmount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center text-lg font-black italic text-foreground pt-2">
+                  <span className="uppercase tracking-tighter">
+                    Total Payable
+                  </span>
+                  <span className="text-primary text-3xl">
+                    ₹{totalAmount.toLocaleString("en-IN")}
+                  </span>
+                </div>
               </div>
 
               <Button
-                className="w-full h-14 rounded-2xl font-black italic uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl shadow-primary/20 transition-all active:scale-95"
+                className="w-full h-16 rounded-2xl font-black italic uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl shadow-primary/20 transition-all active:scale-95 group"
                 onClick={handlePlaceOrder}
-                disabled={isLoading}
+                disabled={isLoading || items.length === 0}
               >
                 {isLoading ? (
-                  <Loader2 className="animate-spin w-5 h-5" />
+                  <Loader2 className="animate-spin w-6 h-6" />
                 ) : (
-                  "Confirm & Pay"
+                  <>Confirm & Place Order</>
                 )}
               </Button>
 
-              <div className="flex flex-col items-center gap-1 opacity-60">
+              <div className="flex flex-col items-center gap-1 opacity-40">
                 <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">
-                  Powered by ANG Network
+                  Secure Checkout by ANG Network
                 </p>
               </div>
             </div>
@@ -220,5 +240,19 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// 🔹 Small Badge Helper if not already in your UI folder
+function Badge({ children, className }: any) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold transition-colors focus:outline-none",
+        className,
+      )}
+    >
+      {children}
+    </span>
   );
 }

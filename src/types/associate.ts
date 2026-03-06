@@ -75,6 +75,8 @@ export const AssociateCategory = {
   CA: "chartered_accountant",
   ADVOCATE: "advocate",
   INTERIOR_DESIGNER: "interior_designer",
+  LEGAL_SERVICE: "legal_service",
+  TAX_FILING: "tax_filing",
 
   // --- Medical ---
   DOCTOR: "doctor",
@@ -82,6 +84,8 @@ export const AssociateCategory = {
   CLINIC_OWNER: "clinic_owner",
   MEDICAL_SHOP_OWNER: "medical_shop_owner",
   PATHOLOGY_LAB: "pathology_lab",
+  NURSE_MEDICAL_SERVICE: "nurse_medical_service",
+  HEALTH_CARE: "health_care",
 
   // --- Partners & Supply Chain ---
   ANG_STORE_PARTNER: "ang_store_partner",
@@ -91,15 +95,19 @@ export const AssociateCategory = {
   DISTRIBUTOR: "distributor",
   CNF: "cnf",
   TRADING: "trading",
+  PACKING_SOLUTIONS: "packing_solutions",
 
-  // --- Manufacturing ---
+  // --- Manufacturing & Industrial ---
   FACTORY_OWNER: "factory_owner",
+  INDUSTRIAL_MATERIALS: "industrial_materials",
+  MACHINERY_TOOLS: "machinery_tools",
 
   // --- Food & Hospitality ---
   RESTAURANT_OWNER: "restaurant_owner",
   CLOUD_KITCHEN_OWNER: "cloud_kitchen_owner",
   TEA_SHOP_OWNER: "tea_shop_owner",
   CATERING_COOKING: "catering_cooking",
+  ORDER_FOOD: "order_food",
 
   // --- Retail & Shops ---
   PETROL_PUMP_OWNER: "petrol_pump_owner",
@@ -110,6 +118,25 @@ export const AssociateCategory = {
   CREATE_STORE_PRODUCT: "create_store_product",
   CREATE_STORE_SERVICE: "create_store_service",
   CREATE_STORE_BOTH: "create_store_both",
+  B2B_PRODUCTS: "b2b_products",
+  ELECTRONICS_STORE: "electronics_store",
+  FURNITURE_STORE: "furniture_store",
+  TOYS_BABY_STORE: "toys_baby_store",
+  STATIONARY_STORE: "stationary_store",
+  REFURBISHED_ITEMS: "refurbished_items",
+  SPORTS_GOODS: "sports_goods",
+  OLD_CARS_BIKES: "old_cars_bikes",
+  STONE_PRODUCTS: "stone_products",
+  TILES_MARBLES: "tiles_marbles",
+  HAND_MADE_ITEMS: "hand_made_items",
+  UPVC_DOORS: "upvc_doors",
+
+  // --- Tech & Construction ---
+  WEBSITE_DEVELOPMENT: "website_development",
+  SOFTWARE_SERVICE: "software_service",
+  CONSTRUCTION_SERVICE: "construction_service",
+  CONSTRUCTION_PRODUCT: "construction_product",
+  LABORATORY: "laboratory",
 
   // --- Education ---
   PRE_SCHOOL_OWNER: "pre_school_owner",
@@ -126,12 +153,10 @@ export const AssociateCategory = {
   CINEMA_HALL_OWNER: "cinema_hall_owner",
   GARDEN: "garden",
 
-  // --- Financial ---
+  // --- Financial & Others ---
   BANK_BM_OTHERS: "bank_bm_others",
-
   COURIER_BOOK: "Book Courier",
-
-  // --- Others ---
+  SHOP_REGISTRATION: "shop_registration",
   OTHERS: "others",
 } as const;
 
@@ -147,11 +172,15 @@ export const CATEGORY_LABELS: Record<AssociateCategory, string> = {
   [AssociateCategory.CA]: "Chartered Accountant",
   [AssociateCategory.ADVOCATE]: "Advocate",
   [AssociateCategory.INTERIOR_DESIGNER]: "Interior Designer",
+  [AssociateCategory.LEGAL_SERVICE]: "Legal Service",
+  [AssociateCategory.TAX_FILING]: "Tax Filing",
   [AssociateCategory.DOCTOR]: "Doctor",
   [AssociateCategory.HOSPITAL_DIRECTOR_DOCTOR]: "Hospital Director",
   [AssociateCategory.CLINIC_OWNER]: "Clinic Owner",
   [AssociateCategory.MEDICAL_SHOP_OWNER]: "Medical Shop Owner",
   [AssociateCategory.PATHOLOGY_LAB]: "Pathology Lab",
+  [AssociateCategory.NURSE_MEDICAL_SERVICE]: "Nurse & Medical Service",
+  [AssociateCategory.HEALTH_CARE]: "Health Care",
   [AssociateCategory.ANG_STORE_PARTNER]: "ANG Store Partner",
   [AssociateCategory.PRODUCT_SUPPLIES_PARTNER]: "Product Supplies Partner",
   [AssociateCategory.SERVICE_PROVIDER]: "Service Provider",
@@ -159,11 +188,15 @@ export const CATEGORY_LABELS: Record<AssociateCategory, string> = {
   [AssociateCategory.DISTRIBUTOR]: "Distributor",
   [AssociateCategory.CNF]: "C&F",
   [AssociateCategory.TRADING]: "Trading",
+  [AssociateCategory.PACKING_SOLUTIONS]: "Packing Solutions",
   [AssociateCategory.FACTORY_OWNER]: "Factory Owner",
+  [AssociateCategory.INDUSTRIAL_MATERIALS]: "Industrial Materials",
+  [AssociateCategory.MACHINERY_TOOLS]: "Machinery & Tools",
   [AssociateCategory.RESTAURANT_OWNER]: "Restaurant Owner",
   [AssociateCategory.CLOUD_KITCHEN_OWNER]: "Cloud Kitchen Owner",
   [AssociateCategory.TEA_SHOP_OWNER]: "Tea Shop Owner",
   [AssociateCategory.CATERING_COOKING]: "Catering / Cooking",
+  [AssociateCategory.ORDER_FOOD]: "Order Food",
   [AssociateCategory.PETROL_PUMP_OWNER]: "Petrol Pump Owner",
   [AssociateCategory.GROCERY_SHOP_OWNER]: "Grocery Shop Owner",
   [AssociateCategory.FASHION_STORE_OWNER]: "Fashion Store Owner",
@@ -172,6 +205,23 @@ export const CATEGORY_LABELS: Record<AssociateCategory, string> = {
   [AssociateCategory.CREATE_STORE_PRODUCT]: "Create Store (Product)",
   [AssociateCategory.CREATE_STORE_SERVICE]: "Create Store (Service)",
   [AssociateCategory.CREATE_STORE_BOTH]: "Create Store (Both)",
+  [AssociateCategory.B2B_PRODUCTS]: "B2B Products",
+  [AssociateCategory.ELECTRONICS_STORE]: "Electronics Store",
+  [AssociateCategory.FURNITURE_STORE]: "Furniture Store",
+  [AssociateCategory.TOYS_BABY_STORE]: "Toys & Baby Store",
+  [AssociateCategory.STATIONARY_STORE]: "Stationary Store",
+  [AssociateCategory.REFURBISHED_ITEMS]: "Refurbished Items",
+  [AssociateCategory.SPORTS_GOODS]: "Sports Goods",
+  [AssociateCategory.OLD_CARS_BIKES]: "Old Cars & Bikes",
+  [AssociateCategory.STONE_PRODUCTS]: "Stone Products",
+  [AssociateCategory.TILES_MARBLES]: "Tiles & Marbles",
+  [AssociateCategory.HAND_MADE_ITEMS]: "Hand Made Items",
+  [AssociateCategory.UPVC_DOORS]: "Upvc Doors",
+  [AssociateCategory.WEBSITE_DEVELOPMENT]: "Website Development",
+  [AssociateCategory.SOFTWARE_SERVICE]: "Software Service",
+  [AssociateCategory.CONSTRUCTION_SERVICE]: "Construction Service",
+  [AssociateCategory.CONSTRUCTION_PRODUCT]: "Construction Product",
+  [AssociateCategory.LABORATORY]: "Laboratory",
   [AssociateCategory.PRE_SCHOOL_OWNER]: "Pre-School Owner",
   [AssociateCategory.MIDDLE_SCHOOL_OWNER]: "Middle School Owner",
   [AssociateCategory.HIGH_SCHOOL_OWNER]: "High School Owner",
@@ -185,6 +235,7 @@ export const CATEGORY_LABELS: Record<AssociateCategory, string> = {
   [AssociateCategory.CINEMA_HALL_OWNER]: "Cinema Hall Owner",
   [AssociateCategory.GARDEN]: "Garden",
   [AssociateCategory.BANK_BM_OTHERS]: "Bank (BM & Others)",
+  [AssociateCategory.SHOP_REGISTRATION]: "Shop Registration",
   [AssociateCategory.OTHERS]: "Others",
 };
 
@@ -262,6 +313,9 @@ export const CATEGORY_GROUPS = {
     AssociateCategory.CA,
     AssociateCategory.ADVOCATE,
     AssociateCategory.INTERIOR_DESIGNER,
+    AssociateCategory.LEGAL_SERVICE,
+    AssociateCategory.TAX_FILING,
+    AssociateCategory.SHOP_REGISTRATION,
   ],
   Medical: [
     AssociateCategory.DOCTOR,
@@ -269,6 +323,9 @@ export const CATEGORY_GROUPS = {
     AssociateCategory.CLINIC_OWNER,
     AssociateCategory.MEDICAL_SHOP_OWNER,
     AssociateCategory.PATHOLOGY_LAB,
+    AssociateCategory.NURSE_MEDICAL_SERVICE,
+    AssociateCategory.HEALTH_CARE,
+    AssociateCategory.LABORATORY,
   ],
   "Partners & Supply Chain": [
     AssociateCategory.ANG_STORE_PARTNER,
@@ -279,13 +336,19 @@ export const CATEGORY_GROUPS = {
     AssociateCategory.CNF,
     AssociateCategory.TRADING,
     AssociateCategory.COURIER_BOOK,
+    AssociateCategory.PACKING_SOLUTIONS,
   ],
-  Manufacturing: [AssociateCategory.FACTORY_OWNER],
+  "Manufacturing & Industrial": [
+    AssociateCategory.FACTORY_OWNER,
+    AssociateCategory.INDUSTRIAL_MATERIALS,
+    AssociateCategory.MACHINERY_TOOLS,
+  ],
   "Food & Hospitality": [
     AssociateCategory.RESTAURANT_OWNER,
     AssociateCategory.CLOUD_KITCHEN_OWNER,
     AssociateCategory.TEA_SHOP_OWNER,
     AssociateCategory.CATERING_COOKING,
+    AssociateCategory.ORDER_FOOD,
   ],
   "Retail & Shops": [
     AssociateCategory.PETROL_PUMP_OWNER,
@@ -296,6 +359,24 @@ export const CATEGORY_GROUPS = {
     AssociateCategory.CREATE_STORE_PRODUCT,
     AssociateCategory.CREATE_STORE_SERVICE,
     AssociateCategory.CREATE_STORE_BOTH,
+    AssociateCategory.B2B_PRODUCTS,
+    AssociateCategory.ELECTRONICS_STORE,
+    AssociateCategory.FURNITURE_STORE,
+    AssociateCategory.TOYS_BABY_STORE,
+    AssociateCategory.STATIONARY_STORE,
+    AssociateCategory.REFURBISHED_ITEMS,
+    AssociateCategory.SPORTS_GOODS,
+    AssociateCategory.OLD_CARS_BIKES,
+    AssociateCategory.STONE_PRODUCTS,
+    AssociateCategory.TILES_MARBLES,
+    AssociateCategory.HAND_MADE_ITEMS,
+    AssociateCategory.UPVC_DOORS,
+  ],
+  "Tech & Construction": [
+    AssociateCategory.WEBSITE_DEVELOPMENT,
+    AssociateCategory.SOFTWARE_SERVICE,
+    AssociateCategory.CONSTRUCTION_SERVICE,
+    AssociateCategory.CONSTRUCTION_PRODUCT,
   ],
   Education: [
     AssociateCategory.PRE_SCHOOL_OWNER,

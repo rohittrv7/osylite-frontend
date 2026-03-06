@@ -23,6 +23,8 @@ export const PRODUCT_CATEGORY = {
   LABORATORY: "Laboratory",
   HARDWARE_PIPE: "Hardware & Pipe",
   UPVC_DOORS_WINDOWS: "Upvc Doors & Windows",
+  MACHINERY_TOOLS: "Machinery Tools",
+  PACKING_SOLUTIONS: "Packing Solutions",
 } as const;
 
 export type ProductCategory =
@@ -174,6 +176,19 @@ export const PRODUCT_CATEGORY_OPTIONS = [
     image:
       "https://images.unsplash.com/photo-1503602642458-232111445840?w=500&q=80",
   },
+  // 🔹 Naye options jo missing the:
+  {
+    value: PRODUCT_CATEGORY.MACHINERY_TOOLS,
+    label: "Machinery & Tools",
+    image:
+      "https://images.unsplash.com/photo-1537462715879-360eeb61a0ad?w=500&q=80",
+  },
+  {
+    value: PRODUCT_CATEGORY.PACKING_SOLUTIONS,
+    label: "Packing Solutions",
+    image:
+      "https://images.unsplash.com/photo-1589793907316-f94015b12811?w=500&q=80",
+  },
 ];
 
 export const SERVICE_CATEGORY = {
@@ -201,13 +216,16 @@ export const SERVICE_CATEGORY = {
   PATHOLOGY_SERVICES: "Pathology Services",
   BANKING_SERVICES: "Banking Services",
   CATERING_COOKING: "Catering & Cooking",
-  PROPERTY: "Property"
+  PROPERTY: "Property",
+  // 🔹 Naye Categories jo aapne bataye:
+  LEGAL_SERVICES: "Legal Services",
+  INTERIOR_DESIGNER: "Interior Designer",
+  MEDICAL_NURSE_SERVICES: "Nurse & Medical Services",
 } as const;
 
 export type ServiceCategory =
   (typeof SERVICE_CATEGORY)[keyof typeof SERVICE_CATEGORY];
 
-// ✅ High-Quality Unsplash Images for Services
 export const SERVICE_CATEGORY_OPTIONS = [
   {
     value: SERVICE_CATEGORY.ANG_PAY,
@@ -358,6 +376,25 @@ export const SERVICE_CATEGORY_OPTIONS = [
     label: "Catering",
     image:
       "https://images.unsplash.com/photo-1577106263724-2c8e03bfe9cf?w=500&q=80",
+  },
+  // 🔹 Naye options add kiye gaye hain:
+  {
+    value: SERVICE_CATEGORY.LEGAL_SERVICES,
+    label: "Legal Service",
+    image:
+      "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=500&q=80",
+  },
+  {
+    value: SERVICE_CATEGORY.INTERIOR_DESIGNER,
+    label: "Interior Designer",
+    image:
+      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=500&q=80",
+  },
+  {
+    value: SERVICE_CATEGORY.MEDICAL_NURSE_SERVICES,
+    label: "Nurse & Medical",
+    image:
+      "https://images.unsplash.com/photo-1576765608596-78e53a30c2c1?w=500&q=80",
   },
 ];
 

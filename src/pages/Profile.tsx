@@ -19,7 +19,7 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"post" | "video" | "reel">("post");
   const { data: userData, isLoading } = useGetProfileQuery();
 
-  const { data: Content } = useGetMyPostsQuery({
+  const { data: Content = [] } = useGetMyPostsQuery({
     type: activeTab,
   });
   const { data: stats } = useGetUserStatsQuery();
@@ -35,11 +35,12 @@ export default function ProfilePage() {
       <div className="flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-8">
         {/* Avatar */}
         <div className="flex justify-center sm:justify-start">
-          <ProfilePhotoDialog
-            avatarUrl={userData.avatarUrl}
-          >
+          <ProfilePhotoDialog avatarUrl={userData.avatarUrl}>
             <Avatar className="h-24 w-24 sm:h-32 sm:w-32 cursor-pointer border-2 border-transparent hover:border-muted transition-all">
-              <AvatarImage src={userData.avatarUrl ?? ""} className="object-cover" />
+              <AvatarImage
+                src={userData.avatarUrl ?? ""}
+                className="object-cover"
+              />
               <AvatarFallback className="text-2xl">
                 {userData.username.charAt(0).toUpperCase()}
               </AvatarFallback>
@@ -166,15 +167,15 @@ export default function ProfilePage() {
           </TabsList>
 
           <TabsContent value="post">
-            <MediaGrid items={Content} />
+            <MediaGrid items={Content} userId={userData.id} />
           </TabsContent>
 
           <TabsContent value="video">
-            <MediaGrid items={Content} />
+            <MediaGrid items={Content} userId={userData.id} />
           </TabsContent>
 
           <TabsContent value="reel">
-            <MediaGrid items={Content} isReel />
+            <MediaGrid items={Content} userId={userData.id} isReel />
           </TabsContent>
         </Tabs>
       )}

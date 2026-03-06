@@ -1,3 +1,4 @@
+import type { OrderDetailResponse } from "@/types/order";
 import { rootApiSlice } from "./rootApiSlice";
 
 export const ordersApi = rootApiSlice.injectEndpoints({
@@ -5,7 +6,7 @@ export const ordersApi = rootApiSlice.injectEndpoints({
     // POST /orders/buy
     buyProduct: builder.mutation<
       any,
-      { productId: string; quantity: number; address: object }
+      { items: { productId: string; quantity: number }[]; address: any }
     >({
       query: (body) => ({
         url: "/orders/buy",
@@ -22,7 +23,7 @@ export const ordersApi = rootApiSlice.injectEndpoints({
     }),
 
     // GET /orders/:id
-    getOrderDetail: builder.query<any, string>({
+    getOrderDetail: builder.query<OrderDetailResponse, string>({
       query: (id) => `/orders/${id}/myorder`,
       providesTags: ["Orders"],
     }),

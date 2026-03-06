@@ -21,6 +21,16 @@ export interface CreateCommentDto {
   text: string;
 }
 
+export interface CreatePostDto {
+  type: "post" | "video" | "reel";
+  fileUrl: string[];
+  thumbnailUrl?: string;
+  title?: string;
+  caption?: string;
+  description?: string;
+  location?: string;
+}
+
 export interface CommentResponse {
   id: string;
   text: string;
@@ -263,6 +273,27 @@ export const postsApi = rootApiSlice.injectEndpoints({
       }),
       providesTags: ["PostFeed"],
     }),
+
+    // postsApi.ts endpoints mein add karein
+    updatePost: builder.mutation<
+      any,
+      { id: string; body: Partial<CreatePostDto> }
+    >({
+      query: ({ id, body }) => ({
+        url: `/posts/${id}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["Post"],
+    }),
+
+    deletePost: builder.mutation<any, string>({
+      query: (id) => ({
+        url: `/posts/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Post"],
+    }),
   }),
 });
 
@@ -290,4 +321,6 @@ export const {
   useGetPublicFeedQuery,
   useGetPostByIdQuery,
   useGetMixFeedQuery,
+  useDeletePostMutation,
+  useUpdatePostMutation,
 } = postsApi;
