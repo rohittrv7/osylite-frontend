@@ -5,11 +5,17 @@ import type { ExploreFilters, PostCategory } from "@/types/post";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetExploreServicesQuery } from "@/store/api/associateApi";
 import JobFeedPage from "@/pages/JobFeedPage";
-import { SERVICE_CATEGORY, type ServiceCategory } from "@/types/content";
+import {
+  SERVICE_CATEGORY,
+  type ServiceCategory,
+} from "@/types/content";
 import MatrimonyFeedPage from "./MatrimonyFeedPage";
 import Index from "./property/Index";
 import Courier from "./courier/Courier";
 import WalletHome from "./wallet/WalletHome";
+import TravelBooking from "./travel/TravelBooking";
+import CreditCardApp from "@/components/CreditCardApp";
+import HotelBookingSystem from "@/components/HotelBookingSystem";
 
 export default function AngService() {
   const location = useLocation();
@@ -24,6 +30,9 @@ export default function AngService() {
   const isProperty = category === SERVICE_CATEGORY.PROPERTY;
   const isCourier = category === SERVICE_CATEGORY.BOOK_COURIER;
   const isAngToken = category === SERVICE_CATEGORY.ANG_TOKEN;
+  const isTraveling = category === SERVICE_CATEGORY.TRAVELLING_TICKETS;
+  const isCreditCard = category === SERVICE_CATEGORY.CREDIT_CARD;
+  const isHotelBooking = category === SERVICE_CATEGORY.BOOK_EXPLORE;
 
   const filters: ExploreFilters | typeof skipToken =
     category && !isJobSearch
@@ -41,10 +50,13 @@ export default function AngService() {
   }
 
   if (isCourier) return <Courier />;
+  if (isCreditCard) return <CreditCardApp />;
+  if (isHotelBooking) return <HotelBookingSystem />;
 
   if (isProperty) {
     return <Index />;
   }
+  if (isTraveling) return <TravelBooking />;
 
   if (isAngToken) {
     return <WalletHome />;
