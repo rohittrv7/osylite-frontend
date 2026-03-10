@@ -27,7 +27,10 @@ export const AssociatesList = () => {
 
       <div className="relative bg-primary/5 py-12 mb-10 overflow-hidden">
         {/* Decorative Background Elements */}
-        <div className="pl-8 flex gap-2" onClick={() => navigate(-1)}>
+        <div
+          className="pl-8 flex gap-2 cursor-pointer"
+          onClick={() => navigate(-1)}
+        >
           <ArrowLeft />
           Back
         </div>
@@ -41,30 +44,6 @@ export const AssociatesList = () => {
             Find the best service providers near you
           </p>
         </div>
-      </div>
-
-      <div className="flex flex-col  md:flex-row justify-between items-start md:items-center gap-4">
-        {/* <div className="flex gap-2 w-full md:w-auto">
-          <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by name..."
-              className="pl-9"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <Select onValueChange={setSelectedCity}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="City" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Patna">Patna</SelectItem>
-              <SelectItem value="Delhi">Delhi</SelectItem>
-              <SelectItem value="Mumbai">Mumbai</SelectItem>
-            </SelectContent>
-          </Select>
-        </div> */}
       </div>
 
       {/* Content */}
