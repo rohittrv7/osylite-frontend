@@ -2,9 +2,15 @@ import { ArrowRight, BarChart3, Globe, ShieldCheck, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsTablet } from "@/hooks/use-tablet";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+
   const features = [
     { icon: BarChart3, title: "Analytics" },
     { icon: Globe, title: "Global Reach" },
@@ -54,19 +60,21 @@ const HeroSection = () => {
                 Login ( Website)
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              <a
-                href="/base.apk"
-                download="Osylite.apk" // Download hone par ye naam dikhega
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button
-                  variant="outline"
-                  className="rounded-full px-6 border-border"
+              {(!isMobile || !isTablet) && (
+                <a
+                  href="/base.apk"
+                  download="osylite.apk" // Download hone par ye naam dikhega
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  Download App
-                </Button>
-              </a>
+                  <Button
+                    variant="outline"
+                    className="rounded-full px-6 border-border"
+                  >
+                    Download App
+                  </Button>
+                </a>
+              )}
             </div>
           </div>
 
