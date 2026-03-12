@@ -69,6 +69,15 @@ import MyTicketsPage from "./pages/courier/Complaints";
 function App() {
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    const splash = document.getElementById("pwa-splash");
+    if (splash) {
+      setTimeout(() => {
+        splash.style.display = "none";
+      }, 3000);
+    }
+  }, []);
+
   const {
     data: user,
     isLoading,
