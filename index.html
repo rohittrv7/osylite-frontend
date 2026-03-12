@@ -12,10 +12,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Channel Management | ANG Growth</title>
   </head>
+  <style>
+    #pwa-splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .splash-logo {
+      width: 120px;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+    @keyframes pulse {
+      0% {
+        transform: scale(0.9);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(0.9);
+        opacity: 0.7;
+      }
+    }
+  </style>
   <body>
     <div id="pwa-splash">
-      <img src="/logo.png" class="pulse-animation" />
-      <div class="loader"></div>
+      <img src="/logo.png" class="splash-logo" alt="Osylite" />
+      <div
+        style="
+          color: white;
+          margin-top: 20px;
+          font-family: sans-serif;
+          font-size: 12px;
+          letter-spacing: 2px;
+        "
+      >
+        OSYLITE
+      </div>
     </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

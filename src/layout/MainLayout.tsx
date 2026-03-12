@@ -6,10 +6,6 @@ import Header from "./Header";
 import { useIsTablet } from "@/hooks/use-tablet";
 import { useState } from "react";
 
-// const HEADER_HEIGHT = "pt-16";
-// const SIDEBAR_DESKTOP = "lg:ml-80";
-// const SIDEBAR_TABLET = "md:ml-64";
-
 const MainLayout = () => {
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
@@ -17,12 +13,11 @@ const MainLayout = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
-      {/* <Sidebar /> */}
       <Sidebar
         isExpanded={isSidebarExpanded}
         setIsExpanded={setIsSidebarExpanded}
       />
-
+2
       <Header isExpanded={isSidebarExpanded} />
 
       <main

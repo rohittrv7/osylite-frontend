@@ -65,6 +65,8 @@ import CheckoutPage from "./components/Checkout";
 import PublicTracking from "./pages/courier/TrackOrder";
 import ShipmentBooking from "./pages/courier/ShipmentBooking";
 import MyTicketsPage from "./pages/courier/Complaints";
+import { useIsMobile } from "./hooks/use-mobile";
+import { useIsTablet } from "./hooks/use-tablet";
 
 function App() {
   const dispatch = useDispatch();
@@ -73,10 +75,15 @@ function App() {
     const splash = document.getElementById("pwa-splash");
     if (splash) {
       setTimeout(() => {
-        splash.style.display = "none";
-      }, 3000);
+        splash.style.opacity = "0";
+        splash.style.transition = "opacity 0.5s ease";
+        setTimeout(() => splash.remove(), 500);
+      }, 2000);
     }
   }, []);
+
+  const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
 
   const {
     data: user,
@@ -129,6 +136,10 @@ function App() {
             path="/associate-register"
             element={<AssociateRegistrationForm />}
           />
+          {isMobile ||
+            (isTablet && (
+              <Route path="/" element={<Navigate to="/login" replace />} />
+            ))}
         </Route>
 
         {/* PROTECTED ROUTES - Accessible only when LOGGED IN */}
