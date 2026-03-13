@@ -67,6 +67,7 @@ import ShipmentBooking from "./pages/courier/ShipmentBooking";
 import MyTicketsPage from "./pages/courier/Complaints";
 import { useIsMobile } from "./hooks/use-mobile";
 import { useIsTablet } from "./hooks/use-tablet";
+import ChangePasswordPage from "./pages/auth/ChangePasswordPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -192,6 +193,8 @@ function App() {
           <Route path="/withdraw" element={<Withdraw />} />
           {/* <Route path="/history" element={<TransactionHistory />} /> */}
           <Route path="/settings" element={<Settings />} />
+          <Route path="/settings/change-password" element={<ChangePasswordPage />} />
+
           <Route path="/my-bookings" element={<MyBookingsPage />} />
 
           <Route path="/post/:id" element={<PostDetailsPage />} />

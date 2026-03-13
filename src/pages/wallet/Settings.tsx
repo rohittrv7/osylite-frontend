@@ -7,6 +7,7 @@ import {
   Bell,
   Shield,
   HelpCircle,
+  Lock,
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { selectAuthUser } from "@/store/selectors/authSelectors";
@@ -20,6 +21,13 @@ const Settings = () => {
       label: "Profile",
       description: "Manage your account details",
       path: "/my-profile",
+      onClick: () => {},
+    },
+    {
+      icon: Lock,
+      label: "Change Password",
+      description: "Manage your account details",
+      path: "/settings/change-password",
       onClick: () => {},
     },
     {

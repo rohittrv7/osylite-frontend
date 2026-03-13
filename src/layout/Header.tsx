@@ -135,7 +135,7 @@ const Header = ({ isExpanded }: HeaderProps) => {
               My Booking
             </DropdownMenuItem>
 
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem onClick={()=> navigate('/settings/change-password')} className="cursor-pointer">
               <Lock className="mr-2 h-4 w-4" />
               Change Password
             </DropdownMenuItem>
