@@ -35,6 +35,7 @@ import {
   useUpdateProfileMutation,
 } from "@/store/api/authApi";
 import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
+import { maskEmail } from "@/helpers/changemail";
 
 const profileSchema = z.object({
   firstName: z.string().min(2, "First name is too short"),
@@ -226,7 +227,7 @@ export default function EditProfile() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-muted-foreground">Email Address</Label>
-                  <Input value={user?.email} disabled className="bg-muted/50" />
+                  <Input value={maskEmail(user?.email)} disabled className="bg-muted/50" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-muted-foreground">Phone Number</Label>

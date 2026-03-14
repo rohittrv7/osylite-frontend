@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useGetAssociateProfileQuery } from "@/store/api/associateApi";
 import { ContentTab } from "@/components/associae-form/ContentTab";
+import { maskEmail } from "@/helpers/changemail";
 // Import the helper component created in step 2
 
 const AssociateProfile = () => {
@@ -173,7 +174,7 @@ const AssociateProfile = () => {
                     <div>
                       <p className="text-sm font-medium">Email</p>
                       <p className="text-sm text-muted-foreground">
-                        {user.email}
+                        {maskEmail(user.email)}
                       </p>
                     </div>
                   </div>

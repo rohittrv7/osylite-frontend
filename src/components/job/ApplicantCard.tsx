@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Phone, Mail, FileText, Calendar, GraduationCap } from "lucide-react";
 import { format } from "date-fns";
 import type { ApplicantDto } from "@/store/api/jobsApi";
+import { maskEmail } from "@/helpers/changemail";
 
 interface ApplicantCardProps {
   app: ApplicantDto;
@@ -44,7 +45,7 @@ export const ApplicantCard = ({ app }: ApplicantCardProps) => {
 
           <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
-              <Mail className="w-3 h-3" /> {candidate.email}
+              <Mail className="w-3 h-3" /> {maskEmail(candidate.email)}
             </span>
             <span className="flex items-center gap-1">
               <Phone className="w-3 h-3" /> {candidate.phone}

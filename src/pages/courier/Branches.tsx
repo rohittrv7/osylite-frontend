@@ -21,6 +21,7 @@ import {
   useGetAssociateByIdQuery,
 } from "@/store/api/courierApi";
 import { Skeleton } from "@/components/ui/skeleton";
+import { maskEmail } from "@/helpers/changemail";
 
 // Custom Debounce Hook
 function useDebounce<T>(value: T, delay: number): T {
@@ -255,7 +256,7 @@ function BranchDetailView({
                   Email
                 </p>
                 <p className="text-sm font-semibold truncate max-w-[200px]">
-                  {detail.businessDetails?.officeEmail || detail.user?.email}
+                  {maskEmail(detail.businessDetails?.officeEmail || detail.user?.email)}
                 </p>
               </div>
             </li>

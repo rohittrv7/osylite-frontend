@@ -17,6 +17,7 @@ import {
 import { JobProfileType } from "@/store/api/jobsApi";
 import { useNavigate } from "react-router-dom";
 import type { User, workHistory } from "@/types/user";
+import { maskEmail } from "@/helpers/changemail";
 
 interface JobProfileViewProps {
   user: User; // Using API User type here ideally
@@ -63,7 +64,7 @@ const JobProfileView = ({ user, onEdit }: JobProfileViewProps) => {
               <MapPin className="w-4 h-4" /> {profile.operatingCity}
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
-              <Mail className="w-4 h-4" /> {profile.officialEmail}
+              <Mail className="w-4 h-4" /> {maskEmail(profile?.officialEmail)}
             </div>
             {profile.companyWebsite && (
               <div className="flex items-center gap-2 text-blue-600">

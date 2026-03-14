@@ -14,6 +14,7 @@ import {
 import { useState } from "react";
 import { FollowStatsDialog } from "@/components/FollowListDialog";
 import { ProfilePhotoDialog } from "@/components/ProfilePhotoDialog";
+import { maskEmail } from "@/helpers/changemail";
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"post" | "video" | "reel">("post");
@@ -106,7 +107,7 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Info label="Member ID" value={userData.memberId} />
-            <Info label="Email" value={userData.email} />
+            <Info label="Email" value={maskEmail(userData.email)} />
             <Info label="Mobile" value={userData.phoneNumber} />
             <Info label="Pincode" value={userData.pincode} />
           </CardContent>
