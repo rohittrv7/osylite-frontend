@@ -10,7 +10,6 @@ const HomePage = () => {
       <ServicesList />
       <FeaturesSection />
       <CTASection />
-      {/* <MobileNav /> */}
     </div>
   );
 };
