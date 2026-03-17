@@ -39,7 +39,7 @@ const SelectServicePage = () => {
             <Card
               key={item.value}
               onClick={() => handleSelect(item.value)}
-              className="group relative cursor-pointer p-0 overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-primary/30"
+              className="group gap-0 relative cursor-pointer p-0 overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-primary/30"
             >
               {/* Image Area */}
               <div className="aspect-[4/3] w-full overflow-hidden bg-muted relative">

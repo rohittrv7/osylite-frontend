@@ -1,14 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import {
-  Sun,
-  Moon,
-  User,
-  Menu,
-  LogIn,
-  UserPlus,
-  ShoppingBag,
-} from "lucide-react";
+import { User, Menu, LogIn, UserPlus, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,16 +16,14 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
 const Header = () => {
-  const { theme, setTheme } = useTheme();
+  // const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
-  // Scroll logic for glass effect
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
@@ -57,11 +47,10 @@ const Header = () => {
       )}
     >
       <div className="container mx-auto flex h-14 items-center justify-between">
-        {/* --- LOGO AREA --- */}
         <Link to="/" className="group flex items-center gap-3 relative">
           <div className="relative h-10 w-10 flex items-center justify-center">
             <div className="absolute inset-0 bg-primary rounded-xl rotate-6 group-hover:rotate-0 transition-transform duration-300 shadow-[0_0_20px_rgba(234,179,8,0.3)]" />
-            <ShoppingBag className="relative text-black w-5 h-5" />
+            <ShoppingBag className="relative text-background w-5 h-5" />
           </div>
           <div className="flex flex-col">
             <span className="text-xl font-[900] uppercase italic tracking-tighter leading-none text-slate-900 dark:text-white">
@@ -99,18 +88,6 @@ const Header = () => {
 
         {/* --- ACTION BUTTONS --- */}
         <div className="flex items-center gap-3">
-          {/* Theme Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 hover:border-primary/50 hover:text-primary transition-all duration-300"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          </Button>
-
-          {/* User Account Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild className="hidden md:flex">
               <Button

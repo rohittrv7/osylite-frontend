@@ -231,7 +231,8 @@ export const SERVICE_CATEGORY_OPTIONS = [
     value: SERVICE_CATEGORY.ANG_PAY,
     label: "ANG Pay",
     image:
-      "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=500&q=80",
+      "https://plus.unsplash.com/premium_photo-1681928677639-44267dea6af7?w=500&q=80",
+    // "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?w=500&q=80",
   },
   {
     value: SERVICE_CATEGORY.CREDIT_CARD,

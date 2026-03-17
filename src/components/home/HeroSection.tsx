@@ -6,6 +6,7 @@ import {
   ShieldCheck,
   Bell,
   Sparkles,
+  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -28,103 +29,105 @@ const HeroSection = () => {
     },
   };
 
-  // 🔹 FIX: Dynamic classes ke liye poori string pass karna best practice hai
   const cardData = [
     {
       icon: BarChart3,
       title: "Analytics",
       color:
-        "bg-gradient-to-br from-blue-500/20 to-transparent dark:from-blue-500/10",
+        "bg-gradient-to-br from-blue-400/20 to-blue-500/10 dark:from-blue-500/20",
+      accent: "text-blue-600 dark:text-blue-400",
+      border: "border-blue-500/20",
     },
     {
       icon: Globe,
       title: "Global",
       color:
-        "bg-gradient-to-br from-yellow-500/20 to-transparent dark:from-primary/10",
+        "bg-gradient-to-br from-yellow-400/20 to-yellow-500/10 dark:from-primary/20",
+      accent: "text-yellow-700 dark:text-primary",
+      border: "border-yellow-500/20",
     },
     {
       icon: ShieldCheck,
       title: "Secure",
       color:
-        "bg-gradient-to-br from-purple-500/20 to-transparent dark:from-purple-500/10",
+        "bg-gradient-to-br from-purple-400/20 to-purple-500/10 dark:from-purple-500/20",
+      accent: "text-purple-600 dark:text-purple-400",
+      border: "border-purple-500/20",
     },
     {
       icon: Bell,
       title: "Fast",
       color:
-        "bg-gradient-to-br from-orange-500/20 to-transparent dark:from-orange-500/10",
+        "bg-gradient-to-br from-orange-400/20 to-orange-500/10 dark:from-orange-500/20",
+      accent: "text-orange-600 dark:text-orange-400",
+      border: "border-orange-500/20",
     },
   ];
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background dark:bg-background text-foreground transition-colors duration-500 py-20 px-4">
-      {/* 🔹 Background Glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/10 dark:from-primary/5 via-transparent to-transparent opacity-60 pointer-events-none" />
-
-      {/* Orbs */}
-      {/* <div className="absolute -top-[10%] -left-[10%] w-[400px] h-[400px] bg-primary/10 dark:bg-yellow-600/5 rounded-full blur-[120px] pointer-events-none" /> */}
-
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background dark:bg-background transition-colors duration-500">
       <div className="container relative z-10 mx-auto">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid lg:grid-cols-2 gap-16 items-center"
+          className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center"
         >
-          {/* --- Left Content --- */}
-          <div className="space-y-10 max-w-2xl">
+          {/* --- LEFT CONTENT (Text) --- */}
+          {/* 🔹 order-1 ensures text comes first on mobile */}
+          <div className="space-y-8 lg:space-y-10 max-w-2xl text-center lg:text-left order-1">
             <motion.div
               variants={itemVariants}
-              className="inline-flex items-center gap-2 rounded-full bg-primary/10 dark:bg-white/5 border border-primary/20 dark:border-white/10 px-4 py-2 backdrop-blur-md"
+              className="inline-flex items-center gap-3 rounded-full bg-background dark:bg-white/5 border border-black/5 dark:border-white/10 px-5 py-2 backdrop-blur-md mx-auto lg:mx-0 shadow-sm"
             >
-              <Sparkles size={14} className="text-primary animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary dark:text-white/70">
-                Future of Digital Scalability
+              <Zap size={14} className="text-primary fill-primary" />
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900 dark:text-white/70">
+                Next-Gen Growth Engine
               </span>
             </motion.div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 md:space-y-6">
               <motion.h1
                 variants={itemVariants}
-                className="text-6xl md:text-8xl lg:text-9xl font-black leading-[0.85] tracking-tighter text-slate-900 dark:text-white"
+                className="text-6xl md:text-8xl lg:text-9xl font-[1000] uppercase italic tracking-tighter leading-[0.85] text-slate-950 dark:text-white"
               >
                 UNLEASH <br />
-                <span className="text-primary drop-shadow-[0_0_30px_rgba(234,179,8,0.3)]">
+                <span className="text-primary drop-shadow-[0_10px_20px_rgba(234,179,8,0.2)]">
                   POWER.
                 </span>
               </motion.h1>
               <motion.p
                 variants={itemVariants}
-                className="text-slate-600 dark:text-white/50 text-lg max-w-md font-medium leading-relaxed border-l-4 border-primary/30 pl-6"
+                className="text-slate-600 dark:text-white/50 text-lg md:text-xl max-w-md font-medium leading-relaxed border-l-4 border-primary/30 pl-6 mx-auto lg:mx-0"
               >
-                We build the digital infrastructure that turns ambitious
-                startups into global market leaders. Precision engineered for
-                the 1%.
+                Building digital highways for ambitious brands. Precision
+                engineered for the 1% who scale faster.
               </motion.p>
             </div>
 
             <motion.div
               variants={itemVariants}
-              className="flex flex-wrap gap-6 pt-4"
+              className="flex flex-wrap justify-center lg:justify-start gap-4 md:gap-6 pt-4"
             >
               <Button
                 size="lg"
-                className="rounded-full px-10 h-16 bg-primary text-primary-foreground font-black uppercase italic tracking-widest hover:scale-105 hover:shadow-[0_0_40px_rgba(234,179,8,0.4)] transition-all duration-500"
+                className="rounded-full px-10 h-16 bg-slate-950 dark:bg-primary text-white dark:text-black font-black uppercase italic tracking-widest hover:scale-105 transition-all shadow-xl"
               >
-                Join the Elite <ArrowRight className="ml-2" />
+                Join the Elite <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button
                 variant="outline"
                 size="lg"
-                className="rounded-full px-10 h-16 border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/5 font-bold uppercase text-xs tracking-widest backdrop-blur-md hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
+                className="rounded-full px-10 h-16 border-black/10 dark:border-white/10 bg-white/30 dark:bg-white/5 font-bold uppercase text-[10px] tracking-widest backdrop-blur-md"
               >
-                View Ecosystem
+                Live Demo <Sparkles className="ml-2 h-4 w-4 text-primary" />
               </Button>
             </motion.div>
           </div>
 
-          {/* --- Right Content: Dynamic Stack Cards --- */}
-          <div className="relative h-[450px] md:h-[550px] w-full flex items-center justify-center mt-12 lg:mt-0 pr-10">
+          {/* --- RIGHT CONTENT (Cards) --- */}
+          {/* 🔹 order-2 ensures cards come after text on mobile */}
+          <div className="relative h-[380px] sm:h-[450px] md:h-[550px] w-full flex items-center justify-center order-2 mt-8 lg:mt-0">
             {cardData.map((item, idx) => (
               <motion.div
                 key={idx}
@@ -138,37 +141,57 @@ const HeroSection = () => {
                   transition: { type: "spring", stiffness: 300 },
                 }}
                 className={cn(
-                  "absolute w-[240px] md:w-[280px] aspect-[3/4] p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/10 backdrop-blur-3xl shadow-2xl transition-all duration-500 cursor-pointer",
-                  "bg-white/90 dark:bg-zinc-900/40",
-                  item.color, // 🔹 Now correctly applying the gradient
+                  "absolute w-[200px] sm:w-[260px] md:w-[300px] aspect-[3/4.2] p-6 md:p-10 rounded-[2.5rem] border shadow-2xl transition-all duration-700 cursor-pointer overflow-hidden",
+                  "bg-white/90 dark:bg-zinc-950/60 backdrop-blur-3xl",
+                  item.color,
+                  item.border,
                 )}
                 style={{
-                  rotate: (idx - 1.5) * 12,
-                  x: (idx - 1.5) * 45,
+                  rotate:
+                    (idx - 1.5) *
+                    (typeof window !== "undefined" && window.innerWidth < 768
+                      ? 8
+                      : 12),
+                  x:
+                    (idx - 1.5) *
+                    (typeof window !== "undefined" && window.innerWidth < 768
+                      ? 35
+                      : 55),
                   zIndex: idx,
                 }}
               >
                 <div className="h-full flex flex-col justify-between relative z-10">
                   <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-primary/10 dark:bg-white/10 flex items-center justify-center border border-primary/20 dark:border-white/10">
-                      <item.icon className="text-primary w-6 h-6" />
+                    <div className="w-10 h-10 md:w-14 md:h-14 rounded-2xl bg-white/50 dark:bg-white/10 flex items-center justify-center border border-black/5 dark:border-white/10 shadow-sm">
+                      <item.icon
+                        className={cn("w-5 h-5 md:w-7 md:h-7", item.accent)}
+                      />
                     </div>
-                    <h3 className="text-2xl font-black uppercase italic tracking-tighter leading-none text-slate-900 dark:text-white">
-                      {item.title} <br /> Solutions
+                    <h3 className="text-xl md:text-3xl font-[1000] uppercase italic tracking-tighter leading-[0.8] text-slate-900 dark:text-white">
+                      {item.title} <br />
+                      <span className="text-primary">Engine.</span>
                     </h3>
                   </div>
 
-                  <div className="space-y-4">
-                    <div className="h-1.5 w-full bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: "85%" }}
-                        transition={{ duration: 1.5, delay: 0.5 }}
-                        className="h-full bg-primary shadow-[0_0_10px_rgba(234,179,8,1)]"
-                      />
+                  <div className="space-y-4 md:space-y-5">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-[8px] md:text-[10px] font-black uppercase opacity-60 text-slate-600 dark:text-white">
+                        <span>Status</span>
+                        <span className="text-primary font-black">
+                          Optimized
+                        </span>
+                      </div>
+                      <div className="h-1.5 md:h-2 w-full bg-black/5 dark:bg-white/10 rounded-full overflow-hidden border border-black/5">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          whileInView={{ width: "90%" }}
+                          transition={{ duration: 2, delay: 0.8 }}
+                          className="h-full bg-primary shadow-[0_0_15px_rgba(234,179,8,0.8)]"
+                        />
+                      </div>
                     </div>
-                    <p className="text-[10px] font-black uppercase opacity-60 tracking-[0.2em] text-slate-500 dark:text-white">
-                      Performance 99.9%
+                    <p className="text-[8px] md:text-[10px] font-black uppercase opacity-40 tracking-[0.2em] text-slate-500 dark:text-white">
+                      Syncing 0.001ms
                     </p>
                   </div>
                 </div>

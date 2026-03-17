@@ -5,10 +5,7 @@ import type { ExploreFilters, PostCategory } from "@/types/post";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetExploreServicesQuery } from "@/store/api/associateApi";
 import JobFeedPage from "@/pages/JobFeedPage";
-import {
-  SERVICE_CATEGORY,
-  type ServiceCategory,
-} from "@/types/content";
+import { SERVICE_CATEGORY, type ServiceCategory } from "@/types/content";
 import MatrimonyFeedPage from "./MatrimonyFeedPage";
 import Index from "./property/Index";
 import Courier from "./courier/Courier";
@@ -16,6 +13,7 @@ import WalletHome from "./wallet/WalletHome";
 import TravelBooking from "./travel/TravelBooking";
 import CreditCardApp from "@/components/CreditCardApp";
 import HotelBookingSystem from "@/components/HotelBookingSystem";
+import AssociatePayPage from "@/components/ang-pay/AssociatePayPage";
 
 export default function AngService() {
   const location = useLocation();
@@ -26,6 +24,7 @@ export default function AngService() {
   const category = state?.category;
 
   const isJobSearch = category === SERVICE_CATEGORY.SEARCH_JOB;
+  const isAngPay = category === SERVICE_CATEGORY.ANG_PAY;
   const isMatrimonySearch = category === SERVICE_CATEGORY.MATRIMONY;
   const isProperty = category === SERVICE_CATEGORY.PROPERTY;
   const isCourier = category === SERVICE_CATEGORY.BOOK_COURIER;
@@ -48,6 +47,8 @@ export default function AngService() {
   if (isMatrimonySearch) {
     return <MatrimonyFeedPage />;
   }
+
+  if (isAngPay) return <AssociatePayPage />;
 
   if (isCourier) return <Courier />;
   if (isCreditCard) return <CreditCardApp />;

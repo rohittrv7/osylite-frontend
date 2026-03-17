@@ -11,7 +11,9 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
-      {(!isMobile || !isTablet) && <Header />}
+      {
+      // (!isMobile || !isTablet) && 
+      <Header />}
 
       <main
         className="
@@ -25,7 +27,9 @@ const Layout = () => {
         <Outlet />
       </main>
 
-      {(!isMobile || !isTablet) && <Footer />}
+      {
+      // (!isMobile || !isTablet) && 
+      <Footer />}
 
       {/* Mobile bottom navigation */}
       {isMobile ||

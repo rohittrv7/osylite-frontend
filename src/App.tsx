@@ -31,7 +31,6 @@ import SelectEntertainment from "./pages/SelectEntertainment";
 import AngService from "./pages/AngService";
 import EntertainMentPage from "./pages/EntertainMentPage";
 import VenueExplore from "./pages/VenueExplore";
-import { Loader2 } from "lucide-react";
 import Friends from "./pages/Friends";
 import JobProfilePage from "./pages/JobProfilePage";
 import JobPostPage from "./pages/JobPostPage";
@@ -86,11 +85,7 @@ function App() {
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
 
-  const {
-    data: user,
-    isLoading,
-    isError,
-  } = useGetProfileQuery(undefined, {
+  const { data: user, isError } = useGetProfileQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
 
@@ -102,18 +97,18 @@ function App() {
     }
   }, [user, isError, dispatch]);
 
-  if (isLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-background text-foreground">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground animate-pulse">
-            Initializing App...
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="flex h-screen w-full items-center justify-center bg-background text-foreground">
+  //       <div className="flex flex-col items-center gap-4">
+  //         <Loader2 className="h-10 w-10 animate-spin text-primary" />
+  //         <p className="text-sm text-muted-foreground animate-pulse">
+  //           Initializing App...
+  //         </p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <ThemeProvider>
@@ -193,7 +188,10 @@ function App() {
           <Route path="/withdraw" element={<Withdraw />} />
           {/* <Route path="/history" element={<TransactionHistory />} /> */}
           <Route path="/settings" element={<Settings />} />
-          <Route path="/settings/change-password" element={<ChangePasswordPage />} />
+          <Route
+            path="/settings/change-password"
+            element={<ChangePasswordPage />}
+          />
 
           <Route path="/my-bookings" element={<MyBookingsPage />} />
 
