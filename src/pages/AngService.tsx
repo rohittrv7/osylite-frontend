@@ -14,6 +14,8 @@ import TravelBooking from "./travel/TravelBooking";
 import CreditCardApp from "@/components/CreditCardApp";
 import HotelBookingSystem from "@/components/HotelBookingSystem";
 import AssociatePayPage from "@/components/ang-pay/AssociatePayPage";
+import AppHubSection from "@/components/app-hub/AppHubSection";
+import HireWorkerSection from "@/components/hire-worker/HireWorkerSection";
 
 export default function AngService() {
   const location = useLocation();
@@ -25,6 +27,8 @@ export default function AngService() {
 
   const isJobSearch = category === SERVICE_CATEGORY.SEARCH_JOB;
   const isAngPay = category === SERVICE_CATEGORY.ANG_PAY;
+  const isAppHub = category === SERVICE_CATEGORY.APP_HUB;
+  const isWorkHire = category === SERVICE_CATEGORY.HIRE_WORKER;
   const isMatrimonySearch = category === SERVICE_CATEGORY.MATRIMONY;
   const isProperty = category === SERVICE_CATEGORY.PROPERTY;
   const isCourier = category === SERVICE_CATEGORY.BOOK_COURIER;
@@ -49,7 +53,8 @@ export default function AngService() {
   }
 
   if (isAngPay) return <AssociatePayPage />;
-
+  if (isAppHub) return <AppHubSection />;
+  if (isWorkHire) return <HireWorkerSection />;
   if (isCourier) return <Courier />;
   if (isCreditCard) return <CreditCardApp />;
   if (isHotelBooking) return <HotelBookingSystem />;
