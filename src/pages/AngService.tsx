@@ -16,6 +16,8 @@ import HotelBookingSystem from "@/components/HotelBookingSystem";
 import AssociatePayPage from "@/components/ang-pay/AssociatePayPage";
 import AppHubSection from "@/components/app-hub/AppHubSection";
 import HireWorkerSection from "@/components/hire-worker/HireWorkerSection";
+import HomeServicesSection from "./home-service/HomeServicesSection";
+import ShopRegistration from "./shop-register/ShopRegistration";
 
 export default function AngService() {
   const location = useLocation();
@@ -36,6 +38,8 @@ export default function AngService() {
   const isTraveling = category === SERVICE_CATEGORY.TRAVELLING_TICKETS;
   const isCreditCard = category === SERVICE_CATEGORY.CREDIT_CARD;
   const isHotelBooking = category === SERVICE_CATEGORY.BOOK_EXPLORE;
+  const isHomeService = category === SERVICE_CATEGORY.HOME_SERVICES;
+  const isShopRegister = category === SERVICE_CATEGORY.SHOP_REGISTRATION;
 
   const filters: ExploreFilters | typeof skipToken =
     category && !isJobSearch
@@ -44,19 +48,15 @@ export default function AngService() {
 
   const { data: posts = [], isLoading } = useGetExploreServicesQuery(filters);
 
-  if (isJobSearch) {
-    return <JobFeedPage />;
-  }
-
-  if (isMatrimonySearch) {
-    return <MatrimonyFeedPage />;
-  }
-
+  if (isJobSearch) return <JobFeedPage />;
+  if (isMatrimonySearch) return <MatrimonyFeedPage />;
+  if (isHomeService) return <HomeServicesSection />;
   if (isAngPay) return <AssociatePayPage />;
   if (isAppHub) return <AppHubSection />;
   if (isWorkHire) return <HireWorkerSection />;
   if (isCourier) return <Courier />;
   if (isCreditCard) return <CreditCardApp />;
+  if (isShopRegister) return <ShopRegistration />;
   if (isHotelBooking) return <HotelBookingSystem />;
 
   if (isProperty) {

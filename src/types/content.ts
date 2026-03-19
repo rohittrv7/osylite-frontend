@@ -262,7 +262,7 @@ export const SERVICE_CATEGORY_OPTIONS = [
     value: SERVICE_CATEGORY.HOME_SERVICES,
     label: "Home Services",
     image:
-      "https://images.unsplash.com/photo-1581578731117-104f2a863a17?w=500&q=80",
+      "https://images.unsplash.com/photo-1722487631997-cf1e0f92c2c4?w=50`0&q=80",
   },
   {
     value: SERVICE_CATEGORY.BOOK_EXPLORE,
