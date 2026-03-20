@@ -20,6 +20,7 @@ import HomeServicesSection from "./home-service/HomeServicesSection";
 import ShopRegistration from "./shop-register/ShopRegistration";
 import TaxFilingSection from "./taxfilling/TaxFilingSection";
 import AppointmentBooking from "./appointment/AppointmentBooking";
+import FoodDeliverySection from "./food-delevery/FoodDeliverySection";
 
 export default function AngService() {
   const location = useLocation();
@@ -44,6 +45,8 @@ export default function AngService() {
   const isHotelBooking = category === SERVICE_CATEGORY.BOOK_EXPLORE;
   const isHomeService = category === SERVICE_CATEGORY.HOME_SERVICES;
   const isShopRegister = category === SERVICE_CATEGORY.SHOP_REGISTRATION;
+  const isFoodOrdering = category === SERVICE_CATEGORY.ORDER_FOOD;
+
 
   const filters: ExploreFilters | typeof skipToken =
     category && !isJobSearch
@@ -52,6 +55,7 @@ export default function AngService() {
 
   const { data: posts = [], isLoading } = useGetExploreServicesQuery(filters);
 
+  if (isFoodOrdering) return <FoodDeliverySection />;
   if (isJobSearch) return <JobFeedPage />;
   if (isMatrimonySearch) return <MatrimonyFeedPage />;
   if (isHomeService) return <HomeServicesSection />;
