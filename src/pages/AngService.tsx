@@ -18,6 +18,8 @@ import AppHubSection from "@/components/app-hub/AppHubSection";
 import HireWorkerSection from "@/components/hire-worker/HireWorkerSection";
 import HomeServicesSection from "./home-service/HomeServicesSection";
 import ShopRegistration from "./shop-register/ShopRegistration";
+import TaxFilingSection from "./taxfilling/TaxFilingSection";
+import AppointmentBooking from "./appointment/AppointmentBooking";
 
 export default function AngService() {
   const location = useLocation();
@@ -35,8 +37,10 @@ export default function AngService() {
   const isProperty = category === SERVICE_CATEGORY.PROPERTY;
   const isCourier = category === SERVICE_CATEGORY.BOOK_COURIER;
   const isAngToken = category === SERVICE_CATEGORY.ANG_TOKEN;
+  const isTaxFilling = category === SERVICE_CATEGORY.TAX_RETURN_FILING;
   const isTraveling = category === SERVICE_CATEGORY.TRAVELLING_TICKETS;
   const isCreditCard = category === SERVICE_CATEGORY.CREDIT_CARD;
+  const isAppointment = category === SERVICE_CATEGORY.GET_APPOINTMENT;
   const isHotelBooking = category === SERVICE_CATEGORY.BOOK_EXPLORE;
   const isHomeService = category === SERVICE_CATEGORY.HOME_SERVICES;
   const isShopRegister = category === SERVICE_CATEGORY.SHOP_REGISTRATION;
@@ -54,6 +58,8 @@ export default function AngService() {
   if (isAngPay) return <AssociatePayPage />;
   if (isAppHub) return <AppHubSection />;
   if (isWorkHire) return <HireWorkerSection />;
+  if (isTaxFilling) return <TaxFilingSection />;
+  if (isAppointment) return <AppointmentBooking />;
   if (isCourier) return <Courier />;
   if (isCreditCard) return <CreditCardApp />;
   if (isShopRegister) return <ShopRegistration />;

@@ -5,7 +5,7 @@ import {
   Globe,
   ShieldCheck,
   Bell,
-  Sparkles,
+  // Sparkles,
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -115,13 +115,30 @@ const HeroSection = () => {
               >
                 Join the Elite <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button
+
+              {
+                <a
+                  href="/base.apk"
+                  download="osylite.apk" // Download hone par ye naam dikhega
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button
+                    variant="outline"
+                size="lg"
+                className="rounded-full px-10 h-16 border-black/10 dark:border-white/10 bg-white/30 dark:bg-white/5 font-bold uppercase text-[10px] tracking-widest backdrop-blur-md cursor-pointer"
+                  >
+                    Download App
+                  </Button>
+                </a>
+              }
+              {/* <Button
                 variant="outline"
                 size="lg"
                 className="rounded-full px-10 h-16 border-black/10 dark:border-white/10 bg-white/30 dark:bg-white/5 font-bold uppercase text-[10px] tracking-widest backdrop-blur-md"
               >
                 Live Demo <Sparkles className="ml-2 h-4 w-4 text-primary" />
-              </Button>
+              </Button> */}
             </motion.div>
           </div>
 
