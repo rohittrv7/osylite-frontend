@@ -10,8 +10,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -110,6 +112,7 @@ const HeroSection = () => {
               className="flex flex-wrap justify-center lg:justify-start gap-4 md:gap-6 pt-4"
             >
               <Button
+                onClick={() => navigate("/login")}
                 size="lg"
                 className="rounded-full px-10 h-16 bg-slate-950 dark:bg-primary text-white dark:text-black font-black uppercase italic tracking-widest hover:scale-105 transition-all shadow-xl"
               >
@@ -125,8 +128,8 @@ const HeroSection = () => {
                 >
                   <Button
                     variant="outline"
-                size="lg"
-                className="rounded-full px-10 h-16 border-black/10 dark:border-white/10 bg-white/30 dark:bg-white/5 font-bold uppercase text-[10px] tracking-widest backdrop-blur-md cursor-pointer"
+                    size="lg"
+                    className="rounded-full px-10 h-16 border-black/10 dark:border-white/10 bg-white/30 dark:bg-white/5 font-bold uppercase text-[10px] tracking-widest backdrop-blur-md cursor-pointer"
                   >
                     Download App
                   </Button>

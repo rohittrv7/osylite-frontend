@@ -21,6 +21,8 @@ import ShopRegistration from "./shop-register/ShopRegistration";
 import TaxFilingSection from "./taxfilling/TaxFilingSection";
 import AppointmentBooking from "./appointment/AppointmentBooking";
 import FoodDeliverySection from "./food-delevery/FoodDeliverySection";
+import HealthAppFinal from "./appointment/HealthAppFinal";
+import PathologyAppFinal from "./appointment/PathologyAppFinal";
 
 export default function AngService() {
   const location = useLocation();
@@ -46,6 +48,8 @@ export default function AngService() {
   const isHomeService = category === SERVICE_CATEGORY.HOME_SERVICES;
   const isShopRegister = category === SERVICE_CATEGORY.SHOP_REGISTRATION;
   const isFoodOrdering = category === SERVICE_CATEGORY.ORDER_FOOD;
+  const isDoctorAppointment = category === SERVICE_CATEGORY.DOCTOR_APPOINTMENT;
+  const isPathology = category === SERVICE_CATEGORY.PATHOLOGY_SERVICES;
 
 
   const filters: ExploreFilters | typeof skipToken =
@@ -55,6 +59,7 @@ export default function AngService() {
 
   const { data: posts = [], isLoading } = useGetExploreServicesQuery(filters);
 
+  if (isDoctorAppointment) return <HealthAppFinal />;
   if (isFoodOrdering) return <FoodDeliverySection />;
   if (isJobSearch) return <JobFeedPage />;
   if (isMatrimonySearch) return <MatrimonyFeedPage />;
@@ -68,6 +73,7 @@ export default function AngService() {
   if (isCreditCard) return <CreditCardApp />;
   if (isShopRegister) return <ShopRegistration />;
   if (isHotelBooking) return <HotelBookingSystem />;
+  if (isPathology) return <PathologyAppFinal />;
 
   if (isProperty) {
     return <Index />;
