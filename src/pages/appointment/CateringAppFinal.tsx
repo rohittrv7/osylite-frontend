@@ -264,7 +264,7 @@ export default function CateringAppFinal() {
         {currentScreen === "home" && (
           <div className="space-y-10 animate-in fade-in duration-500">
             {/* Hero Section */}
-            <div className="bg-card rounded-[2.5rem] border border-border shadow-lg overflow-hidden relative">
+            <div className="bg-card rounded-md border border-border shadow-lg overflow-hidden relative">
               <div className="absolute inset-0 z-0">
                 <img
                   src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1200&q=80"
