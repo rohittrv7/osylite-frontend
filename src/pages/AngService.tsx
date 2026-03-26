@@ -25,6 +25,8 @@ import HealthAppFinal from "./appointment/HealthAppFinal";
 import PathologyAppFinal from "./appointment/PathologyAppFinal";
 import CateringAppFinal from "./appointment/CateringAppFinal";
 import InteriorAppFinal from "./ang-service/InteriorAppFinal";
+import NursingAppFinal from "./ang-service/NursingAppFinal";
+import LegalAppFinal from "./ang-service/LegalAppFinal";
 
 export default function AngService() {
   const location = useLocation();
@@ -54,6 +56,8 @@ export default function AngService() {
   const isPathology = category === SERVICE_CATEGORY.PATHOLOGY_SERVICES;
   const isCatering = category === SERVICE_CATEGORY.CATERING_COOKING;
   const isInterior = category === SERVICE_CATEGORY.INTERIOR_DESIGNER;
+  const isNursing = category === SERVICE_CATEGORY.MEDICAL_NURSE_SERVICES;
+  const isLegal = category === SERVICE_CATEGORY.LEGAL_SERVICES;
 
 
   const filters: ExploreFilters | typeof skipToken =
@@ -63,6 +67,8 @@ export default function AngService() {
 
   const { data: posts = [], isLoading } = useGetExploreServicesQuery(filters);
 
+  if (isLegal) return <LegalAppFinal />;
+  if (isNursing) return <NursingAppFinal />;
   if (isCatering) return <CateringAppFinal />;
   if (isInterior) return <InteriorAppFinal />;
   if (isDoctorAppointment) return <HealthAppFinal />;
