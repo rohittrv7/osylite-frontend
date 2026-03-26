@@ -1,3 +1,4 @@
+import React from "react";
 import MasonryFeed from "@/components/MasonryFeed";
 import { Loader2 } from "lucide-react";
 import { useLocation } from "react-router-dom";
@@ -27,6 +28,40 @@ import CateringAppFinal from "./appointment/CateringAppFinal";
 import InteriorAppFinal from "./ang-service/InteriorAppFinal";
 import NursingAppFinal from "./ang-service/NursingAppFinal";
 import LegalAppFinal from "./ang-service/LegalAppFinal";
+import EmergencyAppFinal from "./ang-service/EmergencyAppFinal";
+import LoanAppFinal from "./ang-service/LoanAppFinal";
+import WebDevAppFinal from "./ang-service/WebDevAppFinal";
+import SoftwareDevAppFinal from "./ang-service/SoftwareDevAppFinal";
+
+// 1. Component Map - Ye list sabse fast aur clean tarika hai route handle karne ka
+const COMPONENT_MAP: Record<string, React.ElementType> = {
+  [SERVICE_CATEGORY.SOFTWARE_DEVELOPMENT]: SoftwareDevAppFinal,
+  [SERVICE_CATEGORY.WEBSITE_DEVELOPMENT]: WebDevAppFinal,
+  [SERVICE_CATEGORY.LOAN_SERVICES]: LoanAppFinal,
+  [SERVICE_CATEGORY.EMERGENCY_SERVICES]: EmergencyAppFinal,
+  [SERVICE_CATEGORY.LEGAL_SERVICES]: LegalAppFinal,
+  [SERVICE_CATEGORY.MEDICAL_NURSE_SERVICES]: NursingAppFinal,
+  [SERVICE_CATEGORY.CATERING_COOKING]: CateringAppFinal,
+  [SERVICE_CATEGORY.INTERIOR_DESIGNER]: InteriorAppFinal,
+  [SERVICE_CATEGORY.DOCTOR_APPOINTMENT]: HealthAppFinal,
+  [SERVICE_CATEGORY.ORDER_FOOD]: FoodDeliverySection,
+  [SERVICE_CATEGORY.SEARCH_JOB]: JobFeedPage,
+  [SERVICE_CATEGORY.MATRIMONY]: MatrimonyFeedPage,
+  [SERVICE_CATEGORY.HOME_SERVICES]: HomeServicesSection,
+  [SERVICE_CATEGORY.ANG_PAY]: AssociatePayPage,
+  [SERVICE_CATEGORY.APP_HUB]: AppHubSection,
+  [SERVICE_CATEGORY.HIRE_WORKER]: HireWorkerSection,
+  [SERVICE_CATEGORY.TAX_RETURN_FILING]: TaxFilingSection,
+  [SERVICE_CATEGORY.GET_APPOINTMENT]: AppointmentBooking,
+  [SERVICE_CATEGORY.BOOK_COURIER]: Courier,
+  [SERVICE_CATEGORY.CREDIT_CARD]: CreditCardApp,
+  [SERVICE_CATEGORY.SHOP_REGISTRATION]: ShopRegistration,
+  [SERVICE_CATEGORY.BOOK_EXPLORE]: HotelBookingSystem,
+  [SERVICE_CATEGORY.PATHOLOGY_SERVICES]: PathologyAppFinal,
+  [SERVICE_CATEGORY.PROPERTY]: Index,
+  [SERVICE_CATEGORY.TRAVELLING_TICKETS]: TravelBooking,
+  [SERVICE_CATEGORY.ANG_TOKEN]: WalletHome,
+};
 
 export default function AngService() {
   const location = useLocation();
@@ -36,66 +71,21 @@ export default function AngService() {
   } | null;
   const category = state?.category;
 
-  const isJobSearch = category === SERVICE_CATEGORY.SEARCH_JOB;
-  const isAngPay = category === SERVICE_CATEGORY.ANG_PAY;
-  const isAppHub = category === SERVICE_CATEGORY.APP_HUB;
-  const isWorkHire = category === SERVICE_CATEGORY.HIRE_WORKER;
-  const isMatrimonySearch = category === SERVICE_CATEGORY.MATRIMONY;
-  const isProperty = category === SERVICE_CATEGORY.PROPERTY;
-  const isCourier = category === SERVICE_CATEGORY.BOOK_COURIER;
-  const isAngToken = category === SERVICE_CATEGORY.ANG_TOKEN;
-  const isTaxFilling = category === SERVICE_CATEGORY.TAX_RETURN_FILING;
-  const isTraveling = category === SERVICE_CATEGORY.TRAVELLING_TICKETS;
-  const isCreditCard = category === SERVICE_CATEGORY.CREDIT_CARD;
-  const isAppointment = category === SERVICE_CATEGORY.GET_APPOINTMENT;
-  const isHotelBooking = category === SERVICE_CATEGORY.BOOK_EXPLORE;
-  const isHomeService = category === SERVICE_CATEGORY.HOME_SERVICES;
-  const isShopRegister = category === SERVICE_CATEGORY.SHOP_REGISTRATION;
-  const isFoodOrdering = category === SERVICE_CATEGORY.ORDER_FOOD;
-  const isDoctorAppointment = category === SERVICE_CATEGORY.DOCTOR_APPOINTMENT;
-  const isPathology = category === SERVICE_CATEGORY.PATHOLOGY_SERVICES;
-  const isCatering = category === SERVICE_CATEGORY.CATERING_COOKING;
-  const isInterior = category === SERVICE_CATEGORY.INTERIOR_DESIGNER;
-  const isNursing = category === SERVICE_CATEGORY.MEDICAL_NURSE_SERVICES;
-  const isLegal = category === SERVICE_CATEGORY.LEGAL_SERVICES;
-
-
+  // 2. Safely call hooks at the top level
   const filters: ExploreFilters | typeof skipToken =
-    category && !isJobSearch
+    category && category !== SERVICE_CATEGORY.SEARCH_JOB
       ? { category: category as PostCategory }
       : skipToken;
 
   const { data: posts = [], isLoading } = useGetExploreServicesQuery(filters);
 
-  if (isLegal) return <LegalAppFinal />;
-  if (isNursing) return <NursingAppFinal />;
-  if (isCatering) return <CateringAppFinal />;
-  if (isInterior) return <InteriorAppFinal />;
-  if (isDoctorAppointment) return <HealthAppFinal />;
-  if (isFoodOrdering) return <FoodDeliverySection />;
-  if (isJobSearch) return <JobFeedPage />;
-  if (isMatrimonySearch) return <MatrimonyFeedPage />;
-  if (isHomeService) return <HomeServicesSection />;
-  if (isAngPay) return <AssociatePayPage />;
-  if (isAppHub) return <AppHubSection />;
-  if (isWorkHire) return <HireWorkerSection />;
-  if (isTaxFilling) return <TaxFilingSection />;
-  if (isAppointment) return <AppointmentBooking />;
-  if (isCourier) return <Courier />;
-  if (isCreditCard) return <CreditCardApp />;
-  if (isShopRegister) return <ShopRegistration />;
-  if (isHotelBooking) return <HotelBookingSystem />;
-  if (isPathology) return <PathologyAppFinal />;
-
-  if (isProperty) {
-    return <Index />;
-  }
-  if (isTraveling) return <TravelBooking />;
-
-  if (isAngToken) {
-    return <WalletHome />;
+  // 3. Render specific Component using Object Mapping (Replaces 25+ if/else statements)
+  if (category && COMPONENT_MAP[category as string]) {
+    const SelectedComponent = COMPONENT_MAP[category as string];
+    return <SelectedComponent />;
   }
 
+  // 4. Default Fallback render if no specific category matches
   return (
     <div className="min-h-screen bg-background pb-16">
       <div className="container mx-auto px-4 py-3">
