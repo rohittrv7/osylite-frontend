@@ -67,6 +67,44 @@ import MyTicketsPage from "./pages/courier/Complaints";
 import { useIsMobile } from "./hooks/use-mobile";
 import { useIsTablet } from "./hooks/use-tablet";
 import ChangePasswordPage from "./pages/auth/ChangePasswordPage";
+import Enquiry from "./pages/hospital/Enquiry";
+import SearchConsultant from "./pages/hospital/SearchConsultant";
+import QuickRate from "./pages/hospital/QuickRate";
+import PatientSearch from "./pages/hospital/PatientSearch";
+import AdmittedPatients from "./pages/hospital/AdmittedPatients";
+import OPDBilling from "./pages/hospital/OPDBilling";
+import Emergency from "./pages/hospital/Emergency";
+import IPDRegistration from "./pages/hospital/IPDRegistration";
+import IPDBilling from "./pages/hospital/IPDBilling";
+import Lab from "./pages/hospital/Lab";
+import Pharmacy from "./pages/hospital/Pharmacy";
+import Inventory from "./pages/hospital/Inventory";
+import MRD from "./pages/hospital/MRD";
+import EPrescription from "./pages/hospital/EPrescription";
+import IPDClinical from "./pages/hospital/IPDClinical";
+import MIS from "./pages/hospital/MIS";
+import Appointment from "./pages/hospital/Appointment";
+import PatientDiet from "./pages/hospital/PatientDiet";
+import Masters from "./pages/hospital/Masters";
+import Admin from "./pages/hospital/Admin";
+import AssetsManagement from "./pages/hospital/AssetsManagement";
+import FeedBack from "./pages/hospital/FeedBack";
+import HumanResource from "./pages/hospital/HumanResource";
+import Reports from "./pages/hospital/Reports";
+import Financial from "./pages/hospital/Financial";
+import ContactManagement from "./pages/hospital/ContactManagement";
+import WardDetail from "./pages/hospital/WardDetail";
+import OTScheduling from "./pages/hospital/OTScheduling";
+import Training from "./pages/hospital/Training";
+import Dialysis from "./pages/hospital/Dialysis";
+import CMS from "./pages/hospital/CMS";
+import BloodBank from "./pages/hospital/BloodBank";
+import AmbulancePage from "./pages/hospital/AmbulancePage";
+import Approvals from "./pages/hospital/Approvals";
+import TPADesk from "./pages/hospital/TPADesk";
+import CSSD from "./pages/hospital/CSSD";
+import ADT from "./pages/hospital/ADT";
+import MedicalCertificate from "./pages/hospital/MedicalCertificate";
 
 function App() {
   const dispatch = useDispatch();
@@ -214,6 +252,46 @@ function App() {
             path="/matrimony/profile/:id"
             element={<MatrimonyProfileDetails />}
           />
+
+          {/* <Route path="/" element={<Index />} /> */}
+          <Route path="/enquiry" element={<Enquiry />} />
+          <Route path="/enquiry/search-consultant" element={<SearchConsultant />} />
+          <Route path="/enquiry/quick-rate" element={<QuickRate />} />
+          <Route path="/enquiry/patient-search" element={<PatientSearch />} />
+          <Route path="/enquiry/admitted-patients" element={<AdmittedPatients />} />
+          <Route path="/opd-billing" element={<OPDBilling />} />
+          <Route path="/emergency" element={<Emergency />} />
+          <Route path="/ipd-registration" element={<IPDRegistration />} />
+          <Route path="/ipd-billing" element={<IPDBilling />} />
+          <Route path="/lab" element={<Lab />} />
+          <Route path="/pharmacy" element={<Pharmacy />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/mrd" element={<MRD />} />
+          <Route path="/e-prescription" element={<EPrescription />} />
+          <Route path="/ipd-clinical" element={<IPDClinical />} />
+          <Route path="/mis" element={<MIS />} />
+          <Route path="/appointment" element={<Appointment />} />
+          <Route path="/patient-diet" element={<PatientDiet />} />
+          <Route path="/masters" element={<Masters />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/assets-management" element={<AssetsManagement />} />
+          <Route path="/feedback" element={<FeedBack />} />
+          <Route path="/human-resource" element={<HumanResource />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/financial" element={<Financial />} />
+          <Route path="/contact-management" element={<ContactManagement />} />
+          <Route path="/ward-detail" element={<WardDetail />} />
+          <Route path="/ot-scheduling" element={<OTScheduling />} />
+          <Route path="/training" element={<Training />} />
+          <Route path="/dialysis" element={<Dialysis />} />
+          <Route path="/cms" element={<CMS />} />
+          <Route path="/blood-bank" element={<BloodBank />} />
+          <Route path="/ambulance" element={<AmbulancePage />} />
+          <Route path="/approvals" element={<Approvals />} />
+          <Route path="/tpa-desk" element={<TPADesk />} />
+          <Route path="/cssd" element={<CSSD />} />
+          <Route path="/adt" element={<ADT />} />
+          <Route path="/medical-certificate" element={<MedicalCertificate />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/mlife" replace />} />
