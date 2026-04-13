@@ -30,9 +30,10 @@ export type ProfileCreatedFor =
   (typeof ProfileCreatedFor)[keyof typeof ProfileCreatedFor];
 
 export interface MatrimonyProfile {
+  candidateName?: string; // New field for the name of the candidate
+  profileFor: ProfileCreatedFor;
   id?: string;
   user?: User;
-  profileFor: ProfileCreatedFor;
   gender: Gender;
   dob: string;
   height: number;

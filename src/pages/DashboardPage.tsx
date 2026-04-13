@@ -137,7 +137,7 @@ export default function Dashboard() {
                 onClick={() => navigator("/property")}
               >
                 <Building className="h-5 w-5" />
-                Create/View Broker profile
+                Create/View Property
               </Button>
 
               <Button

@@ -67,6 +67,40 @@ const BasicInfoStep = ({ formData, updateFormData }: BasicInfoStepProps) => {
         </div>
       </div>
 
+      {/* --- NEW CONDITIONAL NAME INPUT --- */}
+      {formData.profileFor && (
+        <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+          <Label
+            htmlFor="candidateName"
+            className="text-lg font-display text-foreground"
+          >
+            {formData.profileFor === ProfileCreatedFor.SELF
+              ? "Your Full Name"
+              : `Name of the Candidate`}
+            {formData.profileFor === ProfileCreatedFor.SELF ? (
+              <span className="text-muted-foreground text-sm font-normal ml-2">
+                (Optional)
+              </span>
+            ) : (
+              <span className="text-red-500 ml-1">*</span>
+            )}
+          </Label>
+          <Input
+            id="candidateName"
+            type="text"
+            placeholder={
+              formData.profileFor === ProfileCreatedFor.SELF
+                ? "Enter your name"
+                : "Enter full name"
+            }
+            value={formData.candidateName || ""}
+            onChange={(e) => updateFormData({ candidateName: e.target.value })}
+            className="h-12"
+          />
+        </div>
+      )}
+      {/* ---------------------------------- */}
+
       {/* Gender */}
       <div className="space-y-4">
         <Label className="text-lg font-display text-foreground">Gender</Label>
@@ -110,8 +144,18 @@ const BasicInfoStep = ({ formData, updateFormData }: BasicInfoStepProps) => {
           <Input
             id="dob"
             type="date"
-            value={formData.dob || ""}
-            onChange={(e) => updateFormData({ dob: e.target.value })}
+            value={
+              formData.dob
+                ? new Date(formData.dob).toISOString().split("T")[0]
+                : ""
+            }
+            onChange={(e) => {
+              if (e.target.value) {
+                updateFormData({ dob: new Date(e.target.value).toISOString() });
+              } else {
+                updateFormData({ dob: undefined });
+              }
+            }}
             className="pl-10 h-12"
             max={new Date().toISOString().split("T")[0]}
           />

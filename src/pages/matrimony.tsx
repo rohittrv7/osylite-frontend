@@ -1,12 +1,10 @@
 import ProfileForm from "@/components/matrimony/ProfileForm";
-import { useGetProfileQuery } from "@/store/api/authApi"; // Make sure the path is correct for your user API
+import { useGetProfileQuery } from "@/store/api/authApi";
 import { Loader2 } from "lucide-react";
 
 const Matrimony = () => {
-  // 1. Fetch User Profile to check 'isMatrimonyProfile' status
   const { data: user, isLoading } = useGetProfileQuery();
 
-  // 2. Loading State
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -15,22 +13,16 @@ const Matrimony = () => {
     );
   }
 
-  // 3. CASE: Profile Exists (isMatrimonyProfile: true)
-  // Show ONLY the Form (which will auto-load View/Edit mode)
   if (user?.isMatrimonyProfile) {
     return (
       <div className="min-h-screen bg-background py-10 px-4">
-        {/* You can add a simple header if needed, or just the form */}
         <ProfileForm />
       </div>
     );
   }
 
-  // 4. CASE: New User (isMatrimonyProfile: false)
-  // Show Marketing Hero + Create Form
   return (
     <div className="bg-gradient-hero min-h-screen pb-16">
-      {/* Hero Section */}
       <section className="pt-12 pb-6 px-4 sm:px-6 text-center animate-in fade-in slide-in-from-top-4 duration-500">
         <div className="mx-auto max-w-3xl">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold text-foreground mb-6 leading-tight">
@@ -44,7 +36,6 @@ const Matrimony = () => {
         </div>
       </section>
 
-      {/* Trust Badges */}
       <section className="py-6 px-4 sm:px-6">
         <div className="mx-auto flex flex-wrap justify-center gap-4">
           {[
@@ -67,7 +58,6 @@ const Matrimony = () => {
         </div>
       </section>
 
-      {/* Form Section */}
       <section className="py-8 px-4 sm:px-6">
         <ProfileForm />
       </section>

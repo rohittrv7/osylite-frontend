@@ -15,7 +15,7 @@ import {
   useGetMyMatrimonyProfileQuery,
 } from "@/store/api/matrimonyApi";
 import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
-import type { MatrimonyProfile } from "@/types/matrimony";
+import { ProfileCreatedFor, type MatrimonyProfile } from "@/types/matrimony";
 
 const STEPS = [
   { id: 1, title: "Basic Info", icon: "👤" },
@@ -27,15 +27,14 @@ const STEPS = [
 const ProfileForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
 
-  // Default isActive: true, but we will remove it before sending if creating
   const [formData, setFormData] = useState<Partial<MatrimonyProfile>>({
     isActive: true,
+    candidateName: "",
   });
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [isViewMode, setIsViewMode] = useState(false);
 
-  // --- API Hooks ---
   const {
     data: existingProfile,
     isLoading: isLoadingProfile,
@@ -45,9 +44,7 @@ const ProfileForm = () => {
   const [createOrUpdateProfile, { isLoading: isSubmitting }] =
     useCreateOrUpdateMatrimonyProfileMutation();
 
-  // --- Effects ---
   useEffect(() => {
-    // Only switch to View/Edit mode if valid data exists
     if (isProfileLoaded && existingProfile && existingProfile.profileFor) {
       setFormData(existingProfile);
       setIsViewMode(true);
@@ -71,23 +68,36 @@ const ProfileForm = () => {
           toast.error("Please fill in all required fields.");
           return false;
         }
+
+        // CONDITIONAL LOGIC FOR NAME
+        if (
+          formData.profileFor !== ProfileCreatedFor.SELF &&
+          !formData.candidateName?.trim()
+        ) {
+          toast.error(`Please enter the name of the ${formData.profileFor}.`);
+          return false;
+        }
+
         if (formData.height < 100 || formData.height > 250) {
           toast.error("Please enter a valid height between 100-250 cm.");
           return false;
         }
         return true;
+
       case 2:
         if (!formData.religion || !formData.state || !formData.city) {
           toast.error("Please fill in religion, state, and city.");
           return false;
         }
         return true;
+
       case 3:
         if (!formData.education || !formData.occupation) {
           toast.error("Please fill in education and occupation.");
           return false;
         }
         return true;
+
       default:
         return true;
     }
@@ -109,6 +119,7 @@ const ProfileForm = () => {
     try {
       const payload: Partial<MatrimonyProfile> = {
         profileFor: formData.profileFor,
+        candidateName: formData.candidateName,
         gender: formData.gender,
         dob: formData.dob,
         height: formData.height,
@@ -123,7 +134,6 @@ const ProfileForm = () => {
         bio: formData.bio,
       };
 
-      // Only include 'isActive' if we are in Edit Mode
       if (isEditMode) {
         payload.isActive = formData.isActive;
       }
@@ -147,8 +157,6 @@ const ProfileForm = () => {
     setIsViewMode(false);
     setCurrentStep(1);
   };
-
-  // --- Render Logic ---
 
   if (isLoadingProfile) {
     return (
@@ -185,8 +193,6 @@ const ProfileForm = () => {
         return (
           <div className="space-y-6">
             <PhotoBioStep formData={formData} updateFormData={updateFormData} />
-
-            {/* Toggle only in Edit Mode */}
             {isEditMode && (
               <div className="pt-6 border-t border-border mt-6">
                 <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border">
@@ -202,11 +208,7 @@ const ProfileForm = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <span
-                      className={`text-sm font-medium ${
-                        formData.isActive
-                          ? "text-green-600"
-                          : "text-muted-foreground"
-                      }`}
+                      className={`text-sm font-medium ${formData.isActive ? "text-green-600" : "text-muted-foreground"}`}
                     >
                       {formData.isActive ? "Active" : "Hidden"}
                     </span>
@@ -242,8 +244,7 @@ const ProfileForm = () => {
             disabled={currentStep === 1 || isSubmitting}
             className="gap-2"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Previous
+            <ArrowLeft className="w-4 h-4" /> Previous
           </Button>
 
           {currentStep === STEPS.length ? (
@@ -254,20 +255,18 @@ const ProfileForm = () => {
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Saving...
+                  <Loader2 className="w-4 h-4 animate-spin" /> Saving...
                 </>
               ) : (
                 <>
-                  <Check className="w-4 h-4" />
+                  <Check className="w-4 h-4" />{" "}
                   {isEditMode ? "Update Profile" : "Create Profile"}
                 </>
               )}
             </Button>
           ) : (
             <Button onClick={nextStep} className="gap-2">
-              Next
-              <ArrowRight className="w-4 h-4" />
+              Next <ArrowRight className="w-4 h-4" />
             </Button>
           )}
         </div>

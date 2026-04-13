@@ -5,7 +5,7 @@ import {
 } from "@/store/api/chatApi";
 import { useSocket } from "@/hooks/useSocket";
 import type { ChatMessage } from "@/types/chat";
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, Send, Paperclip } from "lucide-react";
 import { useSelector } from "react-redux";
 import { selectAuthUser } from "@/store/selectors/authSelectors";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +25,7 @@ const ChatWindow = ({ userId }: Props) => {
   const { data: history = [] } = useGetChatHistoryQuery(userId);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,6 +49,7 @@ const ChatWindow = ({ userId }: Props) => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Handle standard text message
   const sendMessage = () => {
     if (!currentUserId) return;
 
@@ -70,6 +72,54 @@ const ChatWindow = ({ userId }: Props) => {
     });
 
     inputRef.current!.value = "";
+  };
+
+  // Handle File / Media Selection (Max 100MB)
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !currentUserId) return;
+
+    // 100MB Size Limit Validation
+    if (file.size > 100 * 1024 * 1024) {
+      alert("File size exceeds 100MB limit!");
+      e.target.value = ""; // Reset input
+      return;
+    }
+
+    const isImage = file.type.startsWith("image/");
+
+    // Convert file to Base64 for instant preview and socket transmission
+    // (Note: In a real heavy-production app, you'd upload to S3 first and send the URL)
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Data = event.target?.result as string;
+
+      // Extend ChatMessage locally for media handling
+      const tempMsg: any = {
+        id: crypto.randomUUID(),
+        content: isImage ? "" : `📎 ${file.name}`,
+        senderId: currentUserId,
+        receiverId: userId,
+        createdAt: new Date().toISOString(),
+        fileUrl: base64Data,
+        fileName: file.name,
+        isImage: isImage,
+      };
+
+      setMessages((prev) => [...prev, tempMsg]);
+
+      // Emit file data via Socket
+      socket.emit("sendMessage", {
+        receiverId: userId,
+        content: isImage ? "" : `📎 ${file.name}`,
+        fileData: base64Data,
+        fileName: file.name,
+        fileType: file.type,
+      });
+    };
+
+    reader.readAsDataURL(file);
+    e.target.value = ""; // Reset input after reading
   };
 
   return (
@@ -114,6 +164,8 @@ const ChatWindow = ({ userId }: Props) => {
 
         {messages.map((m) => {
           const isMe = m.senderId === currentUserId;
+          const mediaMsg = m as any; // Cast to access file properties if they exist
+
           return (
             <div
               key={m.id}
@@ -126,9 +178,42 @@ const ChatWindow = ({ userId }: Props) => {
                     : "bg-chat-bubble-received text-chat-bubble-received-foreground rounded-bl-md"
                 }`}
               >
-                <p className="text-sm leading-relaxed">{m.content}</p>
+                {/* File / Media Rendering */}
+                {mediaMsg.fileUrl && (
+                  <div className="mb-2">
+                    {mediaMsg.isImage ||
+                    mediaMsg.fileUrl.startsWith("data:image") ? (
+                      <img
+                        src={mediaMsg.fileUrl}
+                        alt="Attachment"
+                        className="max-w-full h-auto rounded-lg"
+                      />
+                    ) : (
+                      <a
+                        href={mediaMsg.fileUrl}
+                        download={mediaMsg.fileName || "download"}
+                        className="flex items-center gap-2 underline text-sm break-all"
+                      >
+                        <Paperclip className="w-4 h-4 shrink-0" />
+                        {mediaMsg.fileName || "Download Document"}
+                      </a>
+                    )}
+                  </div>
+                )}
+
+                {/* Text Content */}
+                {m.content && (
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {m.content}
+                  </p>
+                )}
+
                 <p
-                  className={`text-[10px] mt-1 ${isMe ? "text-chat-bubble-sent-foreground/60" : "text-chat-timestamp"}`}
+                  className={`text-[10px] mt-1 ${
+                    isMe
+                      ? "text-chat-bubble-sent-foreground/60"
+                      : "text-chat-timestamp"
+                  }`}
                 >
                   {new Date(m.createdAt).toLocaleTimeString([], {
                     hour: "2-digit",
@@ -143,7 +228,23 @@ const ChatWindow = ({ userId }: Props) => {
       </div>
 
       {/* Input */}
-      <div className="px-4 py-3 border-t bg-chat-header flex gap-2">
+      <div className="px-4 py-3 border-t bg-chat-header flex items-center gap-2">
+        {/* Hidden File Input */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          className="hidden"
+        />
+
+        {/* Attachment Button */}
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="w-10 h-10 rounded-full text-muted-foreground flex items-center justify-center hover:bg-muted transition-colors shrink-0"
+        >
+          <Paperclip className="w-5 h-5" />
+        </button>
+
         <input
           ref={inputRef}
           type="text"
@@ -151,9 +252,10 @@ const ChatWindow = ({ userId }: Props) => {
           className="flex-1 px-4 py-2.5 rounded-full bg-muted text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         />
+
         <button
           onClick={sendMessage}
-          className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity"
+          className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity shrink-0"
         >
           <Send className="w-4 h-4" />
         </button>
