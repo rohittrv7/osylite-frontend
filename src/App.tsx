@@ -108,24 +108,31 @@ import MedicalCertificate from "./pages/hospital/MedicalCertificate";
 
 function App() {
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    const splash = document.getElementById("pwa-splash");
-    if (splash) {
-      setTimeout(() => {
-        splash.style.opacity = "0";
-        splash.style.transition = "opacity 0.5s ease";
-        setTimeout(() => splash.remove(), 500);
-      }, 2000);
-    }
-  }, []);
-
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
 
-  const { data: user, isError } = useGetProfileQuery(undefined, {
+  // 1. Yahan isLoading ko destructure kar liya hai
+  const {
+    data: user,
+    isError,
+    isLoading,
+  } = useGetProfileQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
+
+  // 2. Splash screen logic ab isLoading par depend karega
+  useEffect(() => {
+    // Jab API ki loading complete ho jaye (chahe success ya error)
+    if (!isLoading) {
+      const splash = document.getElementById("pwa-splash");
+      if (splash) {
+        // Smooth fade out effect
+        splash.style.opacity = "0";
+        splash.style.transition = "opacity 0.5s ease";
+        setTimeout(() => splash.remove(), 500);
+      }
+    }
+  }, [isLoading]); // isLoading dependency add kar di
 
   useEffect(() => {
     if (user) {
@@ -134,19 +141,6 @@ function App() {
       dispatch(clearAuth());
     }
   }, [user, isError, dispatch]);
-
-  // if (isLoading) {
-  //   return (
-  //     <div className="flex h-screen w-full items-center justify-center bg-background text-foreground">
-  //       <div className="flex flex-col items-center gap-4">
-  //         <Loader2 className="h-10 w-10 animate-spin text-primary" />
-  //         <p className="text-sm text-muted-foreground animate-pulse">
-  //           Initializing App...
-  //         </p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   return (
     <ThemeProvider>
@@ -255,10 +249,16 @@ function App() {
 
           {/* <Route path="/" element={<Index />} /> */}
           <Route path="/enquiry" element={<Enquiry />} />
-          <Route path="/enquiry/search-consultant" element={<SearchConsultant />} />
+          <Route
+            path="/enquiry/search-consultant"
+            element={<SearchConsultant />}
+          />
           <Route path="/enquiry/quick-rate" element={<QuickRate />} />
           <Route path="/enquiry/patient-search" element={<PatientSearch />} />
-          <Route path="/enquiry/admitted-patients" element={<AdmittedPatients />} />
+          <Route
+            path="/enquiry/admitted-patients"
+            element={<AdmittedPatients />}
+          />
           <Route path="/opd-billing" element={<OPDBilling />} />
           <Route path="/emergency" element={<Emergency />} />
           <Route path="/ipd-registration" element={<IPDRegistration />} />
