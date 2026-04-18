@@ -17,13 +17,21 @@ export default defineConfig({
         short_name: "Osylite",
         description:
           "Official Channel Management Application for the ANG Growth Ecosystem.",
-        display: "standalone",
-        display_override: ["standalone", "minimal-ui"],
-        orientation: "portrait-primary",
-        background_color: "#000000",
+
         theme_color: "#000000",
-        start_url: "/?source=pwa",
+        background_color: "#000000",
+
+        // 🔥 CRITICAL FIX: Ye app ko native app ki tarah full-screen open karega bina URL bar ke
+        display: "standalone",
+        display_override: [
+          "window-controls-overlay",
+          "standalone",
+          "minimal-ui",
+        ],
+        orientation: "portrait-primary",
+
         scope: "/",
+        start_url: "/?source=pwa",
         dir: "ltr",
         lang: "en-US",
         categories: ["finance", "shopping", "utilities"],
@@ -89,5 +97,6 @@ export default defineConfig({
   },
   build: {
     chunkSizeWarningLimit: 1500,
+    // Note: Yahan 'manualChunks' use nahi kiya hai taaki purana 'Activity undefined' wala white screen issue dobara na aaye. Vite khud smartly chunks bana lega.
   },
 });
