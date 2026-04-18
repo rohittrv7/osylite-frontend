@@ -18,51 +18,58 @@ export default defineConfig({
         description:
           "Official Channel Management Application for the ANG Growth Ecosystem.",
 
-        // 🔹 FIX: standalone se uper battery/time dikhega,
-        // fullscreen hatane se hide hona band ho jayega.
+        // Native app experience ke liye zaroori
         display: "standalone",
-
-        // 🔹 FIX: window-controls-overlay hataya taaki uper black bar na aaye
         display_override: ["standalone", "minimal-ui"],
+        orientation: "portrait-primary",
 
-        orientation: "portrait",
         background_color: "#000000",
         theme_color: "#000000",
-        start_url: "/",
+
+        // Root slash aur query zaroori hai proper entry point detect karne ke liye
+        start_url: "/?source=pwa",
         scope: "/",
         dir: "ltr",
         lang: "en-US",
         categories: ["finance", "shopping", "utilities"],
+
+        // CRITICAL FIX: Ye browser ko batata hai ki Play Store ka wait mat karo,
+        // seedha PWA install karo.
+        prefer_related_applications: false,
+
         icons: [
           {
-            src: "logo.png",
-            sizes: "192x192", // ⚠️ Ensure karein ye 192px ka hi ho
-            type: "image/png",
-          },
-          {
-            src: "logo.png",
-            sizes: "512x512", // ⚠️ Ensure karein ye 512px ka hi ho
+            // CRITICAL FIX: Images ke aage "/" lagana zaroori hai
+            // Varna build ke baad manifest inko dhoond nahi pata aur app reject ho jata hai
+            src: "/logo.png",
+            sizes: "192x192",
             type: "image/png",
             purpose: "any",
           },
           {
-            src: "logo.png",
+            src: "/logo.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "maskable", // 🔹 Android app icon shape ke liye
+            purpose: "any",
+          },
+          {
+            src: "/logo.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
           },
         ],
-        // 🔹 Shortcuts add karne se app icon par long press karne se menu aata hai
         shortcuts: [
           {
             name: "Dashboard",
-            url: "/",
-            icons: [{ src: "logo.png", sizes: "192x192" }],
+            short_name: "Dashboard",
+            url: "/?source=shortcut",
+            icons: [{ src: "/logo.png", sizes: "192x192" }],
           },
         ],
         screenshots: [
           {
-            src: "screenshot-mobile.png",
+            src: "/screenshot-mobile.png", // "/" added
             sizes: "1080x1920",
             type: "image/png",
             form_factor: "narrow",
@@ -70,11 +77,45 @@ export default defineConfig({
           },
         ],
       },
+      // Local testing ke liye devOptions on kar diye hain
+      devOptions: {
+        enabled: true,
+        type: "module",
+      },
     }),
   ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+    },
+    // Reference wala dedupe optimization
+    dedupe: ["react", "react-dom", "react/jsx-runtime"],
+  },
+  server: {
+    port: 5174,
+    strictPort: true,
+    hmr: {
+      host: "localhost",
+      port: 5174,
+      protocol: "ws",
+    },
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        // App ko fast load karne ke liye smart chunk-splitting
+        // Ye specific libraries ko alag bundle me daal dega taaki cache ho sake
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("react")) return "vendor-react";
+            if (id.includes("@reduxjs") || id.includes("react-redux"))
+              return "vendor-redux";
+            if (id.includes("socket.io-client")) return "vendor-socket";
+            return "vendor"; // Baaki sab generic vendor file mein
+          }
+        },
+      },
     },
   },
 });
