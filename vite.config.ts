@@ -17,30 +17,19 @@ export default defineConfig({
         short_name: "Osylite",
         description:
           "Official Channel Management Application for the ANG Growth Ecosystem.",
-
-        // Native app experience ke liye zaroori
         display: "standalone",
         display_override: ["standalone", "minimal-ui"],
         orientation: "portrait-primary",
-
         background_color: "#000000",
         theme_color: "#000000",
-
-        // Root slash aur query zaroori hai proper entry point detect karne ke liye
         start_url: "/?source=pwa",
         scope: "/",
         dir: "ltr",
         lang: "en-US",
         categories: ["finance", "shopping", "utilities"],
-
-        // CRITICAL FIX: Ye browser ko batata hai ki Play Store ka wait mat karo,
-        // seedha PWA install karo.
         prefer_related_applications: false,
-
         icons: [
           {
-            // CRITICAL FIX: Images ke aage "/" lagana zaroori hai
-            // Varna build ke baad manifest inko dhoond nahi pata aur app reject ho jata hai
             src: "/logo.png",
             sizes: "192x192",
             type: "image/png",
@@ -69,7 +58,7 @@ export default defineConfig({
         ],
         screenshots: [
           {
-            src: "/screenshot-mobile.png", // "/" added
+            src: "/screenshot-mobile.png",
             sizes: "1080x1920",
             type: "image/png",
             form_factor: "narrow",
@@ -77,7 +66,6 @@ export default defineConfig({
           },
         ],
       },
-      // Local testing ke liye devOptions on kar diye hain
       devOptions: {
         enabled: true,
         type: "module",
@@ -88,7 +76,6 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-    // Reference wala dedupe optimization
     dedupe: ["react", "react-dom", "react/jsx-runtime"],
   },
   server: {
@@ -101,21 +88,6 @@ export default defineConfig({
     },
   },
   build: {
-    chunkSizeWarningLimit: 1000,
-    rollupOptions: {
-      output: {
-        // App ko fast load karne ke liye smart chunk-splitting
-        // Ye specific libraries ko alag bundle me daal dega taaki cache ho sake
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (id.includes("react")) return "vendor-react";
-            if (id.includes("@reduxjs") || id.includes("react-redux"))
-              return "vendor-redux";
-            if (id.includes("socket.io-client")) return "vendor-socket";
-            return "vendor"; // Baaki sab generic vendor file mein
-          }
-        },
-      },
-    },
+    chunkSizeWarningLimit: 1500,
   },
 });
