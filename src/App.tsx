@@ -106,12 +106,23 @@ import CSSD from "./pages/hospital/CSSD";
 import ADT from "./pages/hospital/ADT";
 import MedicalCertificate from "./pages/hospital/MedicalCertificate";
 
+// 🔥 BULLETPROOF FIX: Yeh React ke bahar execute hoga.
+// Agar React crash bhi kar gaya, toh bhi splash screen 2.5s ke baad forcefully remove ho jayega.
+if (typeof window !== "undefined") {
+  setTimeout(() => {
+    const splash = document.getElementById("pwa-splash");
+    if (splash) {
+      splash.style.display = "none";
+      splash.remove();
+    }
+  }, 2500);
+}
+
 function App() {
   const dispatch = useDispatch();
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
 
-  // 1. Yahan isLoading ko destructure kar liya hai
   const {
     data: user,
     isError,
@@ -120,19 +131,19 @@ function App() {
     refetchOnMountOrArgChange: true,
   });
 
-  // 2. Splash screen logic ab isLoading par depend karega
+  // 🔥 PRIMARY LOGIC: Agar sab sahi raha aur API jaldi aa gayi, toh turant remove karega
   useEffect(() => {
-    // Jab API ki loading complete ho jaye (chahe success ya error)
     if (!isLoading) {
       const splash = document.getElementById("pwa-splash");
       if (splash) {
-        // Smooth fade out effect
         splash.style.opacity = "0";
-        splash.style.transition = "opacity 0.5s ease";
-        setTimeout(() => splash.remove(), 500);
+        splash.style.transition = "opacity 0.3s ease";
+        setTimeout(() => {
+          if (document.body.contains(splash)) splash.remove();
+        }, 300);
       }
     }
-  }, [isLoading]); // isLoading dependency add kar di
+  }, [isLoading]);
 
   useEffect(() => {
     if (user) {
@@ -145,7 +156,7 @@ function App() {
   return (
     <ThemeProvider>
       <Routes>
-        {/* PUBLIC ROUTES - Accessible only when NOT logged in */}
+        {/* PUBLIC ROUTES */}
         <Route
           element={
             <PublicRoute>
@@ -170,7 +181,7 @@ function App() {
             ))}
         </Route>
 
-        {/* PROTECTED ROUTES - Accessible only when LOGGED IN */}
+        {/* PROTECTED ROUTES */}
         <Route
           element={
             <ProtectedRoute>
@@ -209,8 +220,6 @@ function App() {
           <Route path="/matrimony" element={<Matrimony />} />
           <Route path="/my-profile" element={<EditProfile />} />
           <Route path="/booking-courier" element={<ShipmentBooking />} />
-
-          {/* <Route path="/property-feed" element={<Index />} /> */}
           <Route path="/property/:id" element={<PropertyDetails />} />
           <Route path="/post-property/:id?" element={<PostProperty />} />
           <Route path="/property" element={<PropertyFeed />} />
@@ -218,36 +227,25 @@ function App() {
           <Route path="/wallet" element={<WalletHome />} />
           <Route path="/buy-coins" element={<BuyCoins />} />
           <Route path="/withdraw" element={<Withdraw />} />
-          {/* <Route path="/history" element={<TransactionHistory />} /> */}
           <Route path="/settings" element={<Settings />} />
           <Route
             path="/settings/change-password"
             element={<ChangePasswordPage />}
           />
-
           <Route path="/my-bookings" element={<MyBookingsPage />} />
-
           <Route path="/post/:id" element={<PostDetailsPage />} />
           <Route path="/profile/:id" element={<PublicProfile />} />
-
           <Route path="/ang-mart/:category" element={<AngMart />} />
           <Route path="/ang-service/:category" element={<AngService />} />
-
           <Route path="/venue-explore" element={<VenueExplore />} />
-
           <Route path="/venue-explore/:category" element={<AssociatesList />} />
-
           <Route path="/associate/:id" element={<AssociateProfile />} />
-
           <Route path="/jobs/manage/:jobId" element={<JobCandidatesPage />} />
           <Route path="/jobs/edit/:jobId" element={<EditJobPage />} />
-
           <Route
             path="/matrimony/profile/:id"
             element={<MatrimonyProfileDetails />}
           />
-
-          {/* <Route path="/" element={<Index />} /> */}
           <Route path="/enquiry" element={<Enquiry />} />
           <Route
             path="/enquiry/search-consultant"

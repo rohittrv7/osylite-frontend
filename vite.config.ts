@@ -92,7 +92,7 @@ export default defineConfig({
     dedupe: ["react", "react-dom", "react/jsx-runtime"],
   },
   server: {
-    port: 5174,
+    port: 5173,
     strictPort: true,
     hmr: {
       host: "localhost",
