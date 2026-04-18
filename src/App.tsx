@@ -106,18 +106,6 @@ import CSSD from "./pages/hospital/CSSD";
 import ADT from "./pages/hospital/ADT";
 import MedicalCertificate from "./pages/hospital/MedicalCertificate";
 
-// 🔥 BULLETPROOF FIX: Yeh React ke bahar execute hoga.
-// Agar React crash bhi kar gaya, toh bhi splash screen 2.5s ke baad forcefully remove ho jayega.
-if (typeof window !== "undefined") {
-  setTimeout(() => {
-    const splash = document.getElementById("pwa-splash");
-    if (splash) {
-      splash.style.display = "none";
-      splash.remove();
-    }
-  }, 2500);
-}
-
 function App() {
   const dispatch = useDispatch();
   const isMobile = useIsMobile();
@@ -131,7 +119,7 @@ function App() {
     refetchOnMountOrArgChange: true,
   });
 
-  // 🔥 PRIMARY LOGIC: Agar sab sahi raha aur API jaldi aa gayi, toh turant remove karega
+  // 🔥 PRIMARY LOGIC: Agar API response aa gaya (React successfully load ho gaya), toh splash remove karo
   useEffect(() => {
     if (!isLoading) {
       const splash = document.getElementById("pwa-splash");
