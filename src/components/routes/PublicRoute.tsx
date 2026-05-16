@@ -2,15 +2,13 @@ import { useEffect, type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { UserRole } from "@/types/userRole";
 import { DOMAINS } from "@/config/config";
-import {
-  selectAuthLoading,
-  selectAuthUser,
-} from "@/store/selectors/authSelectors";
+import { selectAuthUser } from "@/store/selectors/authSelectors";
 import { useSelector } from "react-redux";
+import { useGetProfileQuery } from "@/store/api/authApi";
 
 export default function PublicRoute({ children }: { children?: ReactNode }) {
   const user = useSelector(selectAuthUser);
-  const isLoading = useSelector(selectAuthLoading);
+  const { isLoading } = useGetProfileQuery();
 
   useEffect(() => {
     if (!user) return;

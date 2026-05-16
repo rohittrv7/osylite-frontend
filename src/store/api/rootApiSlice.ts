@@ -12,7 +12,7 @@ import { env } from "@/config/env";
 const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "https://api.osylite.com/api",
+  baseUrl: env.VITE_BACKEND_BASE_URL,
 
   credentials: "include",
 
