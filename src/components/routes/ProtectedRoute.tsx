@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
 import { UserRole } from "@/types/userRole";
 import { selectAuthUser } from "@/store/selectors/authSelectors";
-import { useGetProfileQuery } from "@/store/api/authApi";
 
 const DOMAIN_CONFIG: Record<string, string> = {
   [UserRole.ADMIN]: import.meta.env.VITE_ADMIN_URL || "",
@@ -14,7 +13,6 @@ const DOMAIN_CONFIG: Record<string, string> = {
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const user = useSelector(selectAuthUser);
   const location = useLocation();
-  const { isLoading } = useGetProfileQuery();
 
   const processingRef = useRef(false);
 
@@ -37,15 +35,6 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
       window.location.href = `${targetDomain}${location.pathname}`;
     }
   }, [user, location.pathname]);
-
-  // Wait for the profile query to finish before deciding to redirect
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <span className="animate-pulse text-muted-foreground">Loading...</span>
-      </div>
-    );
-  }
 
   if (!user) {
     return <Navigate to="/login" replace />;
