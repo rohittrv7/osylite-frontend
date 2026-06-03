@@ -7,7 +7,7 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { Mutex } from "async-mutex";
 import { clearAuth } from "../slices/authSlice";
-import { env } from "@/config/env";
+// import { env } from "@/config/env";
 
 const mutex = new Mutex();
 
