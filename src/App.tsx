@@ -105,6 +105,7 @@ import TPADesk from "./pages/hospital/TPADesk";
 import CSSD from "./pages/hospital/CSSD";
 import ADT from "./pages/hospital/ADT";
 import MedicalCertificate from "./pages/hospital/MedicalCertificate";
+import FoodDeliverySection from "./pages/food-delevery/FoodDeliverySection";
 
 function App() {
   const dispatch = useDispatch();
@@ -278,6 +279,7 @@ function App() {
           <Route path="/cssd" element={<CSSD />} />
           <Route path="/adt" element={<ADT />} />
           <Route path="/medical-certificate" element={<MedicalCertificate />} />
+          <Route path="/food-delivery" element={<FoodDeliverySection />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/mlife" replace />} />

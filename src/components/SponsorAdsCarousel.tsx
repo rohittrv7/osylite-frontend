@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useGetActiveAdsQuery } from "@/store/api/adsApi";
 
 const sponsorAds = [
   {
@@ -33,6 +34,14 @@ export default function SponsorAdsCarousel() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
   const scrollPositionRef = useRef(0);
+
+  const { data: ads = [] } = useGetActiveAdsQuery();
+
+  // Use live ads if available, otherwise fall back to hardcoded sponsorAds
+  const displayAds =
+    ads.length > 0
+      ? ads.map((ad) => ({ image: ad.fileUrl, alt: ad.title }))
+      : sponsorAds;
 
   useEffect(() => {
     const container = scrollRef.current;
@@ -79,7 +88,7 @@ export default function SponsorAdsCarousel() {
             ref={scrollRef}
             className="flex gap-2 sm:gap-3 md:gap-4 overflow-x-hidden rounded-md whitespace-nowrap"
           >
-            {[...sponsorAds, ...sponsorAds].map((ad, index) => (
+            {[...displayAds, ...displayAds].map((ad, index) => (
               <Card
                 key={index}
                 className={cn(

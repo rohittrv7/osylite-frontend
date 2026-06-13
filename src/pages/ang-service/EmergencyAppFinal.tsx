@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   MapPin,
   AlertTriangle,
@@ -58,6 +58,37 @@ const MEDICAL_SITUATIONS = [
 export default function EmergencyAppFinal() {
   const [currentScreen, setCurrentScreen] = useState<Screen>("home");
 
+  // Location State
+  const [locationText, setLocationText] = useState({ area: "Detecting...", region: "" });
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`
+            );
+            const data = await res.json();
+            const area =
+              data.address?.suburb ||
+              data.address?.neighbourhood ||
+              data.address?.city_district ||
+              data.address?.city ||
+              "Current Location";
+            const region = `${data.address?.city || data.address?.state_district || ""}, ${data.address?.state || ""} ${data.address?.postcode || ""}`.trim();
+            setLocationText({ area, region });
+          } catch {
+            setLocationText({ area: "Location detected", region: "" });
+          }
+        },
+        () => {
+          setLocationText({ area: "Enable GPS for accuracy", region: "" });
+        }
+      );
+    }
+  }, []);
+
   // Emergency State
   const [serviceType, setServiceType] = useState<EmergencyType>(null);
   const [situation, setSituation] = useState("");
@@ -113,10 +144,10 @@ export default function EmergencyAppFinal() {
                   Current GPS Location (Auto-Detected)
                 </p>
                 <h2 className="text-xl font-black mt-1 leading-tight">
-                  Sector 4, Greater Noida
+                  {locationText.area}
                 </h2>
                 <p className="text-sm font-medium text-muted-foreground mt-1">
-                  Uttar Pradesh, 201310
+                  {locationText.region}
                 </p>
               </div>
             </div>

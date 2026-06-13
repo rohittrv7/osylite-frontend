@@ -1,3 +1,30 @@
+export interface OrderListItem {
+  id: string;
+  orderId: string;
+  totalAmount: number;
+  deliveryFee: number;
+  gst: number;
+  status: string;
+  createdAt: string;
+  shippingAddress: {
+    houseNo: string;
+    city: string;
+    state: string;
+    pincode: string;
+  };
+  items: {
+    id: string;
+    quantity: number;
+    priceAtPurchase: number;
+    product: {
+      id: string;
+      title: string;
+      fileUrl: string[];
+      price: number;
+    };
+  }[];
+}
+
 export interface OrderItem {
   id: string;
   quantity: number;

@@ -1,4 +1,4 @@
-import type { OrderDetailResponse } from "@/types/order";
+import type { OrderDetailResponse, OrderListItem } from "@/types/order";
 import { rootApiSlice } from "./rootApiSlice";
 
 export const ordersApi = rootApiSlice.injectEndpoints({
@@ -17,7 +17,7 @@ export const ordersApi = rootApiSlice.injectEndpoints({
     }),
 
     // GET /orders/my-orders
-    getMyOrders: builder.query<any[], void>({
+    getMyOrders: builder.query<OrderListItem[], void>({
       query: () => ({ url: "/orders/list/all", method: "GET" }),
       providesTags: ["Orders"],
     }),

@@ -18,6 +18,7 @@ import {
   useGetMixFeedQuery,
 } from "@/store/api/postsApi";
 import MasonryFeed from "@/components/homeSection/MasonryFeed";
+import { useGetActiveAdsQuery } from "@/store/api/adsApi";
 
 const sections = [
   {
@@ -67,6 +68,7 @@ export default function HomeSections() {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const { data: ReelVideoes } = useGetEntertainmentReelsQuery();
+  const { data: ads = [] } = useGetActiveAdsQuery();
 
   const {
     data: feedData,
@@ -160,6 +162,30 @@ export default function HomeSections() {
 
         {/* Masonry Layout */}
         <MasonryFeed posts={feedData?.data || []} />
+
+        {/* Inline Ads between feed (shown every 5 posts) */}
+        {ads.length > 0 && (feedData?.data?.length || 0) > 3 && (
+          <div className="my-4 rounded-xl overflow-hidden border border-border/30 shadow-sm max-w-lg mx-auto">
+            <div className="bg-muted/30 px-3 py-1 text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+              Sponsored
+            </div>
+            <img
+              src={ads[0].fileUrl}
+              alt={ads[0].title}
+              className="w-full h-auto object-cover max-h-[250px]"
+            />
+            {ads[0].ctaLink && (
+              <a
+                href={ads[0].ctaLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block bg-primary text-primary-foreground text-center py-2 text-xs font-bold uppercase"
+              >
+                Learn More →
+              </a>
+            )}
+          </div>
+        )}
 
         {/* Infinite Scroll Loader */}
         <div ref={loadMoreRef} className="py-10 flex flex-col items-center">

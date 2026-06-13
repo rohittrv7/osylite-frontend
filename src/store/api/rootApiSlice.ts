@@ -7,13 +7,12 @@ import {
 } from "@reduxjs/toolkit/query/react";
 import { Mutex } from "async-mutex";
 import { clearAuth } from "../slices/authSlice";
-// import { env } from "@/config/env";
+import { env } from "@/config/env";
 
 const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
-  // baseUrl: env.VITE_BACKEND_BASE_URL,
-
+  baseUrl: env.VITE_BACKEND_BASE_URL,
   credentials: "include",
 
   prepareHeaders: (headers) => {
@@ -119,5 +118,8 @@ export const rootApiSlice = createApi({
     "Operations",
     "Tracking",
     "Complaints",
+    "Ads",
+    "Stores",
+    "Products",
   ],
 });
