@@ -146,7 +146,7 @@ const FeedCard = ({ post }: FeedCardProps) => {
     if (isVid) {
       return (
         <div
-          className="relative w-full aspect-square bg-black"
+          className="relative w-full bg-black flex items-center justify-center"
           onClick={() => openPreview(url, "video")}
         >
           <video
@@ -155,13 +155,13 @@ const FeedCard = ({ post }: FeedCardProps) => {
             }}
             src={url}
             poster={index === 0 ? post.thumbnailUrl || undefined : undefined}
-            className="w-full h-full object-cover"
+            className="w-full h-auto max-h-[70vh] object-contain"
             muted
             loop
             playsInline
           />
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-all">
-            <Play className="w-10 h-10 text-white opacity-80" />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/25 group-hover:bg-black/15 transition-all">
+            <Play className="w-10 h-10 text-white opacity-85 pointer-events-none" />
           </div>
         </div>
       );
@@ -169,13 +169,13 @@ const FeedCard = ({ post }: FeedCardProps) => {
 
     return (
       <div
-        className="w-full aspect-square overflow-hidden bg-muted"
+        className="w-full overflow-hidden bg-muted flex items-center justify-center"
         onClick={() => openPreview(url, "post")}
       >
         <img
           src={url}
           alt={`Post content ${index + 1}`}
-          className="w-full h-full object-cover"
+          className="w-full h-auto max-h-[75vh] object-contain"
         />
       </div>
     );

@@ -71,8 +71,8 @@ export default function Dashboard() {
             <CardContent className="p-5 flex flex-col items-center text-center gap-1">
               <CircleCheck className="h-8 w-8 text-green-500 mb-1" />
               <p className="text-sm text-muted-foreground">Account Status</p>
-              <p className="text-xl font-semibold text-green-400">
-                {userData.isVerified ? "Active" : "Inactive"}
+              <p className={`text-xl font-semibold ${userData.isOtpVerified || userData.isVerified ? "text-green-400" : "text-red-400"}`}>
+                {userData.isOtpVerified || userData.isVerified ? "Active" : "Inactive"}
               </p>
             </CardContent>
           </Card>

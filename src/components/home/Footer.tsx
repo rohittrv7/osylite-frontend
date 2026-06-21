@@ -32,7 +32,7 @@ const Footer = () => {
 
   return (
     <footer className="relative bg-white dark:bg-[#050505] pt-24 border-t border-slate-200 dark:border-white/5 overflow-hidden transition-colors duration-500">
-      
+
       {/* 🔹 Optimized Background Branding (Size Reduced & Fixed) */}
       <div className="absolute bottom-16 left-0 w-full pointer-events-none select-none opacity-[0.02] dark:opacity-[0.04] text-center">
         <h1 className="text-[12vw] font-[900] uppercase italic tracking-[0.05em] leading-none">
@@ -42,7 +42,7 @@ const Footer = () => {
 
       <div className="container relative z-10 mx-auto px-6 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
-          
+
           {/* --- BRAND INFO (5 Columns) --- */}
           <div className="lg:col-span-5 space-y-8">
             <div className="space-y-6">
@@ -54,13 +54,13 @@ const Footer = () => {
                   ANG <span className="text-primary">Growth</span>
                 </span>
               </div>
-              
+
               <div className="space-y-2">
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">
                   GSTIN: 10CDQPP4007H1ZQ
                 </p>
                 <p className="text-slate-500 dark:text-white/40 text-sm font-medium leading-relaxed max-w-sm">
-                  Empowering the 1% with digital precision. We engineer scalability through 
+                  Empowering the 1% with digital precision. We engineer scalability through
                   modern ecosystems and high-performance tools.
                 </p>
               </div>
@@ -117,7 +117,7 @@ const Footer = () => {
               <li className="flex items-center gap-4">
                 <Mail className="text-primary shrink-0" size={16} />
                 <span className="text-[11px] font-bold text-slate-500 dark:text-white/40 border-b border-primary/20 pb-0.5">
-                  support@anggrowth.com
+                  osylite@gmail.com
                 </span>
               </li>
               <li className="flex items-center gap-4">

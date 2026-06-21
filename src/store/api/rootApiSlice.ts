@@ -121,5 +121,7 @@ export const rootApiSlice = createApi({
     "Ads",
     "Stores",
     "Products",
+    "CreditCards",
+    "AppHub",
   ],
 });

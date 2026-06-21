@@ -73,6 +73,7 @@ export interface User {
   lastPostDate: string | null;
 
   isVerified: boolean;
+  isOtpVerified: boolean;
 
   otpExpiresAt: string | null;
 

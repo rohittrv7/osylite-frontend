@@ -34,7 +34,10 @@ const BuyCoins = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState<any | null>(null);
-  const [customAmount, setCustomAmount] = useState("");
+
+  const queryParams = useMemo(() => new URLSearchParams(window.location.search), []);
+  const paramAmount = queryParams.get("amount") || "";
+  const [customAmount, setCustomAmount] = useState(paramAmount);
 
   // Payment Proof State
   const [utrNumber, setUtrNumber] = useState("");
@@ -116,7 +119,12 @@ const BuyCoins = () => {
       await requestRecharge(payload).unwrap();
       await refetch();
       toast.success("Request submitted successfully!");
-      navigate("/settings");
+      const redirectUrl = new URLSearchParams(window.location.search).get("redirect");
+      if (redirectUrl) {
+        navigate(redirectUrl);
+      } else {
+        navigate("/settings");
+      }
     } catch (error) {
       setUploading(false);
       apiErrorToastHandler(error);
@@ -339,6 +347,115 @@ const BuyCoins = () => {
                 <ChevronRight className="ml-2" />
               </Button>
             </div>
+
+            {finalAmount > 0 && (
+              <div className="border border-border bg-card rounded-3xl p-6 mt-6 space-y-6">
+                <div className="flex items-center justify-between border-b pb-4">
+                  <div className="text-left">
+                    <h3 className="text-lg font-black italic uppercase text-foreground">
+                      ⚡ Quick Scan & Pay (Step 1 of 1)
+                    </h3>
+                    <p className="text-xs text-muted-foreground font-medium">
+                      Scan QR and pay instantly without leaving this screen.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6 items-center">
+                  <div className="space-y-4">
+                    <div className="relative bg-white p-4 rounded-[28px] border-2 border-slate-100 flex items-center justify-center aspect-square max-w-[200px] mx-auto shadow-inner">
+                      <img
+                        src={dynamicQrUrl}
+                        className="w-full h-full object-contain mix-blend-multiply"
+                        alt="QR"
+                      />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        Payable Amount
+                      </p>
+                      <p className="text-2xl font-black text-slate-900 dark:text-white">
+                        ₹{finalAmount.toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div
+                      className="bg-slate-50 dark:bg-zinc-900 rounded-2xl p-4 flex items-center justify-between group active:scale-95 transition-all cursor-pointer border border-border"
+                      onClick={handleCopyUPI}
+                    >
+                      <div className="text-left text-slate-900 dark:text-white">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
+                          Copy UPI ID
+                        </p>
+                        <p className="text-xs font-mono font-black truncate max-w-[150px]">
+                          {paymentConfig?.upiId || "Fetching..."}
+                        </p>
+                      </div>
+                      <div className="h-8 w-8 bg-white dark:bg-zinc-800 rounded-xl shadow-sm flex items-center justify-center text-foreground">
+                        {copied ? (
+                          <Check className="text-green-500 h-4 w-4" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+                        UTR / Transaction ID
+                      </Label>
+                      <Input
+                        placeholder="Enter 12 Digit UTR"
+                        className="h-10 text-sm font-bold rounded-xl border border-border shadow-sm"
+                        value={utrNumber}
+                        onChange={(e) => setUtrNumber(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black text-slate-400 uppercase ml-1">
+                        Screenshot
+                      </Label>
+                      <label className="flex items-center justify-center w-full h-12 border border-dashed rounded-xl cursor-pointer bg-background hover:bg-slate-50 dark:hover:bg-zinc-800 border-border text-xs font-bold transition-all">
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept="image/*"
+                          onChange={(e) => setScreenshot(e.target.files?.[0] || null)}
+                        />
+                        {screenshot ? (
+                          <span className="text-green-600 truncate max-w-[200px] flex items-center gap-1">
+                            <Check size={14} className="text-green-500" /> {screenshot.name}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">Upload Screenshot</span>
+                        )}
+                      </label>
+                    </div>
+
+                    {uploading && (
+                      <div className="space-y-1 px-1">
+                        <div className="flex justify-between text-[8px] font-black uppercase text-primary">
+                          <span>Uploading...</span>
+                          <span>{uploadProgress}%</span>
+                        </div>
+                        <Progress value={uploadProgress} className="h-1.5 rounded-full" />
+                      </div>
+                    )}
+
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting || uploading || !utrNumber.trim() || !screenshot}
+                      className="w-full h-11 text-xs font-black uppercase tracking-widest bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-lg"
+                    >
+                      {isSubmitting || uploading ? "Submitting..." : "Submit Verification"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

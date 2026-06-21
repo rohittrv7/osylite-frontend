@@ -129,9 +129,13 @@ export default function ProfilePage() {
               <span className="text-muted-foreground">Account Status</span>
               <Badge
                 variant="secondary"
-                className="bg-green-100 text-green-800"
+                className={
+                  userData.isOtpVerified || userData.isVerified
+                    ? "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300"
+                    : "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300"
+                }
               >
-                {userData.isVerified ? "Active" : "Inactive"}
+                {userData.isOtpVerified || userData.isVerified ? "Active" : "Inactive"}
               </Badge>
             </div>
           </CardContent>

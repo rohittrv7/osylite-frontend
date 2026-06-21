@@ -12,11 +12,15 @@ import { useBuyProductMutation } from "@/store/api/ordersApi"; // 🔹 Using Bul
 import { apiErrorToastHandler } from "@/helpers/apiErrorToastHandler";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { useGetProfileQuery } from "@/store/api/authApi";
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { items } = useSelector((state: RootState) => state.cart);
+
+  const { data: userData } = useGetProfileQuery();
+  const userCoins = userData?.angCoins ?? 0;
 
   // 🔹 Updated mutation hook
   const [placeOrder, { isLoading }] = useBuyProductMutation();
@@ -137,8 +141,11 @@ export default function CheckoutPage() {
                 <Coins className="w-5 h-5" /> Payment Method
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between p-5 bg-background rounded-xl border-2 border-primary shadow-sm relative overflow-hidden group">
+            <CardContent className="pt-6 space-y-4">
+              <div className={cn(
+                "flex items-center justify-between p-5 bg-background rounded-xl border-2 shadow-sm relative overflow-hidden group",
+                userCoins >= totalAmount ? "border-primary" : "border-border opacity-60"
+              )}>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
                     <Coins className="text-primary w-6 h-6" />
@@ -148,12 +155,26 @@ export default function CheckoutPage() {
                       Pay with ANG Coins
                     </h4>
                     <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-                      Instant & Secure Transaction
+                      Available: {userCoins.toLocaleString()} Coins (Need: {totalAmount.toLocaleString()})
                     </p>
                   </div>
                 </div>
-                <CheckCircle2 className="text-primary w-6 h-6 fill-primary/10" />
+                {userCoins >= totalAmount && <CheckCircle2 className="text-primary w-6 h-6 fill-primary/10" />}
               </div>
+
+              {userCoins < totalAmount && (
+                <div className="border-2 border-dashed border-orange-200 bg-orange-50/50 dark:bg-orange-950/20 p-5 rounded-xl space-y-3">
+                  <p className="text-xs font-bold text-orange-600 dark:text-orange-400">
+                    ⚠️ You do not have enough coins to complete this order. Need {(totalAmount - userCoins).toLocaleString()} more coins (approx ₹{((totalAmount - userCoins) * 2).toLocaleString()}).
+                  </p>
+                  <Button
+                    onClick={() => navigate(`/buy-coins?redirect=/checkout&amount=${(totalAmount - userCoins) * 2}`)}
+                    className="w-full h-11 bg-orange-600 hover:bg-orange-700 text-white font-black italic uppercase text-xs tracking-wider rounded-lg shadow-md"
+                  >
+                    Pay with Currency (Buy Coins)
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -221,7 +242,7 @@ export default function CheckoutPage() {
               <Button
                 className="w-full h-16 rounded-2xl font-black italic uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl shadow-primary/20 transition-all active:scale-95 group"
                 onClick={handlePlaceOrder}
-                disabled={isLoading || items.length === 0}
+                disabled={isLoading || items.length === 0 || userCoins < totalAmount}
               >
                 {isLoading ? (
                   <Loader2 className="animate-spin w-6 h-6" />
